@@ -26,3 +26,11 @@ class NumberLexerErrors:
     @staticmethod
     def trailing_exponent_sign() -> str:
         return "Trailing sign in exponent"
+
+    @staticmethod
+    def no_hex_digits() -> str:
+        return "No hexadecimal digits found"
+
+    @staticmethod
+    def invalid_constant(expected: str, actual: str) -> str:
+        return f"Invalid constant, expected {expected}, got {actual}"
