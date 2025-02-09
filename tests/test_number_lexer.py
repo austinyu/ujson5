@@ -38,7 +38,7 @@ valid_examples = [
 
 valid_examples_entry = [f"{eg}," for eg in valid_examples]
 
-valid_examples_entry_spaces = [f"{eg}{" " * randint(1, 10)}," for eg in valid_examples]
+valid_examples_entry_spaces = [f"{eg}{' ' * randint(1, 10)}," for eg in valid_examples]
 
 valid_example_upper = [eg.upper() for eg in valid_examples]
 
