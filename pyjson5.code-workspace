@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"pyjson"
+		],
+		"python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+		"pylint.interpreter": [
+			"${workspaceFolder}\\.venv\\Scripts\\python.exe"
+		],
+		"editor.rulers": [80]
+	}
+}

@@ -1,0 +1,41 @@
+[project]
+name = "pyjson5"
+description = "TODO"
+authors = [
+    {name = "Austin Yu",email = "yuxm.austin1023@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+]
+dynamic = ["version"]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+version = "0.0.0"
+[tool.poetry.requires-plugins]
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+
+
+
+[tool.pytest.ini_options]
+addopts = """
+    --cov pyjson5
+    --cov-report xml:tests/.coverage/cov.xml
+    --cov-report html:tests/.coverage/html
+"""
+
+[tool.poetry-dynamic-versioning]
+enable = true
