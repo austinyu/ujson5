@@ -1,10 +1,10 @@
 pyjson5
 
+https://github.com/marketplace/actions/install-poetry-action
+
+
+
 - `poetry install --with test`
-
-
-
-
 - Number DFA
 
 ```
@@ -64,8 +64,6 @@ TRAILING_WS (accepting):
   on other          -> ERROR
 
 ```
-
-
 
 ```
                 # whitespace characters defined here
