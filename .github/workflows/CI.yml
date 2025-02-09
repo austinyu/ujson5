@@ -36,7 +36,7 @@ jobs:
           python -m pip install build
           python -m build
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ runner.os }}-py${{ matrix.python-version }}
           path: dist/*
@@ -68,7 +68,7 @@ jobs:
           python -m pip install build
           python -m build
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ runner.os }}-py${{ matrix.python-version }}
           path: dist/*
@@ -98,7 +98,7 @@ jobs:
           python -m pip install build
           python -m build
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ runner.os }}-py${{ matrix.python-version }}
           path: dist/*
