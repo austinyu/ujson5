@@ -77,7 +77,7 @@ def test_valid_multiline_string(text_strings: list[str], spacing: int) -> None:
     original_string = "\n".join(text_strings).encode().decode("unicode_escape")
     original_string = f'"{original_string}"'
     multi_line_string = (
-        f"\\{" " * spacing}{choice(list(LINE_TERMINATOR_SEQUENCE))}".join(text_strings)
+        f"\\{' ' * spacing}{choice(list(LINE_TERMINATOR_SEQUENCE))}".join(text_strings)
     )
     multi_line_string = f'"{multi_line_string}"'
     multi_line_string = simplify_escapes(multi_line_string)
