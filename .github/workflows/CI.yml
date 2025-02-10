@@ -56,10 +56,10 @@ jobs:
           poetry run flake8 .
       - name: Lint code with pylint
         run: |
-          poetry run pylint .
+          poetry run pylint src tests --rcfile=.pylintrc
       - name: Type check with mypy
         run: |
-          poetry run mypy .
+          poetry run mypy src tests
       #----------------------------------------------
       #       run test suite & publish coverage
       #----------------------------------------------

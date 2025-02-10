@@ -26,14 +26,13 @@ string_valid_examples_raw: list[str] = [
     *[f"hello\\{es} with es" for es in ESCAPE_SEQUENCE_NO_NL],
 ]
 
-
 string_valid_examples_single: list[str] = [
-    f"'{raw}'{" " * randint(1, 10)}{choice(list(LINE_TERMINATOR_SEQUENCE))}"
+    f"'{raw}'{' ' * randint(1, 10)}{choice(list(LINE_TERMINATOR_SEQUENCE))}"
     for raw in string_valid_examples_raw
 ]
 
 string_valid_examples_double: list[str] = [
-    f'"{raw}"{" " * randint(1, 10)}{choice(list(LINE_TERMINATOR_SEQUENCE))}'
+    f'"{raw}"{' ' * randint(1, 10)}{choice(list(LINE_TERMINATOR_SEQUENCE))}'
     for raw in string_valid_examples_raw
 ]
 

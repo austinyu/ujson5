@@ -35,11 +35,12 @@ repos:
         language: system
         types: [python]
         require_serial: true
-        args:
-          [
+        args: [
+            "src",
+            "tests",
             "-rn", # Only display messages
             "-sn", # Don't display the score
-            "--rcfile=.pylintrc"
+            "--rcfile=.pylintrc",
           ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
