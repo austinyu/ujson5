@@ -10,4 +10,4 @@ jobs:
       - uses: psf/black@stable
         with:
           src: "./src"
-          use_pyproject: true
+          options: "--check --verbose"
