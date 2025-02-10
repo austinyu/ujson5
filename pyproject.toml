@@ -21,14 +21,27 @@ version = "0.0.0"
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
-[tool.poetry.group.test]
+[tool.poetry.group.dev]
 optional = true
 
-[tool.poetry.group.test.dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
+black = "^25.1.0"
+flake8 = "^7.1.1"
+pylint = "^3.3.4"
+mypy = "^1.15.0"
+flake8-simplify = "^0.21.0"
+flake8-mutable = "^1.2.0"
+flake8-print = "^5.0.0"
+flake8-use-fstring = "^1.4"
+flake8-builtins = "^2.5.0"
+flake8-functions-names = "^0.4.0"
+flake8-variables-names = "^0.0.6"
+flake8-no-implicit-concat = "^0.3.7"
 
-
+[tool.bandit]
+skips = ["B101", "B311"]
 
 [tool.pytest.ini_options]
 addopts = """

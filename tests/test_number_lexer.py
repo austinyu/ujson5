@@ -1,3 +1,5 @@
+"""Tests for the number lexer."""
+
 from random import randint
 
 import pytest
@@ -136,7 +138,9 @@ number_invalid_examples = [
     "+nan",
     "-nan",
     "Infinity Infinity",
-    "InfinityInfinity" "InfinityK" "NaN NaN",
+    "InfinityInfinity",
+    "InfinityK",
+    "NaN NaN",
     "NaNNad",
     "NaNN",
     "0 0",
@@ -145,7 +149,8 @@ number_invalid_examples = [
     "1.2e-3 1.2e-3",
     "0x0 0x0",
     "0x1 0x1    ",
-    "++" "-  -",
+    "++",
+    "-  -",
 ]
 
 
@@ -158,16 +163,18 @@ number_invalid_examples = [
     + number_valid_examples_spaces_entry,
 )
 def test_valid_numbers(text_number: str) -> None:
+    """Test valid numbers."""
     result = tokenize_number(buffer=text_number, idx=0)
     assert result.token is not None
-    assert result.token["type"] == TokenType.JSON5_NUMBER
+    assert result.token.tk_type == TokenType.JSON5_NUMBER
     if "," in text_number:
-        assert result.token["value"] == text_number.strip()[:-1].strip()
+        assert result.token.value == text_number.strip()[:-1].strip()
     else:
-        assert result.token["value"] == text_number.strip()
+        assert result.token.value == text_number.strip()
 
 
 @pytest.mark.parametrize("text_number", number_invalid_examples)
 def test_invalid_invalid_numbers(text_number: str) -> None:
+    """Test invalid numbers."""
     with pytest.raises(JSON5DecodeError):
         tokenize_number(buffer=text_number, idx=0)

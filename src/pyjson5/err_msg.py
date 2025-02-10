@@ -1,10 +1,19 @@
+"""Error messages for lexer and parser"""
+
+# pylint: disable=C0116
+
+
 class LexerErrors:
+    """General lexer errors"""
+
     @staticmethod
     def unexpected_eof() -> str:
         return "Unexpected end of file"
 
 
 class NumberLexerErrors:
+    """Errors related to number lexer"""
+
     @staticmethod
     def unexpected_char_in_number(char: str) -> str:
         return f"Unexpected character '{char}' in number"
@@ -43,6 +52,8 @@ class NumberLexerErrors:
 
 
 class StringLexerErrors:
+    """Errors related to string lexer"""
+
     @staticmethod
     def string_invalid_start(char: str) -> str:
         return f"Invalid start of string: <{char}>"

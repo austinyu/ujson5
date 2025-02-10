@@ -1,0 +1,22 @@
+[MASTER]
+# A comma-separated list of package or module names from where C extensions may be loaded.
+extension-pkg-whitelist=
+# List of modules to be ignored (as a comma-separated string)
+ignored-modules=pytest
+
+[MESSAGES CONTROL]
+# Disable the following messages:
+disable=
+    R0912,  # too-many-branches
+    R0915,  # too-many-statements
+    R0903,  # too-few-public-methods
+
+[REPORTS]
+# Tells whether to display a full report or only the messages.
+reports=no
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=88
+
+[DESIGN]

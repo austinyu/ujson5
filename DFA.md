@@ -96,12 +96,12 @@ NumericLiteral ::
     DecimalLiteral
     HexIntegerLiteral
 DecimalLiteral ::
-    DecimalIntegerLiteral . DecimalDigitsopt ExponentPartopt
-    . DecimalDigits ExponentPartopt
-    DecimalIntegerLiteral ExponentPartopt
+    DecimalIntegerLiteral . DecimalDigits _opt ExponentPart _opt
+    . DecimalDigits ExponentPart _opt
+    DecimalIntegerLiteral ExponentPart _opt
 DecimalIntegerLiteral ::
     0
-    NonZeroDigit DecimalDigitsopt
+    NonZeroDigit DecimalDigits _opt
 DecimalDigits ::
     DecimalDigit
     DecimalDigits DecimalDigit

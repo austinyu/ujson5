@@ -1,10 +1,17 @@
+"""Test the string lexer."""
+
 from random import choice, choices, randint
 
 import pytest
 
 from pyjson5.core import JSON5DecodeError
-from pyjson5.lexer import (ESCAPE_SEQUENCE, LINE_TERMINATOR_SEQUENCE,
-                           TokenType, simplify_escapes, tokenize_string)
+from pyjson5.lexer import (
+    ESCAPE_SEQUENCE,
+    LINE_TERMINATOR_SEQUENCE,
+    TokenType,
+    simplify_escapes,
+    tokenize_string,
+)
 
 ESCAPE_SEQUENCE_NO_NL = ESCAPE_SEQUENCE.copy()
 del ESCAPE_SEQUENCE_NO_NL["n"]
@@ -57,17 +64,17 @@ string_invalid_examples: list[str] = [
     "text_string", string_valid_examples_single + string_valid_examples_double
 )
 def test_valid_strings(text_string: str) -> None:
+    """Test valid strings that do not escape to multiple lines."""
     text_string = simplify_escapes(text_string)
     result = tokenize_string(buffer=text_string, idx=0)
     assert result.token is not None
-    assert result.token["type"] == TokenType.JSON5_STRING
-    assert result.token["value"] == text_string.strip().encode().decode(
-        "unicode_escape"
-    )
+    assert result.token.tk_type == TokenType.JSON5_STRING
+    assert result.token.value == text_string.strip().encode().decode("unicode_escape")
 
 
 @pytest.mark.parametrize("text_strings, spacing", string_multi_lines_ext)
 def test_valid_multiline_string(text_strings: list[str], spacing: int) -> None:
+    """Test valid strings that escape to multiple lines."""
     original_string = "\n".join(text_strings).encode().decode("unicode_escape")
     original_string = f'"{original_string}"'
     multi_line_string = (
@@ -77,11 +84,12 @@ def test_valid_multiline_string(text_strings: list[str], spacing: int) -> None:
     multi_line_string = simplify_escapes(multi_line_string)
     result = tokenize_string(buffer=multi_line_string, idx=0)
     assert result.token is not None
-    assert result.token["type"] == TokenType.JSON5_STRING
-    assert result.token["value"] == original_string
+    assert result.token.tk_type == TokenType.JSON5_STRING
+    assert result.token.value == original_string
 
 
 @pytest.mark.parametrize("text_string", string_invalid_examples)
 def test_invalid_strings(text_string: str) -> None:
+    """Test invalid strings."""
     with pytest.raises(JSON5DecodeError):
         tokenize_string(buffer=text_string, idx=0)

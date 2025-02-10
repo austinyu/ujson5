@@ -6,14 +6,12 @@
 	],
 	"settings": {
 		"cSpell.words": [
-			"Characterbut",
-			"Charactersopt",
-			"pyjson"
+
 		],
 		"python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
 		"pylint.interpreter": [
 			"${workspaceFolder}\\.venv\\Scripts\\python.exe"
 		],
-		"editor.rulers": [80]
+		"editor.rulers": [88]
 	}
 }

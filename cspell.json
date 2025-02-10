@@ -1,0 +1,30 @@
+{
+  "version": "0.2",
+  "ignorePaths": [
+    ".github/*",
+    ".pre-commit-config.yaml"
+  ],
+  "dictionaryDefinitions": [],
+  "dictionaries": [],
+  "words": [
+    "addopts",
+    "bfnrtv",
+    "Characterbut",
+    "Charactersopt",
+    "fstring",
+    "htmlcov",
+    "isspace",
+    "mypy",
+    "NOINT",
+    "nosetests",
+    "pycache",
+    "pyjson",
+    "pylint",
+    "pytest",
+    "snok",
+    "venv",
+    "virtualenvs"
+  ],
+  "ignoreWords": [],
+  "import": []
+}

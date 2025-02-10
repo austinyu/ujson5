@@ -1,23 +1,70 @@
+# pre-commit autoupdate
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v5.0.0
     hooks:
-      - id: trailing-whitespace
       - id: end-of-file-fixer
+      - id: trailing-whitespace
       - id: check-yaml
+      - id: check-toml
       - id: check-added-large-files
 
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args:
+          [--remove-all-unused-imports, "--remove-unused-variables", --in-place]
+
   - repo: https://github.com/psf/black
-    rev: 23.9.1
+    rev: 25.1.0
     hooks:
       - id: black
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+  - repo: https://github.com/pycqa/flake8
+    rev: "7.1.1" # pick a git hash / tag to point to
     hooks:
-      - id: isort
+      - id: flake8
 
-  # - repo: https://github.com/PyCQA/flake8
-  #   rev: 6.1.0
-  #   hooks:
-  #     - id: flake8
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        require_serial: true
+        args:
+          [
+            "-rn", # Only display messages
+            "-sn", # Don't display the score
+            "--rcfile=.pylintrc"
+          ]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "v1.15.0" # Use the sha / tag you want to point at
+    hooks:
+      - id: mypy
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: "1.8.2" # Update me!
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+
+  - repo: https://github.com/streetsidesoftware/cspell-cli
+    rev: v8.17.2
+    hooks:
+      - id: cspell # Spell check changed files
+      - id: cspell # Spell check the commit message
+        name: check commit message spelling
+        args:
+          - --no-must-find-files
+          - --no-progress
+          - --no-summary
+          - --files
+          - .git/COMMIT_EDITMSG
+        stages: [commit-msg]
+        always_run: true
