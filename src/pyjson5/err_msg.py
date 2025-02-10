@@ -1,3 +1,9 @@
+class LexerErrors:
+    @staticmethod
+    def unexpected_eof() -> str:
+        return "Unexpected end of file"
+
+
 class NumberLexerErrors:
     @staticmethod
     def unexpected_char_in_number(char: str) -> str:
@@ -34,3 +40,17 @@ class NumberLexerErrors:
     @staticmethod
     def invalid_constant(expected: str, actual: str) -> str:
         return f"Invalid constant, expected {expected}, got {actual}"
+
+
+class StringLexerErrors:
+    @staticmethod
+    def string_invalid_start(char: str) -> str:
+        return f"Invalid start of string: <{char}>"
+
+    @staticmethod
+    def unexpected_end_of_string() -> str:
+        return "Unexpected end of string"
+
+    @staticmethod
+    def unexpected_escape_sequence(char: str) -> str:
+        return f"Unexpected escape sequence: <{char}>"

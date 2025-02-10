@@ -14,7 +14,7 @@ class JSON5DecodeError(ValueError):
     def __init__(self, msg: str, doc: str, pos: int):
         lineno = doc.count("\n", 0, pos) + 1
         colno = pos - doc.rfind("\n", 0, pos)
-        errmsg = "%s: line %d column %d (char %d)" % (msg, lineno, colno, pos)
+        errmsg = f"{msg}: line {lineno} column {colno} (char {pos})"
         ValueError.__init__(self, errmsg)
         self.msg = msg
         self.doc = doc

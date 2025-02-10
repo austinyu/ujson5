@@ -3,9 +3,9 @@ from random import randint
 import pytest
 
 from pyjson5.core import JSON5DecodeError
-from pyjson5.lexer import tokenize_number
+from pyjson5.lexer import TokenType, tokenize_number
 
-valid_examples = [
+number_valid_examples = [
     "0",
     "0",
     "3e2",
@@ -46,7 +46,7 @@ valid_examples = [
     "-.434",
 ]
 
-valid_constants = [
+number_valid_constants = [
     "Infinity",
     "+Infinity",
     "-Infinity",
@@ -55,19 +55,20 @@ valid_constants = [
     "-NaN",
 ]
 
-valid_example_upper = [eg.upper() for eg in valid_examples]
+number_valid_example_upper = [eg.upper() for eg in number_valid_examples]
 
-valid_examples_spaces = [
-    f"{' ' * randint(1, 10)}{eg}{' ' * randint(1, 10)}"
-    for eg in valid_examples + valid_example_upper
+number_valid_examples_spaces = [
+    f"{eg}{' ' * randint(1, 10)}"
+    for eg in number_valid_examples + number_valid_example_upper
 ]
 
-valid_examples_spaces_entry = [
-    f"{eg},{' ' * randint(1, 10)}" for eg in valid_examples_spaces + valid_example_upper
+number_valid_examples_spaces_entry = [
+    f"{eg},{' ' * randint(1, 10)}"
+    for eg in number_valid_examples_spaces + number_valid_example_upper
 ]
 
 
-invalid_examples = [
+number_invalid_examples = [
     "",
     "    ",
     "-",
@@ -85,7 +86,7 @@ invalid_examples = [
     "5.5.5",
     "1.",
     "1 e3",
-    " 0d",
+    "0d",
     " 2f",
     " 2ei",
     "2e9d",
@@ -121,6 +122,14 @@ invalid_examples = [
     "Na",
     "-Na",
     "infinity",
+    "InfinityHere",
+    "NaNHere",
+    "+InfinityHere",
+    "-NaNHere",
+    "InfinitY",
+    "Nan",
+    "+InfinitY",
+    "-Nan",
     "nan",
     "+infinity",
     "-infinity",
@@ -141,18 +150,24 @@ invalid_examples = [
 
 
 @pytest.mark.parametrize(
-    "test_input",
-    valid_examples
-    + valid_constants
-    + valid_example_upper
-    + valid_examples_spaces
-    + valid_examples_spaces_entry,
+    "text_number",
+    number_valid_examples
+    + number_valid_constants
+    + number_valid_example_upper
+    + number_valid_examples_spaces
+    + number_valid_examples_spaces_entry,
 )
-def test_valid_literals(test_input):
-    assert tokenize_number(buffer=test_input, idx=0).token is not None
+def test_valid_numbers(text_number: str) -> None:
+    result = tokenize_number(buffer=text_number, idx=0)
+    assert result.token is not None
+    assert result.token["type"] == TokenType.JSON5_NUMBER
+    if "," in text_number:
+        assert result.token["value"] == text_number.strip()[:-1].strip()
+    else:
+        assert result.token["value"] == text_number.strip()
 
 
-@pytest.mark.parametrize("test_input", invalid_examples)
-def test_invalid_literals(test_input):
+@pytest.mark.parametrize("text_number", number_invalid_examples)
+def test_invalid_invalid_numbers(text_number: str) -> None:
     with pytest.raises(JSON5DecodeError):
-        tokenize_number(buffer=test_input, idx=0)
+        tokenize_number(buffer=text_number, idx=0)

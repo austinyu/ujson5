@@ -1,8 +1,9 @@
+import re
 from enum import Enum, auto
 from typing import Literal, NamedTuple, TypedDict
 
-from . import err_msg
 from .core import JSON5DecodeError
+from .err_msg import LexerErrors, NumberLexerErrors, StringLexerErrors
 
 
 class TokenType(Enum):
@@ -22,56 +23,71 @@ class TokenResult(NamedTuple):
     idx: int
 
 
+LINE_TERMINATOR_SEQUENCE = {
+    "\u000A",  # <LF>
+    "\u000D",  # <CR> [lookahead ∉ <LF> ]
+    "\u2028",  # <LS>
+    "\u2029",  # <PS>
+    "\u000D\u000A",  # <CR> <LF>
+}
+
+ESCAPE_SEQUENCE = {
+    "'": "\u0027",  # Apostrophe
+    '"': "\u0022",  # Quotation mark
+    "\\": "\u005C",  # Reverse solidus
+    "b": "\u0008",  # Backspace
+    "f": "\u000C",  # Form feed
+    "n": "\u000A",  # Line feed
+    "r": "\u000D",  # Carriage return
+    "t": "\u0009",  # Horizontal tab
+    "v": "\u000B",  # Vertical tab
+    "0": "\u0000",  # Null
+}
+TOKEN_END_CHARS = {",", "]", "}", "\n"}
+
+
+def simplify_escapes(s: str) -> str:
+    """Simplify escape sequences in a string. This function replaces line
+    continuation sequences with a newline character.
+
+    Args:
+        s (str): string with escape sequences
+
+    Returns:
+        str: string with escape sequences simplified
+    """
+    s = re.sub(
+        r"(?:\u000D\u000A|[\u000A\u000D\u2028\u2029])",
+        "\n",
+        s,
+    )
+    return s
+
+
 NON_ZERO_DIGITS = set("1 2 3 4 5 6 7 8 9".split())
 DIGITS = set("0 1 2 3 4 5 6 7 8 9".split())
 EXPONENT_INDICATORS = {"e", "E"}
 SIGN = {"+", "-"}
 HEX_DIGITS = set("0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F".split())
 
-
-"""
-LEADING_WS: Leading whitespace before the number
-SIGN: Sign of the number (+ or -)
-INF_I: 'I' in 'Infinity'
-INF_IN: 'n' in 'Infinity'
-INF_INF: 'f' in 'Infinity'
-INF_INFI: 'i' in 'Infinity'
-INF_INFIN: 'n' in 'Infinity'
-INF_INFINI: 'i' in 'Infinity'
-INF_INFINIT: 't' in 'Infinity'
-INF_INFINITY: 'y' in 'Infinity' (accepting)
-NAN_N: 'N' in 'NaN'
-NAN_NA: 'a' in 'NaN'
-NAN_NAN: 'N' in 'NaN' (accepting)
-INT_ZERO: Integer zero (accepting)
-INT_NONZERO: Non-zero integer (accepting)
-DOT_NOINT: Dot without integer part
-FRACTION: Fractional part of the number (accepting)
-EXP_START: Start of the exponent part
-EXP_SIGN: Sign of the exponent
-EXP_DIGITS: Digits of the exponent (accepting)
-TRAILING_WS: Trailing whitespace after the number (accepting)
-HEX_START: Start of a hexadecimal number
-HEX_DIGITS: Digits of a hexadecimal number (accepting)
-"""
 NumberStateLiteral = Literal[
-    "LEADING_WS",
-    "SIGN",
-    "INF_INFINITY",  # accepting
-    "NAN_NAN",  # accepting
-    "INT_ZERO",  # accepting
-    "INT_NONZERO",  # accepting
-    "DOT_NOINT",
-    "FRACTION",  # accepting
-    "EXP_START",
-    "EXP_SIGN",
-    "EXP_DIGITS",  # accepting
-    "TRAILING_WS",  # accepting
-    "HEX_START",
-    "HEX_DIGITS",  # accepting
+    "NUMBER_START",  # Initial state, waiting for a number
+    "SIGN",  # Read a + or - sign, waiting for number
+    "INF_INFINITY",  # Read 'Infinity' (accepting)
+    "NAN_NAN",  # Read 'NaN' (accepting)
+    "INT_ZERO",  # Read integer zero (accepting)
+    "INT_NONZERO",  # Read non-zero integer (accepting)
+    "DOT_NOINT",  # Read dot without integer part, waiting for fraction
+    "FRACTION",  # Read fractional part of the number (accepting)
+    "EXP_START",  # Start of the exponent part, waiting for sign or digit
+    "EXP_SIGN",  # Read sign of the exponent, waiting for digit
+    "EXP_DIGITS",  # Read digits of the exponent (accepting)
+    "TRAILING_WS",  # Read trailing whitespace after the number (accepting)
+    "HEX_START",  # Start of a hexadecimal number, waiting for hex digits
+    "HEX_DIGITS",  # Read digits of a hexadecimal number (accepting)
 ]
 NumberState: dict[NumberStateLiteral, int] = {
-    "LEADING_WS": 0,
+    "NUMBER_START": 0,
     "SIGN": 1,
     "INF_INFINITY": 2,  # accepting
     "NAN_NAN": 3,  # accepting
@@ -87,7 +103,7 @@ NumberState: dict[NumberStateLiteral, int] = {
     "HEX_DIGITS": 13,  # accepting
 }
 
-ACCEPTING_STATES = {
+NUMBER_ACCEPTING_STATES = {
     NumberState["INF_INFINITY"],
     NumberState["NAN_NAN"],
     NumberState["INT_ZERO"],
@@ -101,7 +117,7 @@ ACCEPTING_STATES = {
 
 def handle_unexpected_char(buffer: str, idx: int, char: str) -> None:
     raise JSON5DecodeError(
-        msg=err_msg.NumberLexerErrors.unexpected_char_in_number(char),
+        msg=NumberLexerErrors.unexpected_char_in_number(char),
         doc=buffer,
         pos=idx,
     )
@@ -109,49 +125,51 @@ def handle_unexpected_char(buffer: str, idx: int, char: str) -> None:
 
 def tokenize_number(buffer: str, idx: int) -> TokenResult:
     """Transition Table"""
-    state: int = NumberState["LEADING_WS"]
-    number_start_idx, number_end_idx = idx, idx
-
+    state: int = NumberState["NUMBER_START"]
+    start_idx = idx
     while idx < len(buffer):
         char = buffer[idx]
 
-        if char == ",":
-            if state in ACCEPTING_STATES and state != NumberState["TRAILING_WS"]:
-                number_end_idx = idx
+        if char in TOKEN_END_CHARS:
             break
 
-        if state == NumberState["LEADING_WS"]:
-            if char.isspace():
-                state = NumberState["LEADING_WS"]
-                idx += 1
-            elif char in {"+", "-"}:
-                number_start_idx = idx
+        if state == NumberState["NUMBER_START"]:
+            if char in {"+", "-"}:
                 state = NumberState["SIGN"]
                 idx += 1
             elif char == "I":
-                number_start_idx = idx
                 # directly check if we have "Infinity"
-                if idx + 8 <= len(buffer) and buffer[idx : idx + 8] == "Infinity":
+                if idx + 8 > len(buffer):
+                    raise JSON5DecodeError(
+                        msg=LexerErrors.unexpected_eof(),
+                        doc=buffer,
+                        pos=idx,
+                    )
+                elif buffer[idx : idx + 8] == "Infinity":
                     idx += 8
                     state = NumberState["INF_INFINITY"]
-                    number_end_idx = idx
                 else:
                     raise JSON5DecodeError(
-                        msg=err_msg.NumberLexerErrors.invalid_constant(
+                        msg=NumberLexerErrors.invalid_constant(
                             "Infinity", buffer[idx : idx + 8]
                         ),
                         doc=buffer,
                         pos=idx,
                     )
             elif char == "N":
-                number_start_idx = idx
                 # directly check if we have "NaN"
-                if idx + 3 <= len(buffer) and buffer[idx : idx + 3] == "NaN":
+                if idx + 3 > len(buffer):
+                    raise JSON5DecodeError(
+                        msg=LexerErrors.unexpected_eof(),
+                        doc=buffer,
+                        pos=idx,
+                    )
+                elif buffer[idx : idx + 3] == "NaN":
                     idx += 3
                     state = NumberState["NAN_NAN"]
                 else:
                     raise JSON5DecodeError(
-                        msg=err_msg.NumberLexerErrors.invalid_constant(
+                        msg=NumberLexerErrors.invalid_constant(
                             "NaN", buffer[idx : idx + 3]
                         ),
                         doc=buffer,
@@ -159,43 +177,47 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
                     )
             elif char == "0":
                 idx += 1
-                number_start_idx = idx
                 state = NumberState["INT_ZERO"]
             elif char in NON_ZERO_DIGITS:
                 idx += 1
-                number_start_idx = idx
                 state = NumberState["INT_NONZERO"]
             elif char == ".":
                 idx += 1
-                number_start_idx = idx
                 state = NumberState["DOT_NOINT"]
             else:
                 handle_unexpected_char(buffer, idx, char)
         elif state == NumberState["SIGN"]:
             if char == "I":
-                number_start_idx = idx
-                if idx + 8 <= len(buffer) and buffer[idx : idx + 8] == "Infinity":
+                if idx + 8 > len(buffer):
+                    raise JSON5DecodeError(
+                        msg=LexerErrors.unexpected_eof(),
+                        doc=buffer,
+                        pos=idx,
+                    )
+                elif buffer[idx : idx + 8] == "Infinity":
                     idx += 8
                     state = NumberState["INF_INFINITY"]
-                    number_end_idx = idx
-                    break
                 else:
                     raise JSON5DecodeError(
-                        msg=err_msg.NumberLexerErrors.invalid_constant(
+                        msg=NumberLexerErrors.invalid_constant(
                             "Infinity", buffer[idx : idx + 8]
                         ),
                         doc=buffer,
                         pos=idx,
                     )
             elif char == "N":
-                number_start_idx = idx
-                if idx + 3 <= len(buffer) and buffer[idx : idx + 3] == "NaN":
+                if idx + 3 > len(buffer):
+                    raise JSON5DecodeError(
+                        msg=LexerErrors.unexpected_eof(),
+                        doc=buffer,
+                        pos=idx,
+                    )
+                elif buffer[idx : idx + 3] == "NaN":
                     idx += 3
                     state = NumberState["NAN_NAN"]
-                    break
                 else:
                     raise JSON5DecodeError(
-                        msg=err_msg.NumberLexerErrors.invalid_constant(
+                        msg=NumberLexerErrors.invalid_constant(
                             "NaN", buffer[idx : idx + 3]
                         ),
                         doc=buffer,
@@ -212,7 +234,6 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
                 state = NumberState["DOT_NOINT"]
             else:
                 handle_unexpected_char(buffer, idx, char)
-            number_start_idx = idx
         elif state == NumberState["INT_ZERO"]:
             if char == "x" or char == "X":
                 state = NumberState["HEX_START"]
@@ -221,11 +242,10 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             elif char in EXPONENT_INDICATORS:
                 state = NumberState["EXP_START"]
             elif char.isspace():
-                number_end_idx = idx
                 state = NumberState["TRAILING_WS"]
             elif char in DIGITS:
                 raise JSON5DecodeError(
-                    msg=err_msg.NumberLexerErrors.leading_zero_followed_by_digit(),
+                    msg=NumberLexerErrors.leading_zero_followed_by_digit(),
                     doc=buffer,
                     pos=idx,
                 )
@@ -240,7 +260,6 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             elif char in EXPONENT_INDICATORS:
                 state = NumberState["EXP_START"]
             elif char.isspace():
-                number_end_idx = idx
                 state = NumberState["TRAILING_WS"]
             else:
                 handle_unexpected_char(buffer, idx, char)
@@ -256,7 +275,6 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             elif char in EXPONENT_INDICATORS:
                 state = NumberState["EXP_START"]
             elif char.isspace():
-                number_end_idx = idx
                 state = NumberState["TRAILING_WS"]
             else:
                 handle_unexpected_char(buffer, idx, char)
@@ -279,7 +297,6 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             if char in DIGITS:
                 state = NumberState["EXP_DIGITS"]
             elif char.isspace():
-                number_end_idx = idx
                 state = NumberState["TRAILING_WS"]
             else:
                 handle_unexpected_char(buffer, idx, char)
@@ -293,7 +310,6 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             if char in HEX_DIGITS:
                 state = NumberState["HEX_DIGITS"]
             elif char.isspace():
-                number_end_idx = idx
                 state = NumberState["TRAILING_WS"]
             else:
                 handle_unexpected_char(buffer, idx, char)
@@ -310,54 +326,204 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
                 state = NumberState["TRAILING_WS"]
             else:
                 raise JSON5DecodeError(
-                    msg=err_msg.NumberLexerErrors.space_in_number(),
+                    msg=NumberLexerErrors.space_in_number(),
                     doc=buffer,
                     pos=idx,
                 )
             idx += 1
 
-    if state in ACCEPTING_STATES:
+    if state in NUMBER_ACCEPTING_STATES:
         return TokenResult(
             Token(
                 type=TokenType.JSON5_NUMBER,
-                value=buffer[number_start_idx:number_end_idx],
+                value=buffer[start_idx:idx].strip(),
             ),
             idx,
         )
-    elif state == NumberState["LEADING_WS"]:
+    elif state == NumberState["NUMBER_START"]:
         raise JSON5DecodeError(
-            msg=err_msg.NumberLexerErrors.no_number(),
+            msg=NumberLexerErrors.no_number(),
             doc=buffer,
             pos=idx,
         )
     elif state == NumberState["SIGN"]:
         raise JSON5DecodeError(
-            msg=err_msg.NumberLexerErrors.no_number(),
+            msg=NumberLexerErrors.no_number(),
             doc=buffer,
             pos=idx,
         )
     elif state == NumberState["DOT_NOINT"]:
         raise JSON5DecodeError(
-            msg=err_msg.NumberLexerErrors.trailing_dot(),
+            msg=NumberLexerErrors.trailing_dot(),
             doc=buffer,
             pos=idx,
         )
     elif state == NumberState["EXP_START"]:
         raise JSON5DecodeError(
-            msg=err_msg.NumberLexerErrors.trailing_exponent(),
+            msg=NumberLexerErrors.trailing_exponent(),
             doc=buffer,
             pos=idx,
         )
     elif state == NumberState["HEX_START"]:
         raise JSON5DecodeError(
-            msg=err_msg.NumberLexerErrors.no_hex_digits(),
+            msg=NumberLexerErrors.no_hex_digits(),
             doc=buffer,
             pos=idx,
         )
     else:
         assert state == NumberState["EXP_SIGN"], state
         raise JSON5DecodeError(
-            msg=err_msg.NumberLexerErrors.trailing_exponent_sign(),
+            msg=NumberLexerErrors.trailing_exponent_sign(),
+            doc=buffer,
+            pos=idx,
+        )
+
+
+StringStateLiteral = Literal[
+    "STRING_START",  # Initial state, waiting for a string
+    "DOUBLE_STRING",
+    "SINGLE_STRING",
+    "END_STRING",  # accepting
+]
+STRING_STATES: dict[StringStateLiteral, int] = {
+    "STRING_START": 0,
+    "DOUBLE_STRING": 1,
+    "SINGLE_STRING": 2,
+    "END_STRING": 3,  # accepting
+}
+
+
+def _escape_handler(buffer: str, idx: int) -> int:
+    """Handle escape sequences
+
+    Args:
+        buffer (str): JSON5 document
+        idx (int): current index. Must point to the escape character
+
+    Returns:
+        int: updated index
+
+    Raises:
+        JSON5DecodeError: if the escape sequence is invalid
+    """
+    assert buffer[idx] == "\\"
+    if idx + 1 == len(buffer):
+        raise JSON5DecodeError(
+            msg=LexerErrors.unexpected_eof(),
+            doc=buffer,
+            pos=idx,
+        )
+    next_char = buffer[idx + 1]
+
+    if next_char == "\n":  # Line continuation
+        idx += 2
+    elif next_char.isspace():  # Ignore whitespace
+        idx += 2
+        while idx < len(buffer):
+            character = buffer[idx]
+            if character == "\n":
+                break
+            elif character.isspace():
+                idx += 1
+            else:
+                break
+        if idx == len(buffer):
+            raise JSON5DecodeError(
+                msg=LexerErrors.unexpected_eof(),
+                doc=buffer,
+                pos=idx,
+            )
+        elif buffer[idx] == "\n":
+            idx += 1
+        else:
+            print(buffer[: idx + 1], f"<{buffer[idx]}>")
+            raise JSON5DecodeError(
+                msg=StringLexerErrors.unexpected_end_of_string(),
+                doc=buffer,
+                pos=idx,
+            )
+    elif next_char in ESCAPE_SEQUENCE:  # Single character escape sequence
+        idx += 2
+    else:
+        raise JSON5DecodeError(
+            msg=StringLexerErrors.unexpected_escape_sequence(f"\\{next_char}"),
+            doc=buffer,
+            pos=idx,
+        )
+    return idx
+
+
+def tokenize_string(buffer: str, idx: int) -> TokenResult:
+    state: int = STRING_STATES["STRING_START"]
+    start_idx = idx
+    quote = buffer[idx]
+    if quote == '"':
+        state = STRING_STATES["DOUBLE_STRING"]
+    elif quote == "'":
+        state = STRING_STATES["SINGLE_STRING"]
+    else:
+        raise JSON5DecodeError(
+            msg=StringLexerErrors.string_invalid_start(quote),
+            doc=buffer,
+            pos=idx,
+        )
+    idx += 1
+
+    while idx < len(buffer):
+        assert state != STRING_STATES["STRING_START"], state
+
+        char = buffer[idx]
+
+        if char == "\n":
+            break
+
+        if state == STRING_STATES["DOUBLE_STRING"]:
+            if char == '"':
+                state = STRING_STATES["END_STRING"]
+                idx += 1
+            elif char == "\\":
+                idx = _escape_handler(buffer, idx)
+            else:
+                idx += 1
+        elif state == STRING_STATES["SINGLE_STRING"]:
+            if char == "'":
+                state = STRING_STATES["END_STRING"]
+                idx += 1
+            elif char == "\\":
+                idx = _escape_handler(buffer, idx)
+            else:
+                idx += 1
+        else:
+            assert state == STRING_STATES["END_STRING"], state
+            if char.isspace():
+                idx += 1
+            else:
+                raise JSON5DecodeError(
+                    msg="Unexpected character after string",
+                    doc=buffer,
+                    pos=idx,
+                )
+
+    if state == STRING_STATES["END_STRING"]:
+        substring = buffer[start_idx:idx].strip()
+        # Unescape escape sequences
+        substring = re.sub(
+            r"\\([\'\"\\bfnrtv0])",
+            lambda match: ESCAPE_SEQUENCE[str(match.group(1))],
+            substring,
+        )
+        # Unescape line continuation
+        substring = re.sub(r"\\\s*\n", "\n", substring)
+        return TokenResult(
+            Token(
+                type=TokenType.JSON5_STRING,
+                value=substring,
+            ),
+            idx,
+        )
+    else:
+        raise JSON5DecodeError(
+            msg=StringLexerErrors.unexpected_end_of_string(),
             doc=buffer,
             pos=idx,
         )

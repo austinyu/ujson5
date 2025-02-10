@@ -6,6 +6,8 @@
 	],
 	"settings": {
 		"cSpell.words": [
+			"Characterbut",
+			"Charactersopt",
 			"pyjson"
 		],
 		"python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
