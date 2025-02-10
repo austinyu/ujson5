@@ -32,7 +32,7 @@ string_valid_examples_single: list[str] = [
 ]
 
 string_valid_examples_double: list[str] = [
-    f'"{raw}"{' ' * randint(1, 10)}{choice(list(LINE_TERMINATOR_SEQUENCE))}'
+    f'"{raw}"{" " * randint(1, 10)}{choice(list(LINE_TERMINATOR_SEQUENCE))}'
     for raw in string_valid_examples_raw
 ]
 
