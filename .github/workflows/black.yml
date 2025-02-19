@@ -1,4 +1,4 @@
-name: Black Formatter
+name: black formatter
 
 on: [push, pull_request]
 

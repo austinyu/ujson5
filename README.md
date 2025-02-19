@@ -12,7 +12,9 @@
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 
-
 https://github.com/marketplace/actions/install-poetry-action
 
-- `poetry install --with test`
+## Setup development environment
+- Install [poetry](https://python-poetry.org/docs/)
+- `poetry install --with dev`
+- `pre-commit install`

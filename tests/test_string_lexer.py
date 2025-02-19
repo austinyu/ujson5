@@ -43,7 +43,7 @@ string_valid_examples_double: list[str] = [
 ]
 
 
-def process_escape_sequences(s: str) -> str:
+def process_escape_sequences(text: str) -> str:
     """Process escape sequences in a string."""
     escape_sequence_re = re.compile(
         r'\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|\\[\'"\\bfnrtv0]'
@@ -66,7 +66,7 @@ def process_escape_sequences(s: str) -> str:
             "\\0": "\x00",
         }[esc]
 
-    return escape_sequence_re.sub(replace_escape, s)
+    return escape_sequence_re.sub(replace_escape, text)
 
 
 string_multi_lines_ext: list[tuple[list[str], int]] = [

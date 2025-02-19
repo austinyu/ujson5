@@ -206,24 +206,13 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             else:
                 _handle_unexpected_char(buffer, idx, char)
             idx += 1
-        elif state == NumberState["EXP_SIGN"]:
+        elif state in {NumberState["EXP_SIGN"], NumberState["EXP_DIGITS"]}:
             if char in consts.DIGITS:
                 state = NumberState["EXP_DIGITS"]
             else:
                 _handle_unexpected_char(buffer, idx, char)
             idx += 1
-        elif state == NumberState["EXP_DIGITS"]:
-            if char in consts.DIGITS:
-                state = NumberState["EXP_DIGITS"]
-            else:
-                _handle_unexpected_char(buffer, idx, char)
-            idx += 1
-        elif state == NumberState["HEX_START"]:
-            if char in consts.HEX_DIGITS:
-                state = NumberState["HEX_DIGITS"]
-            else:
-                _handle_unexpected_char(buffer, idx, char)
-        elif state == NumberState["HEX_DIGITS"]:
+        elif state in {NumberState["HEX_START"], NumberState["HEX_DIGITS"]}:
             if char in consts.HEX_DIGITS:
                 state = NumberState["HEX_DIGITS"]
             else:
@@ -528,13 +517,12 @@ def tokenize_identifier(buffer: str, idx: int) -> TokenResult:
             is_start_char = False
         if is_start_char:
             continue
-        if char in consts.UNICODE_COMBINING_MARKS:
-            idx += 1
-        elif char in consts.UNICODE_DIGITS:
-            idx += 1
-        elif char in consts.UNICODE_CONNECTORS:
-            idx += 1
-        elif char in {consts.ZWJ, consts.ZWNJ}:
+        if (
+            char in consts.UNICODE_COMBINING_MARKS
+            or char in consts.UNICODE_DIGITS
+            or char in consts.UNICODE_CONNECTORS
+            or char in {consts.ZWJ, consts.ZWNJ}
+        ):
             idx += 1
         else:
             raise JSON5DecodeError(

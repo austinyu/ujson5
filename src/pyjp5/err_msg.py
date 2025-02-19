@@ -71,5 +71,5 @@ class IdentifierLexerErrors:
         return f"Invalid start of identifier: <{char}>"
 
     @staticmethod
-    def invalid_char(char: str) -> str:
-        return f"Invalid character in identifier: <{char}>"
+    def invalid_char(character: str) -> str:
+        return f"Invalid character in identifier: <{character}>"

@@ -49,18 +49,6 @@ jobs:
           python -m pip install --upgrade pip
           poetry install --with dev --no-interaction
       #----------------------------------------------
-      #       run linters and formatters
-      #----------------------------------------------
-      - name: Lint code with flake8
-        run: |
-          poetry run flake8 .
-      - name: Lint code with pylint
-        run: |
-          poetry run pylint src tests --rcfile=.pylintrc
-      - name: Type check with mypy
-        run: |
-          poetry run mypy src tests
-      #----------------------------------------------
       #       run test suite & publish coverage
       #----------------------------------------------
       - name: Test with pytest

@@ -24,7 +24,7 @@ unicode_connectors = copy(UNICODE_CONNECTORS)
 
 
 @pytest.mark.parametrize(
-    "identifiers, start, end",
+    "identifier, start, end",
     [
         ("a", 0, 1),
         ("A", 0, 1),
@@ -39,9 +39,9 @@ unicode_connectors = copy(UNICODE_CONNECTORS)
         (f"{unicode_letters.pop()}{unicode_connectors.pop()}", 0, 2),
     ],
 )
-def test_valid_identifiers(identifiers: str, start: int, end: int) -> None:
+def test_valid_identifiers(identifier: str, start: int, end: int) -> None:
     """Test valid identifiers."""
-    result = tokenize_identifier(buffer=identifiers, idx=0)
+    result = tokenize_identifier(buffer=identifier, idx=0)
     assert result.token is not None
     assert result.token.tk_type == TokenType.JSON5_IDENTIFIER
     r_start, r_end = result.token.value
@@ -49,7 +49,7 @@ def test_valid_identifiers(identifiers: str, start: int, end: int) -> None:
 
 
 @pytest.mark.parametrize(
-    "identifiers",
+    "identifier",
     [
         "\\u22\\xab",
         f"\\u{unicode_combining_marks.pop()}",
@@ -58,7 +58,7 @@ def test_valid_identifiers(identifiers: str, start: int, end: int) -> None:
         "A\u2603",  # invalid unicode escape sequence
     ],
 )
-def test_invalid_identifiers(identifiers: str) -> None:
+def test_invalid_identifiers(identifier: str) -> None:
     """Test invalid identifiers."""
     with pytest.raises(JSON5DecodeError):
-        tokenize_identifier(buffer=identifiers, idx=0)
+        tokenize_identifier(buffer=identifier, idx=0)
