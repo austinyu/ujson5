@@ -20,10 +20,12 @@ from . import lexer_consts as consts
 class TokenType(Enum):
     """Token types for JSON5 documents"""
 
-    JSON5_IDENTIFIER = auto()
-    JSON5_PUNCTUATOR = auto()
-    JSON5_STRING = auto()
-    JSON5_NUMBER = auto()
+    IDENTIFIER = auto()
+    PUNCTUATOR = auto()
+    STRING = auto()
+    NUMBER = auto()
+    BOOLEAN = auto()
+    NULL = auto()
 
 
 class Token(NamedTuple):
@@ -49,6 +51,7 @@ NumberStateLiteral = Literal[
     "INT_ZERO",  # Read integer zero (accepting)
     "INT_NONZERO",  # Read non-zero integer (accepting)
     "DOT_NOINT",  # Read dot without integer part, waiting for fraction
+    "DOT_INT",  # Read dot with integer part (accepting)
     "FRACTION",  # Read fractional part of the number (accepting)
     "EXP_START",  # Start of the exponent part, waiting for sign or digit
     "EXP_SIGN",  # Read sign of the exponent, waiting for digit
@@ -64,12 +67,13 @@ NumberState: dict[NumberStateLiteral, int] = {
     "INT_ZERO": 4,
     "INT_NONZERO": 5,
     "DOT_NOINT": 6,
-    "FRACTION": 7,
-    "EXP_START": 8,
-    "EXP_SIGN": 9,
-    "EXP_DIGITS": 10,  # accepting
-    "HEX_START": 11,
-    "HEX_DIGITS": 12,  # accepting
+    "DOT_INT": 7,  # accepting
+    "FRACTION": 8,
+    "EXP_START": 9,
+    "EXP_SIGN": 10,
+    "EXP_DIGITS": 11,  # accepting
+    "HEX_START": 12,
+    "HEX_DIGITS": 13,  # accepting
 }
 
 NUMBER_ACCEPTING_STATES = {
@@ -80,6 +84,7 @@ NUMBER_ACCEPTING_STATES = {
     NumberState["FRACTION"],
     NumberState["EXP_DIGITS"],
     NumberState["HEX_DIGITS"],
+    NumberState["DOT_INT"],
 }
 
 
@@ -163,7 +168,7 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             if char in consts.HEX_INDICATORS:
                 state = NumberState["HEX_START"]
             elif char == ".":
-                state = NumberState["DOT_NOINT"]
+                state = NumberState["DOT_INT"]
             elif char in consts.EXPONENT_INDICATORS:
                 state = NumberState["EXP_START"]
             elif char in consts.DIGITS:
@@ -179,13 +184,13 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
             if char in consts.DIGITS:
                 state = NumberState["INT_NONZERO"]
             elif char == ".":
-                state = NumberState["DOT_NOINT"]
+                state = NumberState["DOT_INT"]
             elif char in consts.EXPONENT_INDICATORS:
                 state = NumberState["EXP_START"]
             else:
                 _handle_unexpected_char(buffer, idx, char)
             idx += 1
-        elif state == NumberState["DOT_NOINT"]:
+        elif state in {NumberState["DOT_NOINT"], NumberState["DOT_INT"]}:
             if char in consts.DIGITS:
                 state = NumberState["FRACTION"]
             else:
@@ -222,7 +227,7 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
     if state in NUMBER_ACCEPTING_STATES:
         return TokenResult(
             Token(
-                tk_type=TokenType.JSON5_NUMBER,
+                tk_type=TokenType.NUMBER,
                 value=(start_idx, idx),
             ),
             idx,
@@ -431,10 +436,10 @@ def tokenize_string(buffer: str, idx: int) -> TokenResult:
     if state == STRING_STATES["END_STRING"]:
         return TokenResult(
             Token(
-                tk_type=TokenType.JSON5_STRING,
+                tk_type=TokenType.STRING,
                 value=(start_idx, idx),
             ),
-            idx,
+            idx + 1,  # Skip the closing quote
         )
     raise JSON5DecodeError(
         msg=StringLexerErrors.unexpected_end_of_string(),
@@ -533,7 +538,7 @@ def tokenize_identifier(buffer: str, idx: int) -> TokenResult:
 
     return TokenResult(
         Token(
-            tk_type=TokenType.JSON5_IDENTIFIER,
+            tk_type=TokenType.IDENTIFIER,
             value=(start_idx, idx),
         ),
         idx,
@@ -574,3 +579,54 @@ def validate_comment(buffer: str, idx: int) -> int:
             pos=idx,
         )
     return idx + 2
+
+
+def tokenize(buffer: str) -> list[Token]:
+    """Tokenize a JSON5 document.
+
+    Args:
+        buffer (str): JSON5 document
+
+    Returns:
+        list[Token]: List of tokens
+    """
+    tokens: list[Token] = []
+    idx: int = 0
+    while idx < len(buffer):
+        char = buffer[idx]
+        if char.isspace():
+            idx += 1
+        elif char in consts.PUNCTUATORS:
+            tokens.append(Token(TokenType.PUNCTUATOR, (idx, idx + 1)))
+            idx += 1
+        elif char in {"'", '"'}:
+            result = tokenize_string(buffer, idx)
+            tokens.append(result.token)
+            idx = result.idx
+        elif char == "/":
+            idx = validate_comment(buffer, idx)
+        elif char.isdigit() or char in {"+", "-", "."}:
+            result = tokenize_number(buffer, idx)
+            tokens.append(result.token)
+            idx = result.idx
+        else:
+            result = tokenize_identifier(buffer, idx)
+            tok_str = buffer[result.token.value[0] : result.token.value[1]]
+            if tok_str in {"true", "false"}:
+                token = Token(TokenType.BOOLEAN, result.token.value)
+            elif tok_str == "null":
+                token = Token(TokenType.NULL, result.token.value)
+            elif tok_str in {
+                "Infinity",
+                "NaN",
+                "-Infinity",
+                "-NaN",
+                "+Infinity",
+                "+NaN",
+            }:
+                token = Token(TokenType.NUMBER, result.token.value)
+            else:
+                token = result.token
+            tokens.append(token)
+            idx = result.idx
+    return tokens

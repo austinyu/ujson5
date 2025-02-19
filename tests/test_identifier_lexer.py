@@ -51,7 +51,7 @@ def test_valid_identifiers(identifier: str, start: int, end: int) -> None:
     """Test valid identifiers."""
     result = tokenize_identifier(buffer=identifier, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.JSON5_IDENTIFIER
+    assert result.token.tk_type == TokenType.IDENTIFIER
     r_start, r_end = result.token.value
     assert (r_start, r_end) == (start, end)
 

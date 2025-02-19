@@ -2,7 +2,8 @@
   "version": "0.2",
   "ignorePaths": [
     ".github/*",
-    ".pre-commit-config.yaml"
+    ".pre-commit-config.yaml",
+    "tests/config.json5"
   ],
   "dictionaryDefinitions": [],
   "dictionaries": [],

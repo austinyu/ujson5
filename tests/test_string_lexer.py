@@ -86,9 +86,10 @@ def test_valid_strings(text_string: str) -> None:
     text_string = simplify_escapes(text_string)
     result = tokenize_string(buffer=text_string, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.JSON5_STRING
+    assert result.token.tk_type == TokenType.STRING
     start, end = result.token.value
     assert text_string[start:end] == text_string.strip()[1:-1]
+    assert text_string[result.idx - 1] in {'"', "'"}
 
 
 @pytest.mark.parametrize("text_strings, spacing", string_multi_lines_ext)
@@ -103,9 +104,10 @@ def test_valid_multiline_string(text_strings: list[str], spacing: int) -> None:
     multi_line_string = simplify_escapes(multi_line_string)
     result = tokenize_string(buffer=multi_line_string, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.JSON5_STRING
+    assert result.token.tk_type == TokenType.STRING
     start, end = result.token.value
     assert multi_line_string[start:end] == multi_line_string[1:-1]
+    assert multi_line_string[result.idx - 1] in {'"', "'"}
 
 
 TEST_PASSAGE = """\"Lorem ipsum dolor sit wd, ws ads es.\\
@@ -118,9 +120,10 @@ def test_passage() -> None:
     """Test a passage."""
     result = tokenize_string(buffer=TEST_PASSAGE, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.JSON5_STRING
+    assert result.token.tk_type == TokenType.STRING
     start, end = result.token.value
     assert TEST_PASSAGE[start:end] == TEST_PASSAGE[1:-1]
+    assert TEST_PASSAGE[result.idx - 1] in {'"', "'"}
 
 
 string_invalid_examples: list[str] = [

@@ -46,6 +46,7 @@ number_valid_examples = [
     "-0",
     "+.123",
     "-.434",
+    "2323.",
 ]
 
 number_valid_constants = [
@@ -83,9 +84,7 @@ number_invalid_examples = [
     ". 123",
     "4.5e ",
     "4.5e+ ",
-    "5.",
     "5.5.5",
-    "1.",
     "0d",
     "2e9d",
     "123a",
@@ -97,7 +96,6 @@ number_invalid_examples = [
     "1e-.",
     "0123",
     "00.123",
-    "1. 2",
     "1e 2",
     "123abc",
     "1.23e10xyz",
@@ -153,7 +151,7 @@ def test_valid_numbers(text_number: str) -> None:
     """Test valid numbers."""
     result = tokenize_number(buffer=text_number, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.JSON5_NUMBER
+    assert result.token.tk_type == TokenType.NUMBER
     start, end = result.token.value
     if "," in text_number:
         assert text_number[start:end] == text_number.strip()[:-1].strip()
