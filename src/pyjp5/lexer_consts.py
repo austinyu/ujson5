@@ -140,7 +140,9 @@ UNICODE_DIGITS = {
 }
 
 UNICODE_CONNECTORS = {
-    chr(i) for i in range(0x110000) if unicodedata.category(chr(i)) == "Pc"
+    chr(i)
+    for i in range(0x110000)
+    if (unicodedata.category(chr(i)) == "Pc" and chr(i) != "_")
 }
 
 ZWNJ = "\u200c"  # Zero Width Non-Joiner
