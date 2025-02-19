@@ -77,3 +77,11 @@ class IdentifierLexerErrors:
     @staticmethod
     def reserved_word(word: str) -> str:
         return f"Reserved word cannot be used as identifier: <{word}>"
+
+
+class ParseErrors:
+    """General parse errors"""
+
+    @staticmethod
+    def expecting_value() -> str:
+        return "Expecting value"

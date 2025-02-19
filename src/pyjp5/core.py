@@ -1,5 +1,8 @@
 """Core JSON5 classes and exceptions."""
 
+from enum import Enum, auto
+from typing import NamedTuple
+
 
 class JSON5DecodeError(ValueError):
     """Subclass of ValueError with the following additional properties:
@@ -26,3 +29,29 @@ class JSON5DecodeError(ValueError):
 
     def __reduce__(self) -> tuple:
         return self.__class__, (self.msg, self.doc, self.pos)
+
+
+class TokenType(Enum):
+    """Token types for JSON5 documents"""
+
+    IDENTIFIER = auto()
+    PUNCTUATOR = auto()
+    STRING = auto()
+    NUMBER = auto()
+    BOOLEAN = auto()
+    NULL = auto()
+
+
+class Token(NamedTuple):
+    """Token representation"""
+
+    tk_type: TokenType
+    # start and end index of the token in the document
+    value: tuple[int, int]
+
+
+class TokenResult(NamedTuple):
+    """Token result"""
+
+    token: Token
+    idx: int
