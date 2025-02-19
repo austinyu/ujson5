@@ -1,8 +1,8 @@
-# pyjson5
+# pyjp5
 
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
-[![CI](https://github.com/austinyu/pyjson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/pyjson5/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/gh/austinyu/pyjson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/pyjson5)
+[![CI](https://github.com/austinyu/pyjp5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/pyjp5/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/austinyu/pyjp5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/pyjp5)
 [![python](https://img.shields.io/badge/Python-3.10-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
 [![python](https://img.shields.io/badge/Python-3.11-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
 [![python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)

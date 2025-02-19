@@ -19,10 +19,6 @@ class NumberLexerErrors:
         return f"Unexpected character '{char}' in number"
 
     @staticmethod
-    def space_in_number() -> str:
-        return "Unexpected space in number"
-
-    @staticmethod
     def leading_zero_followed_by_digit() -> str:
         return "Leading '0' cannot be followed by more digits"
 
@@ -65,3 +61,15 @@ class StringLexerErrors:
     @staticmethod
     def unexpected_escape_sequence(char: str) -> str:
         return f"Unexpected escape sequence: <{char}>"
+
+
+class IdentifierLexerErrors:
+    """Errors related to identifier lexer"""
+
+    @staticmethod
+    def invalid_start(char: str) -> str:
+        return f"Invalid start of identifier: <{char}>"
+
+    @staticmethod
+    def invalid_char(char: str) -> str:
+        return f"Invalid character in identifier: <{char}>"

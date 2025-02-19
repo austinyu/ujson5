@@ -18,12 +18,13 @@
     "NOINT",
     "nosetests",
     "pycache",
-    "pyjson",
+    "pyjp",
     "pylint",
     "pytest",
     "snok",
     "venv",
-    "virtualenvs"
+    "virtualenvs",
+    "ZWNJ"
   ],
   "ignoreWords": [],
   "import": []
