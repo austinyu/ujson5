@@ -538,3 +538,39 @@ def tokenize_identifier(buffer: str, idx: int) -> TokenResult:
         ),
         idx,
     )
+
+
+def validate_comment(buffer: str, idx: int) -> int:
+    """Validate a comment.
+
+    Args:
+        buffer (str): JSON5 document
+        idx (int): current index. Must point to the start of the comment
+
+    Returns:
+        int: updated index
+
+    Raises:
+        JSON5DecodeError: if the comment is invalid
+    """
+    assert buffer[idx] == "/"
+    if idx + 1 >= len(buffer):
+        raise JSON5DecodeError(
+            msg=LexerErrors.unexpected_eof(),
+            doc=buffer,
+            pos=idx,
+        )
+    if buffer[idx + 1] == "/":  # Single line comment
+        while idx < len(buffer) and buffer[idx] != "\n":
+            idx += 1
+        return idx + 1 if idx < len(buffer) else idx
+    # Multi-line comment
+    while idx + 1 < len(buffer) and buffer[idx : idx + 2] != "*/":
+        idx += 1
+    if idx + 1 == len(buffer):
+        raise JSON5DecodeError(
+            msg=LexerErrors.unexpected_eof(),
+            doc=buffer,
+            pos=idx,
+        )
+    return idx + 2

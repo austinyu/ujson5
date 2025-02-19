@@ -39,7 +39,7 @@ RANDOM_UNICODE_ESCAPE = (
         ("_A", 0, 2),
         ("$A", 0, 2),
         (RANDOM_UNICODE_ESCAPE, 0, 6),
-        (f"a02a{" " * randint(0, 10)}", 0, 4),
+        (f"a02a{' ' * randint(0, 10)}", 0, 4),
         *[(f"_\\u0312{p}   ", 0, 7) for p in PUNCTUATORS],
         (f"{unicode_letters.pop()}{unicode_combining_marks.pop()}", 0, 2),
         (f"{unicode_letters.pop()}{ZWJ}{ZWNJ}", 0, 3),
