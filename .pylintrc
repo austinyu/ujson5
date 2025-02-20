@@ -11,6 +11,7 @@ disable=
     R0915,  # too-many-statements
     R0903,  # too-few-public-methods
     R0914,  # too-many-locals
+    R0913,  # too-many-arguments
 
 [REPORTS]
 # Tells whether to display a full report or only the messages.

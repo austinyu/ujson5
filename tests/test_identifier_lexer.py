@@ -9,7 +9,7 @@ from pyjp5.lexer import (
     TokenType,
     tokenize_identifier,
 )
-from pyjp5.lexer_consts import (
+from pyjp5.consts import (
     UNICODE_LETTERS,
     UNICODE_COMBINING_MARKS,
     UNICODE_DIGITS,

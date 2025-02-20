@@ -5,6 +5,7 @@ tokens are used by the parser to build the abstract syntax tree (AST).
 """
 
 from typing import Literal
+import re
 
 from .core import JSON5DecodeError, Token, TokenType, TokenResult
 from .err_msg import (
@@ -13,8 +14,24 @@ from .err_msg import (
     StringLexerErrors,
     IdentifierLexerErrors,
 )
-from . import lexer_consts as consts
-from .utils import simplify_escapes
+from . import consts
+
+
+def simplify_escapes(text: str) -> str:
+    """Simplify escape sequences in a string. This function replaces line
+    continuation sequences with a newline character.
+
+    Args:
+        text (str): string with escape sequences
+
+    Returns:
+        str: string with escape sequences simplified
+    """
+    return re.sub(
+        r"(?:\u000D\u000A|[\u000A\u000D\u2028\u2029])",
+        "\n",
+        text,
+    )
 
 
 NumberState = Literal[

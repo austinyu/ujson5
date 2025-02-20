@@ -109,3 +109,7 @@ class ParseErrors:
     @staticmethod
     def bad_string_continuation() -> str:
         return "Bad string continuation. `\\` must be followed by a newline"
+
+    @staticmethod
+    def invalid_control_char() -> str:
+        return "Invalid control character in string"

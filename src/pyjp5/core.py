@@ -4,6 +4,7 @@ from enum import Enum, auto
 from typing import NamedTuple
 
 JsonValue = dict | list | int | float | str | None | bool
+JsonValuePairs = list[tuple[str, JsonValue]]
 
 
 class JSON5DecodeError(ValueError):

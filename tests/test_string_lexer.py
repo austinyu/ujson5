@@ -10,12 +10,12 @@ from pyjp5.core import JSON5DecodeError
 from pyjp5.lexer import (
     TokenType,
     tokenize_string,
+    simplify_escapes,
 )
-from pyjp5.lexer_consts import (
+from pyjp5.consts import (
     ESCAPE_SEQUENCE,
     LINE_TERMINATOR_SEQUENCE,
 )
-from pyjp5.utils import simplify_escapes
 
 ESCAPE_SEQUENCE_NO_NL = ESCAPE_SEQUENCE.copy()
 del ESCAPE_SEQUENCE_NO_NL["n"]

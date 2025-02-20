@@ -2,20 +2,12 @@
 
 from math import isnan
 from typing import Any
+from collections.abc import Callable
 from os.path import join, dirname
 
 import pytest
 
-from pyjp5 import loads, JsonValue
-from pyjp5.core import JSON5DecodeError
-
-# JSON5Value:
-# JSON5Null
-# JSON5Boolean
-# JSON5String
-# JSON5Number
-# JSON5Object
-# JSON5Array
+import pyjp5 as pj
 
 
 @pytest.mark.parametrize(
@@ -41,7 +33,7 @@ from pyjp5.core import JSON5DecodeError
 )
 def test_basic_loads(json5: str, py_value: Any) -> None:
     """Test basic JSON5 loads."""
-    loaded: Any = loads(json5)
+    loaded: Any = pj.loads(json5)
     try:
         if not isnan(py_value):
             assert loaded == py_value
@@ -110,9 +102,9 @@ No \\n's!",
         ),
     ],
 )
-def test_composite_loads(json5: str, py_value: JsonValue) -> None:
+def test_composite_loads(json5: str, py_value: pj.JsonValue) -> None:
     """Test composite JSON5 loads."""
-    assert loads(json5) == py_value
+    assert pj.loads(json5, strict=False) == py_value
 
 
 @pytest.mark.parametrize(
@@ -125,18 +117,89 @@ def test_composite_loads(json5: str, py_value: JsonValue) -> None:
         ":34",
         ":{ab: 1232",
         '"abc \\ des"',
+        "1}",
+        "1:",
+        "{1:",
+        "abc\\tdef",
     ],
 )
 def test_invalid_loads(json5: str) -> None:
     """Test invalid JSON5 loads."""
-    with pytest.raises(JSON5DecodeError):
-        v = loads(json5)
+    with pytest.raises(pj.JSON5DecodeError):
+        v = pj.loads(json5)
         print(v)
 
 
 def test_config_file() -> None:
     """Test config file"""
     with open(join(dirname(__file__), "config.json5"), "r", encoding="utf8") as file:
-        config_content = file.read()
-    results = loads(config_content)
+        results = pj.load(file)
     assert results  # Add appropriate assertions based on expected tokens
+
+
+@pytest.mark.parametrize(
+    "json5, obj_hook, py_value",
+    [
+        (
+            """{
+    key1: 1,
+    "key2": 2,
+    "key3": 3,
+    "key4": 4,
+    "key5": 5,
+    key6: 6
+}""",
+            lambda py_obj: {k.upper(): v + 1 for k, v in py_obj.items()},
+            {
+                "KEY1": 2,
+                "KEY2": 3,
+                "KEY3": 4,
+                "KEY4": 5,
+                "KEY5": 6,
+                "KEY6": 7,
+            },
+        ),
+        ("3", lambda v: v, 3),
+    ],
+)
+def test_object_hook(
+    json5: str,
+    obj_hook: Callable[[dict[str, pj.JsonValue]], Any],
+    py_value: pj.JsonValue,
+) -> None:
+    """Test composite JSON5 loads."""
+    assert pj.loads(json5, object_hook=obj_hook) == py_value
+
+
+@pytest.mark.parametrize(
+    "json5, obj_pairs_hook, py_value",
+    [
+        (
+            """{
+    key6: 6
+    "key3": 3,
+    "key5": 5,
+    key1: 1,
+    "key2": 2,
+    "key4": 4,
+}""",
+            lambda py_obj_pairs: [(k.upper(), v + 1) for k, v in py_obj_pairs],
+            [
+                ("KEY6", 7),
+                ("KEY3", 4),
+                ("KEY5", 6),
+                ("KEY1", 2),
+                ("KEY2", 3),
+                ("KEY4", 5),
+            ],
+        ),
+        ("3", lambda v: v, 3),
+    ],
+)
+def test_object_pair_hook(
+    json5: str,
+    obj_pairs_hook: Callable[[tuple[str, pj.JsonValue]], Any],
+    py_value: pj.JsonValue,
+) -> None:
+    """Test composite JSON5 loads."""
+    assert pj.loads(json5, object_pairs_hook=obj_pairs_hook) == py_value
