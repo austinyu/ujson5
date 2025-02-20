@@ -3,6 +3,8 @@
 from enum import Enum, auto
 from typing import NamedTuple
 
+JsonValue = dict | list | int | float | str | None | bool
+
 
 class JSON5DecodeError(ValueError):
     """Subclass of ValueError with the following additional properties:

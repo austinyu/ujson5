@@ -85,3 +85,27 @@ class ParseErrors:
     @staticmethod
     def expecting_value() -> str:
         return "Expecting value"
+
+    @staticmethod
+    def expecting_property_name() -> str:
+        return "Expecting property name followed by ':'"
+
+    @staticmethod
+    def unexpected_punctuation(actual: str) -> str:
+        return f"Unexpected punctuation: <{actual}>"
+
+    @staticmethod
+    def unexpected_colon() -> str:
+        return "Unexpected colon"
+
+    @staticmethod
+    def unexpected_token_after_colon(token_type: str) -> str:
+        return f"Unexpected token: {token_type} after ':'"
+
+    @staticmethod
+    def multiple_root() -> str:
+        return "Multiple root elements"
+
+    @staticmethod
+    def bad_string_continuation() -> str:
+        return "Bad string continuation. `\\` must be followed by a newline"
