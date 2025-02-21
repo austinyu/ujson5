@@ -4,8 +4,8 @@ from random import randint
 
 import pytest
 
-from pyjp5.core import JSON5DecodeError
-from pyjp5.lexer import TokenType, tokenize_number
+from pyjp5.core import JSON5DecodeError, TOKEN_TYPE
+from pyjp5.lexer import tokenize_number
 
 number_valid_examples = [
     "0",
@@ -151,7 +151,7 @@ def test_valid_numbers(text_number: str) -> None:
     """Test valid numbers."""
     result = tokenize_number(buffer=text_number, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.NUMBER
+    assert result.token.tk_type == TOKEN_TYPE["NUMBER"]
     start, end = result.token.value
     if "," in text_number:
         assert text_number[start:end] == text_number.strip()[:-1].strip()

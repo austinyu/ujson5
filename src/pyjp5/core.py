@@ -1,6 +1,5 @@
 """Core JSON5 classes and exceptions."""
 
-from enum import Enum, auto
 from typing import NamedTuple
 
 JsonValue = dict | list | int | float | str | None | bool
@@ -34,27 +33,25 @@ class JSON5DecodeError(ValueError):
         return self.__class__, (self.msg, self.doc, self.pos)
 
 
-class TokenType(Enum):
-    """Token types for JSON5 documents"""
-
-    IDENTIFIER = auto()
-    STRING = auto()
-    NUMBER = auto()
-    BOOLEAN = auto()
-    NULL = auto()
-
-    PUN_OPEN_BRACE = auto()
-    PUN_CLOSE_BRACE = auto()
-    PUN_OPEN_BRACKET = auto()
-    PUN_CLOSE_BRACKET = auto()
-    PUN_COLON = auto()
-    PUN_COMMA = auto()
+TOKEN_TYPE = {
+    "IDENTIFIER": 0,
+    "STRING": 1,
+    "NUMBER": 2,
+    "BOOLEAN": 3,
+    "NULL": 4,
+    "PUN_OPEN_BRACE": 5,
+    "PUN_CLOSE_BRACE": 6,
+    "PUN_OPEN_BRACKET": 7,
+    "PUN_CLOSE_BRACKET": 8,
+    "PUN_COLON": 9,
+    "PUN_COMMA": 10,
+}
 
 
 class Token(NamedTuple):
     """Token representation"""
 
-    tk_type: TokenType
+    tk_type: int
     # start and end index of the token in the document
     value: tuple[int, int]
 

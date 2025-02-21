@@ -4,9 +4,8 @@ from copy import copy
 from random import choice, randint
 import pytest
 
-from pyjp5.core import JSON5DecodeError
+from pyjp5.core import JSON5DecodeError, TOKEN_TYPE
 from pyjp5.lexer import (
-    TokenType,
     tokenize_identifier,
 )
 from pyjp5.consts import (
@@ -51,7 +50,7 @@ def test_valid_identifiers(identifier: str, start: int, end: int) -> None:
     """Test valid identifiers."""
     result = tokenize_identifier(buffer=identifier, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.IDENTIFIER
+    assert result.token.tk_type == TOKEN_TYPE["IDENTIFIER"]
     r_start, r_end = result.token.value
     assert (r_start, r_end) == (start, end)
 

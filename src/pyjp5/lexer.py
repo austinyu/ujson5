@@ -7,7 +7,7 @@ tokens are used by the parser to build the abstract syntax tree (AST).
 from typing import Literal
 import re
 
-from .core import JSON5DecodeError, Token, TokenType, TokenResult
+from .core import JSON5DecodeError, Token, TokenResult, TOKEN_TYPE
 from .err_msg import (
     GeneralError,
     NumberGeneralError,
@@ -210,7 +210,7 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
     if state in NUMBER_ACCEPTING_STATES:
         return TokenResult(
             Token(
-                tk_type=TokenType.NUMBER,
+                tk_type=TOKEN_TYPE["NUMBER"],
                 value=(start_idx, idx),
             ),
             idx,
@@ -413,7 +413,7 @@ def tokenize_string(buffer: str, idx: int) -> TokenResult:
     if state == "END_STRING":
         return TokenResult(
             Token(
-                tk_type=TokenType.STRING,
+                tk_type=TOKEN_TYPE["STRING"],
                 value=(start_idx, idx),
             ),
             idx + 1,  # Skip the closing quote
@@ -515,7 +515,7 @@ def tokenize_identifier(buffer: str, idx: int) -> TokenResult:
 
     return TokenResult(
         Token(
-            tk_type=TokenType.IDENTIFIER,
+            tk_type=TOKEN_TYPE["IDENTIFIER"],
             value=(start_idx, idx),
         ),
         idx,
@@ -575,22 +575,22 @@ def tokenize(buffer: str) -> list[Token]:
         if char.isspace():
             idx += 1
         elif char == "{":
-            tokens.append(Token(TokenType.PUN_OPEN_BRACE, (idx, idx + 1)))
+            tokens.append(Token(TOKEN_TYPE["PUN_OPEN_BRACE"], (idx, idx + 1)))
             idx += 1
         elif char == "}":
-            tokens.append(Token(TokenType.PUN_CLOSE_BRACE, (idx, idx + 1)))
+            tokens.append(Token(TOKEN_TYPE["PUN_CLOSE_BRACE"], (idx, idx + 1)))
             idx += 1
         elif char == "[":
-            tokens.append(Token(TokenType.PUN_OPEN_BRACKET, (idx, idx + 1)))
+            tokens.append(Token(TOKEN_TYPE["PUN_OPEN_BRACKET"], (idx, idx + 1)))
             idx += 1
         elif char == "]":
-            tokens.append(Token(TokenType.PUN_CLOSE_BRACKET, (idx, idx + 1)))
+            tokens.append(Token(TOKEN_TYPE["PUN_CLOSE_BRACKET"], (idx, idx + 1)))
             idx += 1
         elif char == ":":
-            tokens.append(Token(TokenType.PUN_COLON, (idx, idx + 1)))
+            tokens.append(Token(TOKEN_TYPE["PUN_COLON"], (idx, idx + 1)))
             idx += 1
         elif char == ",":
-            tokens.append(Token(TokenType.PUN_COMMA, (idx, idx + 1)))
+            tokens.append(Token(TOKEN_TYPE["PUN_COMMA"], (idx, idx + 1)))
             idx += 1
         elif char in {"'", '"'}:
             result = tokenize_string(buffer, idx)
@@ -606,9 +606,9 @@ def tokenize(buffer: str) -> list[Token]:
             result = tokenize_identifier(buffer, idx)
             tok_str = buffer[result.token.value[0] : result.token.value[1]]
             if tok_str in {"true", "false"}:
-                token = Token(TokenType.BOOLEAN, result.token.value)
+                token = Token(TOKEN_TYPE["BOOLEAN"], result.token.value)
             elif tok_str == "null":
-                token = Token(TokenType.NULL, result.token.value)
+                token = Token(TOKEN_TYPE["NULL"], result.token.value)
             elif tok_str in {
                 "Infinity",
                 "NaN",
@@ -617,7 +617,7 @@ def tokenize(buffer: str) -> list[Token]:
                 "+Infinity",
                 "+NaN",
             }:
-                token = Token(TokenType.NUMBER, result.token.value)
+                token = Token(TOKEN_TYPE["NUMBER"], result.token.value)
             else:
                 token = result.token
             tokens.append(token)

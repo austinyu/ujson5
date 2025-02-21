@@ -6,9 +6,8 @@ import re
 
 import pytest
 
-from pyjp5.core import JSON5DecodeError
+from pyjp5.core import JSON5DecodeError, TOKEN_TYPE
 from pyjp5.lexer import (
-    TokenType,
     tokenize_string,
     simplify_escapes,
 )
@@ -86,7 +85,7 @@ def test_valid_strings(text_string: str) -> None:
     text_string = simplify_escapes(text_string)
     result = tokenize_string(buffer=text_string, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.STRING
+    assert result.token.tk_type == TOKEN_TYPE["STRING"]
     start, end = result.token.value
     assert text_string[start:end] == text_string.strip()[1:-1]
     assert text_string[result.idx - 1] in {'"', "'"}
@@ -104,7 +103,7 @@ def test_valid_multiline_string(text_strings: list[str], spacing: int) -> None:
     multi_line_string = simplify_escapes(multi_line_string)
     result = tokenize_string(buffer=multi_line_string, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.STRING
+    assert result.token.tk_type == TOKEN_TYPE["STRING"]
     start, end = result.token.value
     assert multi_line_string[start:end] == multi_line_string[1:-1]
     assert multi_line_string[result.idx - 1] in {'"', "'"}
@@ -120,7 +119,7 @@ def test_passage() -> None:
     """Test a passage."""
     result = tokenize_string(buffer=TEST_PASSAGE, idx=0)
     assert result.token is not None
-    assert result.token.tk_type == TokenType.STRING
+    assert result.token.tk_type == TOKEN_TYPE["STRING"]
     start, end = result.token.value
     assert TEST_PASSAGE[start:end] == TEST_PASSAGE[1:-1]
     assert TEST_PASSAGE[result.idx - 1] in {'"', "'"}
