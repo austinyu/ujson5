@@ -38,11 +38,17 @@ class TokenType(Enum):
     """Token types for JSON5 documents"""
 
     IDENTIFIER = auto()
-    PUNCTUATOR = auto()
     STRING = auto()
     NUMBER = auto()
     BOOLEAN = auto()
     NULL = auto()
+
+    PUN_OPEN_BRACE = auto()
+    PUN_CLOSE_BRACE = auto()
+    PUN_OPEN_BRACKET = auto()
+    PUN_CLOSE_BRACKET = auto()
+    PUN_COLON = auto()
+    PUN_COMMA = auto()
 
 
 class Token(NamedTuple):

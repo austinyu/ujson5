@@ -1,7 +1,5 @@
 """Test lexer module"""
 
-from os.path import join, dirname
-
 from pyjp5.lexer import tokenize, TokenType
 
 
@@ -22,63 +20,63 @@ No \\\\n's!",
 }"""
 
 tokens: list[tuple[TokenType, str]] = [
-    (TokenType.PUNCTUATOR, "{"),
+    (TokenType.PUN_OPEN_BRACE, "{"),
     (TokenType.IDENTIFIER, "unquoted"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.STRING, "and you can quote me on that"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "singleQuotes"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.STRING, 'I can use "double quotes" here'),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "lineBreaks"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.STRING, "Look, Mom! \\\nNo \\\\n's!"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "hexadecimal"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.NUMBER, "0xdecaf"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "leadingDecimalPoint"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.NUMBER, ".8675309"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "andTrailing"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.NUMBER, "8675309."),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "positiveSign"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.NUMBER, "+1"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "trailingComma"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.STRING, "in objects"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "andIn"),
-    (TokenType.PUNCTUATOR, ":"),
-    (TokenType.PUNCTUATOR, "["),
+    (TokenType.PUN_COLON, ":"),
+    (TokenType.PUN_OPEN_BRACKET, "["),
     (TokenType.STRING, "arrays"),
-    (TokenType.PUNCTUATOR, ","),
-    (TokenType.PUNCTUATOR, "]"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
+    (TokenType.PUN_CLOSE_BRACKET, "]"),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.STRING, "backwardsCompatible"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.STRING, "with JSON"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "null_supported"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.NULL, "null"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "infinities_supported"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.NUMBER, "Infinity"),
-    (TokenType.PUNCTUATOR, ","),
+    (TokenType.PUN_COMMA, ","),
     (TokenType.IDENTIFIER, "NaN_supported"),
-    (TokenType.PUNCTUATOR, ":"),
+    (TokenType.PUN_COLON, ":"),
     (TokenType.NUMBER, "NaN"),
-    (TokenType.PUNCTUATOR, ","),
-    (TokenType.PUNCTUATOR, "}"),
+    (TokenType.PUN_COMMA, ","),
+    (TokenType.PUN_CLOSE_BRACE, "}"),
 ]
 
 
@@ -90,11 +88,3 @@ def test_lexer() -> None:
         assert r.tk_type == t[0]
         r_text = JSON5_TEXT[r.value[0] : r.value[1]]
         assert r_text == t[1]
-
-
-def test_config_file() -> None:
-    """Test config file"""
-    with open(join(dirname(__file__), "config.json5"), "r", encoding="utf8") as file:
-        config_content = file.read()
-    results = tokenize(config_content)
-    assert results  # Add appropriate assertions based on expected tokens

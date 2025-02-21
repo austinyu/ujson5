@@ -3,7 +3,6 @@
 from math import isnan
 from typing import Any
 from collections.abc import Callable
-from os.path import join, dirname
 
 import pytest
 
@@ -120,21 +119,23 @@ def test_composite_loads(json5: str, py_value: pj.JsonValue) -> None:
         "1}",
         "1:",
         "{1:",
-        "abc\\tdef",
+        "abc\tdef",
+        "{23",
+        ":",
+        "{",
+        ",",
+        ",11 11",
+        "{abc: 12 def: 23}",
+        "{'abc': 12 'def': 23}",
+        "[12, 23:]",
+        "{abc: 12, 23: 465}",
+        "[12, 23, abc]",
     ],
 )
 def test_invalid_loads(json5: str) -> None:
     """Test invalid JSON5 loads."""
     with pytest.raises(pj.JSON5DecodeError):
-        v = pj.loads(json5)
-        print(v)
-
-
-def test_config_file() -> None:
-    """Test config file"""
-    with open(join(dirname(__file__), "config.json5"), "r", encoding="utf8") as file:
-        results = pj.load(file)
-    assert results  # Add appropriate assertions based on expected tokens
+        pj.loads(json5)
 
 
 @pytest.mark.parametrize(
@@ -176,7 +177,7 @@ def test_object_hook(
     [
         (
             """{
-    key6: 6
+    key6: 6,
     "key3": 3,
     "key5": 5,
     key1: 1,

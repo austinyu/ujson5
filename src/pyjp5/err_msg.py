@@ -3,15 +3,19 @@
 # pylint: disable=C0116
 
 
-class LexerErrors:
-    """General lexer errors"""
+class GeneralError:
+    """General errors"""
 
     @staticmethod
     def unexpected_eof() -> str:
         return "Unexpected end of file"
 
+    @staticmethod
+    def empty_json5() -> str:
+        return "Empty JSON5 document"
 
-class NumberLexerErrors:
+
+class NumberGeneralError:
     """Errors related to number lexer"""
 
     @staticmethod
@@ -47,7 +51,7 @@ class NumberLexerErrors:
         return f"Invalid constant, expected {expected}, got {actual}"
 
 
-class StringLexerErrors:
+class StringGeneralError:
     """Errors related to string lexer"""
 
     @staticmethod
@@ -63,7 +67,7 @@ class StringLexerErrors:
         return f"Unexpected escape sequence: <{char}>"
 
 
-class IdentifierLexerErrors:
+class IdentifierGeneralError:
     """Errors related to identifier lexer"""
 
     @staticmethod
@@ -95,8 +99,8 @@ class ParseErrors:
         return f"Unexpected punctuation: <{actual}>"
 
     @staticmethod
-    def unexpected_colon() -> str:
-        return "Unexpected colon"
+    def expecting_punctuation(expected: str) -> str:
+        return f"Expecting punctuation: <{expected}>"
 
     @staticmethod
     def unexpected_token_after_colon(token_type: str) -> str:
