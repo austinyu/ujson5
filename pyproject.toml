@@ -39,7 +39,6 @@ flake8-builtins = "^2.5.0"
 flake8-functions-names = "^0.4.0"
 flake8-variables-names = "^0.0.6"
 flake8-no-implicit-concat = "^0.3.7"
-requests = "^2.32.3"
 
 [tool.bandit]
 skips = ["B101", "B311"]
