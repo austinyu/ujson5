@@ -15,6 +15,14 @@
 https://github.com/marketplace/actions/install-poetry-action
 
 ## Setup development environment
+
 - Install [poetry](https://python-poetry.org/docs/)
 - `poetry install --with dev`
 - `pre-commit install`
+
+
+TODOs
+
+- ruler implementation
+- CLI implementation
+- comments extraction

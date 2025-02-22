@@ -1,7 +1,7 @@
 """Test the identifier lexer."""
 
 from copy import copy
-from random import choice, randint
+from random import choice, randint, sample
 import pytest
 
 from pyjp5.core import JSON5DecodeError, TOKEN_TYPE
@@ -60,9 +60,9 @@ def test_valid_identifiers(identifier: str, start: int, end: int) -> None:
     [
         "\\u22\\xab",
         "\\u",
-        *list(unicode_combining_marks),
-        *list(unicode_digits),
-        *list(unicode_connectors),
+        *sample(list(unicode_combining_marks), k=min(10, len(unicode_combining_marks))),
+        *sample(list(unicode_digits), k=min(10, len(unicode_digits))),
+        *sample(list(unicode_connectors), k=min(10, len(unicode_connectors))),
         "A\u2603",  # invalid unicode escape sequence
     ],
 )

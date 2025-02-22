@@ -33,6 +33,10 @@ class JSON5DecodeError(ValueError):
         return self.__class__, (self.msg, self.doc, self.pos)
 
 
+class JSON5EncodeError(ValueError):
+    """Subclass of ValueError raised when encoding fails."""
+
+
 TOKEN_TYPE = {
     "IDENTIFIER": 0,
     "STRING": 1,
