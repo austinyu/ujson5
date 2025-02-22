@@ -18,6 +18,7 @@ import pyjp5 as pj
         ('"string"', "string"),
         ('"string with \\"escaped quotes\\""', 'string with "escaped quotes"'),
         ('"string with multiple \\\nlines"', "string with multiple lines"),
+        ('"sig\u03a3ma"', "sigΣma"),
         ("123", 123),
         ("123.456", 123.456),
         ("0x23", 0x23),
@@ -28,6 +29,8 @@ import pyjp5 as pj
         ("-NaN", float("-nan")),
         ("[1, 2, 3]", [1, 2, 3]),
         ('{"key": "value"}', {"key": "value"}),
+        ('{"sig\u03a3ma": "value"}', {"sigΣma": "value"}),
+        ('{sig\u03a3ma: "value"}', {"sigΣma": "value"}),
     ],
 )
 def test_basic_loads(json5: str, py_value: Any) -> None:

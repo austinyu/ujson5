@@ -173,7 +173,7 @@ class Json5Decoder:
                 if not stack or stack[-1][0] == "array" or stack[-1][2] is not None:
                     # identifier can only be used as a key in an object
                     raise JSON5DecodeError(ParseErrors.expecting_value(), json5_str, 0)
-                update_last_key(tk_str, idx)
+                update_last_key(self._parse_identifier(tk_str), idx)
             elif tk_typ == TOKEN_TYPE["STRING"]:
                 if not self._validate_line_continuation(tk_str):
                     raise JSON5DecodeError(
@@ -377,9 +377,11 @@ class Json5Decoder:
 
     def _parse_string(self, str_str: str, json5_str: str, str_start_idx: int) -> str:
         def replace_escape_sequences_and_continuations(match):
-            """Unescape escape sequences and line continuations in a string.
+            """Unescape escape sequences, unicode escape sequence
+                and line continuations in a string.
             escape sequences replaced: `\'`, `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t`,
                 `\v`, `\0`
+            unicode escape sequences replaced: `\\u` followed by 4 hexadecimal digits
             line continuations replaced: `\\` followed by a newline character
             """
             if match.group(1):
@@ -391,12 +393,31 @@ class Json5Decoder:
                         str_start_idx + match.start(),
                     )
                 return ESCAPE_SEQUENCE[match.group(1)]
+            if match.group(2):
+                return chr(int(match.group(2), 16))
             return ""
 
+        # group 1: escape sequences, group 2: unicode escape sequences
+        # group 3: line continuations
         return re.sub(
-            r"\\([\'\"\\bfnrtv0])|\\\s*\n",
+            r"\\([\'\"\\bfnrtv0])|\\u([0-9a-fA-F]{4})|\\\s*\n",
             replace_escape_sequences_and_continuations,
             str_str,
+        )
+
+    def _parse_identifier(self, id_str: str) -> str:
+        def replace_unicode_escape_sequences(match):
+            """Unescape unicode escape sequences in an identifier.
+            unicode escape sequences replaced: `\\u` followed by 4 hexadecimal digits
+            """
+            return chr(int(match.group(1), 16))
+
+        # group 1: escape sequences, group 2: unicode escape sequences
+        # group 3: line continuations
+        return re.sub(
+            r"\\u([0-9a-fA-F]{4})",
+            replace_unicode_escape_sequences,
+            id_str,
         )
 
 

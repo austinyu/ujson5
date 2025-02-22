@@ -4,7 +4,6 @@ from typing import Any
 
 import pytest
 
-
 import pyjp5
 
 
@@ -147,11 +146,30 @@ def test_circular_ref() -> None:
     with pytest.raises(pyjp5.JSON5EncodeError):
         pyjp5.dumps(lst)
 
+    lst = []
+    lst.append(lst)
+    with pytest.raises(pyjp5.JSON5EncodeError):
+        pyjp5.dumps(lst)
+
     obj = {}
     obj["list"] = []
     obj["list"].append(obj)
     with pytest.raises(pyjp5.JSON5EncodeError):
         pyjp5.dumps(obj)
+
+    class Custom:
+        """Custom class."""
+
+        def __init__(self, value: Any) -> None:
+            self.value = value
+
+    subset = Custom(1)
+    subset.value = subset
+    with pytest.raises(pyjp5.JSON5EncodeError):
+        pyjp5.dumps(subset, default=lambda v: v.value)
+
+    subset = Custom(1)
+    pyjp5.dumps(subset, default=lambda v: v.value, check_circular=False)
 
 
 def test_sort_keys() -> None:
@@ -163,17 +181,46 @@ def test_sort_keys() -> None:
 
 def test_default_set() -> None:
     """Test default set."""
-    py_obj = set([1, 2, 3])
-    pyjp5.dumps(py_obj, default=list)
+    py_set = set([1, 2, 3])
+    pyjp5.dumps(py_set, default=list)
 
-    pyjp5.dumps(py_obj, default=lambda _: '"string"')
+    py_lst = [1, 2, 3, set([1, 2, 3])]
+    pyjp5.dumps(py_lst, default=list)
 
-    pyjp5.dumps(py_obj, default=lambda _: 1)
 
-    pyjp5.dumps(py_obj, default=lambda _: 2.4)
+def test_separators() -> None:
+    """Test separators."""
+    py_obj = {"key1": "value1", "key2": "value2"}
+    assert (
+        pyjp5.dumps(py_obj, separators=(",", ":"))
+        == '{"key1":"value1","key2":"value2"}'
+    )
+    assert (
+        pyjp5.dumps(py_obj, separators=(",", ": "))
+        == '{"key1": "value1","key2": "value2"}'
+    )
+    assert (
+        pyjp5.dumps(py_obj, separators=("|", ">"))
+        == '{"key1">"value1"|"key2">"value2"}'
+    )
 
-    pyjp5.dumps(py_obj, default=lambda _: True)
 
-    pyjp5.dumps(py_obj, default=lambda _: False)
+def test_replace_unicode() -> None:
+    """Test unicode replacement"""
+    py_obj = f"Hello\nWorld {chr(0x19)}"
+    uni_char = f"\\u{0x19:04x}"
+    expected_output = f'"Hello\\nWorld {uni_char}"'
+    assert pyjp5.dumps(py_obj, ensure_ascii=False) == expected_output
 
-    pyjp5.dumps(py_obj, default=lambda _: None)
+
+@pytest.mark.parametrize(
+    "py_obj, json5_str",
+    [
+        ("Hello\x80World", '"Hello\\u0080World"'),
+        # surrogate pair
+        ("Hello\U0001f600World", '"Hello\\ud83d\\ude00World"'),
+    ],
+)
+def test_replace_ascii(py_obj: str, json5_str: str) -> None:
+    """Test ASCII replacement"""
+    assert pyjp5.dumps(py_obj, ensure_ascii=True) == json5_str
