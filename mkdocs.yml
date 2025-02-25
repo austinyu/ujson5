@@ -1,7 +1,45 @@
 site_name: pyjp5
+site_url: https://austinyu.github.io/pyjp5/
 nav:
 - Home: index.md
 - About: about.md
 
 theme:
   name: material
+  palette:
+  - media: "(prefers-color-scheme)"
+    scheme: default
+    primary: orange
+    accent: amber
+    toggle:
+      icon: material/weather-sunny
+      name: "Switch to light mode"
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: orange
+    accent: amber
+    toggle:
+      icon: material/weather-night
+      name: "Switch to dark mode"
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: orange
+    accent: amber
+    toggle:
+      icon: material/lightbulb-auto-outline
+      name: "Switch to system preference"
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - toc.integrate
+    - navigation.top
+    - search
+    - search.suggest
+    - search.highlight
+    - search.share
+
+repo_name: austinyu/pyjp5
+repo_url: https://github.com/austinyu/pyjp5
