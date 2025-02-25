@@ -21,3 +21,5 @@ coverage.xml
 # Built wheels
 *.whl
 dist/*
+
+site/*

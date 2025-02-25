@@ -40,6 +40,11 @@ flake8-functions-names = "^0.4.0"
 flake8-variables-names = "^0.0.6"
 flake8-no-implicit-concat = "^0.3.7"
 
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.6.5"
+
 [tool.bandit]
 skips = ["B101", "B311"]
 

@@ -20,9 +20,15 @@ https://github.com/marketplace/actions/install-poetry-action
 - `poetry install --with dev`
 - `pre-commit install`
 
-
 TODOs
 
 - ruler implementation
 - CLI implementation
 - comments extraction
+
+
+## CLIs
+
+- `poetry install --with [group]`
+- `poetry add --group [group] [dep]`
+- `mkdocs server`
