@@ -2,10 +2,9 @@
 Snapshot tests are used to test the consistency of the dump and load functions.
 """
 
-import snapshots
-
-
 import pyjp5
+
+from . import snapshots
 
 
 def dump_alpha() -> None:

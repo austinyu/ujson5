@@ -1,9 +1,11 @@
 """TODO"""
 
+import sys
 from collections.abc import Callable, Iterable
 from typing import Any, TextIO, TypedDict, is_typeddict
 import re
 import inspect
+from warnings import warn
 
 from .core import JSON5EncodeError
 from .err_msg import EncoderErrors
@@ -66,10 +68,15 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
     def _get_comments(typed_dict_cls: Any, key_path: str) -> None:
         nonlocal comments
 
-        # get comments from all inherit fields from parent TypedDict
-        for base in typed_dict_cls.__orig_bases__:
-            if is_typeddict(base):
-                _get_comments(base, key_path)
+        if sys.version_info < (3, 12):
+            warn(
+                "Comments extraction is currently only fully supported on Python 3.12+"
+            )
+        else:
+            # get comments from all inherit fields from parent TypedDict
+            for base in typed_dict_cls.__orig_bases__:
+                if is_typeddict(base):
+                    _get_comments(base, key_path)
 
         # get comments from current TypedDict
         source: str = inspect.getsource(typed_dict_cls)
