@@ -11,7 +11,7 @@
 			"${workspaceFolder}\\.venv\\Scripts\\python.exe"
 		],
 		"editor.rulers": [
-			88
+			95
 		],
 		"yaml.schemas": {
 			"https://squidfunk.github.io/mkdocs-material/schema.json": "mkdocs.yml"
