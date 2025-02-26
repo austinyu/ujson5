@@ -1,8 +1,9 @@
 """TODO"""
 
 from collections.abc import Callable, Iterable
-from typing import Any, TextIO
+from typing import Any, TextIO, TypedDict, is_typeddict
 import re
+import inspect
 
 from .core import JSON5EncodeError
 from .err_msg import EncoderErrors
@@ -34,6 +35,66 @@ ESCAPE_DCT = {
 for i in range(0x20):
     ESCAPE_DCT.setdefault(chr(i), f"\\u{i:04x}")
 
+COMMENTS_PATTERN = re.compile(
+    r"(?P<block_comment>(?: *# *.+? *\n)*)"
+    r" *(?P<name>\w+): *(?P<type>[^ ]+) *(?:# *(?P<inline_comment>.+))?\n"
+)
+
+
+class EntryComments(TypedDict):
+    """Comments related to a TypedDict entry"""
+
+    block_comments: list[str]
+    inline_comment: str
+
+
+CommentsCache = dict[str, EntryComments]
+
+
+def extend_key_path(base_path: str, key: str) -> str:
+    """Generate a unique name for each key in a composite dictionary by concatenating the
+    base path and the key"""
+    return f"{base_path}/{key}"
+
+
+def get_comments(typed_dict_cls: Any) -> CommentsCache:
+    """Extract comments from a TypedDict class"""
+    assert is_typeddict(typed_dict_cls)
+
+    comments: CommentsCache = {}
+
+    def _get_comments(typed_dict_cls: Any, key_path: str) -> None:
+        nonlocal comments
+
+        # get comments from all inherit fields from parent TypedDict
+        for base in typed_dict_cls.__orig_bases__:
+            if is_typeddict(base):
+                _get_comments(base, key_path)
+
+        # get comments from current TypedDict
+        source: str = inspect.getsource(typed_dict_cls)
+        matches: Iterable[re.Match[str]] = COMMENTS_PATTERN.finditer(source)
+        for match in matches:
+            block_comment: str = match.group("block_comment").strip()
+            name = match.group("name")
+            inline_comment: str = match.group("inline_comment") or ""
+            block_comments: list[str] = [
+                comment.strip()[1:].strip()
+                for comment in block_comment.split("\n")
+                if comment.strip()
+            ]
+            comments[extend_key_path(key_path, name)] = {
+                "block_comments": block_comments,
+                "inline_comment": inline_comment,
+            }
+        # get comments from nested TypedDict
+        for key, type_def in typed_dict_cls.__annotations__.items():
+            if is_typeddict(type_def):
+                _get_comments(type_def, extend_key_path(key_path, key))
+
+    _get_comments(typed_dict_cls, key_path="")
+    return comments
+
 
 class JSON5Encoder:
     """TODO"""
@@ -49,7 +110,8 @@ class JSON5Encoder:
         indent: int | None = None,
         separators: tuple[str, str] | None = None,
         sort_keys: bool = False,
-        ensure_quoted_keys: bool = False,
+        quoted_keys: bool = False,
+        trailing_comma: bool | None = None,
     ) -> None:
         self._skip_keys: bool = skip_keys
         self._ensure_ascii: bool = ensure_ascii
@@ -58,9 +120,12 @@ class JSON5Encoder:
         self._indent_str: str | None = " " * indent if indent is not None else None
         self._item_separator: str = ", "
         self._key_separator: str = ": "
-        self._ensure_quoted_keys: bool = ensure_quoted_keys
+        self._quoted_keys: bool = quoted_keys
         if indent is not None:
             self._item_separator = ","
+        self._trailing_comma: bool = indent is not None
+        if trailing_comma is not None:
+            self._trailing_comma = trailing_comma
         if separators is not None:
             self._item_separator, self._key_separator = separators
 
@@ -72,8 +137,12 @@ class JSON5Encoder:
         else:
             self._markers = None
 
-    def encode(self, obj: Any) -> str:
+        self._comments_cache: CommentsCache = {}
+
+    def encode(self, obj: Any, typed_dict_cls: Any | None = None) -> str:
         """TODO"""
+        if typed_dict_cls is not None and not is_typeddict(typed_dict_cls):
+            raise JSON5EncodeError(EncoderErrors.invalid_typed_dict(typed_dict_cls))
         if isinstance(obj, str):
             return self._encode_str(obj)
         if isinstance(obj, bool):
@@ -85,14 +154,18 @@ class JSON5Encoder:
         if obj is None:
             return "null"
 
-        chunks = self.iterencode(obj)
+        chunks = self.iterencode(obj, typed_dict_cls)
         if not isinstance(chunks, (list, tuple)):
             chunks = list(chunks)
         return "".join(chunks)
 
-    def iterencode(self, obj: Any) -> Iterable[str]:
+    def iterencode(self, obj: Any, typed_dict_cls: Any | None = None) -> Iterable[str]:
         """TODO"""
-        return self._iterencode(obj, indent_level=0)
+        if is_typeddict(typed_dict_cls):
+            self._comments_cache = get_comments(typed_dict_cls)
+        elif typed_dict_cls is not None:
+            raise JSON5EncodeError(EncoderErrors.invalid_typed_dict(typed_dict_cls))
+        return self._iterencode(obj, indent_level=0, key_path="")
 
     def default(self, obj: Any) -> Serializable:
         """TODO"""
@@ -139,11 +212,11 @@ class JSON5Encoder:
 
         if self._ensure_ascii:
             return f'"{ESCAPE_ASCII.sub(replace_ascii, obj)}"'
-        if key_str and not self._ensure_quoted_keys:
+        if key_str and not self._quoted_keys:
             return ESCAPE.sub(replace_unicode, obj)
         return f'"{ESCAPE.sub(replace_unicode, obj)}"'
 
-    def _iterencode(self, obj: Any, indent_level: int) -> Iterable[str]:
+    def _iterencode(self, obj: Any, indent_level: int, key_path: str) -> Iterable[str]:
         if isinstance(obj, str):
             yield self._encode_str(obj)
         elif obj is None:
@@ -159,9 +232,9 @@ class JSON5Encoder:
             # see comment for int/float in _make_iterencode
             yield self._encode_float(obj)
         elif isinstance(obj, (list, tuple)):
-            yield from self._iterencode_list(obj, indent_level)
+            yield from self._iterencode_list(obj, indent_level, key_path)
         elif isinstance(obj, dict):
-            yield from self._iterencode_dict(obj, indent_level)
+            yield from self._iterencode_dict(obj, indent_level, key_path)
         else:
             if self._markers is not None:
                 marker_id: int | None = id(obj)
@@ -172,11 +245,13 @@ class JSON5Encoder:
             else:
                 marker_id = None
             obj_user = self.default(obj)
-            yield from self._iterencode(obj_user, indent_level)
+            yield from self._iterencode(obj_user, indent_level, key_path)
             if self._markers is not None and marker_id is not None:
                 del self._markers[marker_id]
 
-    def _iterencode_list(self, obj: list | tuple, indent_level: int) -> Iterable[str]:
+    def _iterencode_list(
+        self, obj: list | tuple, indent_level: int, key_path: str
+    ) -> Iterable[str]:
         if not obj:
             yield "[]"
             return
@@ -206,20 +281,25 @@ class JSON5Encoder:
                 buffer = separator
             yield buffer
             if isinstance(value, (list, tuple)):
-                chunks = self._iterencode_list(value, indent_level)
+                chunks = self._iterencode_list(value, indent_level, key_path)
             elif isinstance(value, dict):
-                chunks = self._iterencode_dict(value, indent_level)
+                chunks = self._iterencode_dict(value, indent_level, key_path)
             else:
-                chunks = self._iterencode(value, indent_level)
+                chunks = self._iterencode(value, indent_level, key_path)
             yield from chunks
+        comma = self._item_separator if self._trailing_comma else ""
         if self._indent_str is not None:
             indent_level -= 1
-            yield "\n" + self._indent_str * indent_level
+            yield comma + "\n" + self._indent_str * indent_level
+        else:
+            yield comma
         yield "]"
         if self._markers is not None and marker_id is not None:
             del self._markers[marker_id]
 
-    def _iterencode_dict(self, obj: dict[Any, Any], indent_level: int) -> Iterable[str]:
+    def _iterencode_dict(
+        self, obj: dict[Any, Any], indent_level: int, key_path: str
+    ) -> Iterable[str]:
         if not obj:
             yield "{}"
             return
@@ -236,17 +316,16 @@ class JSON5Encoder:
             indent_level += 1
             newline_indent: str | None = "\n" + self._indent_str * indent_level
             assert newline_indent is not None
-            item_separator: str = self._item_separator + newline_indent
             yield newline_indent
         else:
             newline_indent = None
-            item_separator = self._item_separator
         first = True
         if self._sort_keys:
             items: Any = sorted(obj.items())
         else:
             items = obj.items()
-        for key, value in items:
+        total_items: int = len(items)
+        for idx, (key, value) in enumerate(items):
             if isinstance(key, str):
                 pass
             # JavaScript is weakly typed for these, so it makes sense to
@@ -257,19 +336,36 @@ class JSON5Encoder:
                 continue
             else:
                 raise JSON5EncodeError(EncoderErrors.invalid_key_type(key))
+            specific_key_path: str = extend_key_path(key_path, key)
+            block_comments: list[str] = self._comments_cache.get(  # type: ignore
+                specific_key_path, {}
+            ).get("block_comments", [])
+            inline_comment: str = self._comments_cache.get(  # type: ignore
+                specific_key_path, {}
+            ).get("inline_comment", "")
             if first:
                 first = False
-            else:
-                yield item_separator
+            elif newline_indent is not None:
+                yield newline_indent  # we do not need to yield anything if indent == 0
+            for block_comment in block_comments:
+                if newline_indent is not None:
+                    yield f"// {block_comment}{newline_indent}"
             yield self._encode_str(key, key_str=True)
             yield self._key_separator
             if isinstance(value, (list, tuple)):
-                chunks = self._iterencode_list(value, indent_level)
+                chunks = self._iterencode_list(value, indent_level, specific_key_path)
             elif isinstance(value, dict):
-                chunks = self._iterencode_dict(value, indent_level)
+                chunks = self._iterencode_dict(value, indent_level, specific_key_path)
             else:
-                chunks = self._iterencode(value, indent_level)
+                chunks = self._iterencode(value, indent_level, specific_key_path)
             yield from chunks
+
+            if idx != total_items - 1:
+                yield self._item_separator
+            elif self._trailing_comma:
+                yield self._item_separator
+            if inline_comment and newline_indent is not None:
+                yield "  // " + inline_comment
         if self._indent_str is not None:
             indent_level -= 1
             yield "\n" + self._indent_str * indent_level
@@ -286,13 +382,15 @@ _default_encoder = JSON5Encoder(
     indent=None,
     separators=None,
     default=None,
-    ensure_quoted_keys=False,
+    quoted_keys=False,
     sort_keys=False,
+    trailing_comma=None,
 )
 
 
 def dumps(
     obj: Any,
+    typed_dict_cls: Any | None = None,
     *,
     skip_keys: bool = False,
     ensure_ascii: bool = True,
@@ -303,7 +401,8 @@ def dumps(
     separators: tuple[str, str] | None = None,
     default: DefaultInterface | None = None,
     sort_keys: bool = False,
-    ensure_quoted_keys: bool = False,
+    quoted_keys: bool = False,
+    trailing_comma: bool | None = None,
 ) -> str:
     """TODO"""
     if (
@@ -316,9 +415,10 @@ def dumps(
         and separators is None
         and default is None
         and not sort_keys
-        and not ensure_quoted_keys
+        and not quoted_keys
+        and trailing_comma is None
     ):
-        return _default_encoder.encode(obj)
+        return _default_encoder.encode(obj, typed_dict_cls)
     if cls is None:
         cls = JSON5Encoder
     return cls(
@@ -330,13 +430,15 @@ def dumps(
         separators=separators,
         default=default,
         sort_keys=sort_keys,
-        ensure_quoted_keys=ensure_quoted_keys,
-    ).encode(obj)
+        quoted_keys=quoted_keys,
+        trailing_comma=trailing_comma,
+    ).encode(obj, typed_dict_cls)
 
 
 def dump(
     obj: Any,
     fp: TextIO,
+    typed_dict_cls: Any | None = None,
     *,
     skip_keys: bool = False,
     ensure_ascii: bool = True,
@@ -347,7 +449,8 @@ def dump(
     separators: tuple[str, str] | None = None,
     default: DefaultInterface | None = None,
     sort_keys: bool = False,
-    ensure_quoted_keys: bool = False,
+    quoted_keys: bool = False,
+    trailing_comma: bool | None = None,
 ) -> None:
     """TODO"""
     if (
@@ -360,9 +463,10 @@ def dump(
         and separators is None
         and default is None
         and not sort_keys
-        and not ensure_quoted_keys
+        and not quoted_keys
+        and trailing_comma is None
     ):
-        iterable = _default_encoder.iterencode(obj)
+        iterable = _default_encoder.iterencode(obj, typed_dict_cls)
     else:
         if cls is None:
             cls = JSON5Encoder
@@ -375,7 +479,9 @@ def dump(
             separators=separators,
             default=default,
             sort_keys=sort_keys,
-            ensure_quoted_keys=ensure_quoted_keys,
-        ).iterencode(obj)
+            quoted_keys=quoted_keys,
+            trailing_comma=trailing_comma,
+        ).iterencode(obj, typed_dict_cls)
     for chunk in iterable:
         fp.write(chunk)
+    fp.write("\n")

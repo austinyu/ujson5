@@ -13,8 +13,13 @@ from .core import (
     TOKEN_TYPE,
 )
 from .consts import ESCAPE_SEQUENCE
-from .err_msg import GeneralError, ParseErrors
+from .err_msg import DecoderErr, ParseErrors
 from .lexer import tokenize
+
+ObjectHookArg = dict[str, JsonValue]
+ObjectHook = Callable[[ObjectHookArg], Any]
+ObjectPairsHookArg = list[tuple[str, JsonValue]]
+ObjectPairsHook = Callable[[ObjectPairsHookArg], Any]
 
 
 class Json5Decoder:
@@ -23,21 +28,19 @@ class Json5Decoder:
     def __init__(
         self,
         *,
-        object_hook: Callable[[dict[str, JsonValue]], Any] | None = None,
+        object_hook: ObjectHook | None = None,
         parse_float: Callable[[str], Any] | None = None,
         parse_int: Callable[[str], Any] | None = None,
         parse_constant: Callable[[str], Any] | None = None,
         strict: bool = True,
-        object_pairs_hook: Callable[[tuple[str, JsonValue]], Any] | None = None,
+        object_pairs_hook: ObjectPairsHook | None = None,
     ) -> None:
-        self._object_hook: Callable[[dict[str, JsonValue]], Any] | None = object_hook
+        self._object_hook: ObjectHook | None = object_hook
         self._parse_float: Callable[[str], Any] | None = parse_float
         self._parse_int: Callable[[str], Any] | None = parse_int
         self._parse_constant: Callable[[str], Any] | None = parse_constant
         self._strict: bool = strict
-        self._object_pairs_hook: Callable[[tuple[str, JsonValue]], Any] | None = (
-            object_pairs_hook
-        )
+        self._object_pairs_hook: ObjectPairsHook | None = object_pairs_hook
 
     def decode(self, json5_str: str) -> Any:
         """TODO"""
@@ -47,6 +50,9 @@ class Json5Decoder:
     def raw_decode(self, json5_str: str) -> tuple[Any, int]:
         """TODO"""
         tokens = tokenize(json5_str)
+        if tokens[-1].tk_type == TOKEN_TYPE["STRING"]:
+            # If the last token is a string, we need to skip the closing quote
+            return self._parse_json5(json5_str, tokens), tokens[-1].value[1] + 1
         return self._parse_json5(json5_str, tokens), tokens[-1].value[1]
 
     def _parse_json5(
@@ -54,7 +60,7 @@ class Json5Decoder:
     ) -> JsonValue | JsonValuePairs:
         """Parse a JSON5 string with tokens."""
         if not tokens:
-            raise JSON5DecodeError(GeneralError.empty_json5(), json5_str, 0)
+            raise JSON5DecodeError(DecoderErr.empty_json5(), json5_str, 0)
 
         # stack contains (type, data, last_key) tuples
         stack: list[tuple[Literal["object", "array"], JsonValue, str | None]] = []
@@ -321,13 +327,23 @@ class Json5Decoder:
                 ParseErrors.expecting_value(), json5_str, tokens[-1].value[0]
             )
 
+        if self._object_pairs_hook is None and self._object_hook is not None:
+            try:
+                return self._object_hook(root) if isinstance(root, dict) else root
+            except Exception as e:
+                raise JSON5DecodeError(
+                    ParseErrors.invalid_object_hook(), json5_str, tokens[-1].value[0]
+                ) from e
         if self._object_pairs_hook is not None:
             try:
                 return self._object_pairs_hook(root)  # type: ignore
-            except TypeError:
-                return root
-        if self._object_hook is not None:
-            return self._object_hook(root) if isinstance(root, dict) else root
+            except Exception as e:
+                raise JSON5DecodeError(
+                    ParseErrors.invalid_object_pairs_hook(),
+                    json5_str,
+                    tokens[-1].value[0],
+                ) from e
+
         # no hooks provided, just parse the JSON5 string
         return root
 
@@ -424,12 +440,12 @@ class Json5Decoder:
 def loads(
     json5_str: str,
     *,
-    object_hook: Callable[[dict[str, JsonValue]], Any] | None = None,
+    object_hook: ObjectHook | None = None,
     parse_float: Callable[[str], Any] | None = None,
     parse_int: Callable[[str], Any] | None = None,
     parse_constant: Callable[[str], Any] | None = None,
     strict: bool = True,
-    object_pairs_hook: Callable[[tuple[str, JsonValue]], Any] | None = None,
+    object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
     """TODO"""
     decoder = Json5Decoder(
@@ -446,12 +462,12 @@ def loads(
 def load(
     file: TextIO,
     *,
-    object_hook: Callable[[dict[str, JsonValue]], Any] | None = None,
+    object_hook: ObjectHook | None = None,
     parse_float: Callable[[str], Any] | None = None,
     parse_int: Callable[[str], Any] | None = None,
     parse_constant: Callable[[str], Any] | None = None,
     strict: bool = True,
-    object_pairs_hook: Callable[[tuple[str, JsonValue]], Any] | None = None,
+    object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
     """Convert JSON5 file to python data."""
     return loads(

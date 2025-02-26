@@ -5,7 +5,7 @@
 from typing import Any
 
 
-class GeneralError:
+class DecoderErr:
     """General errors"""
 
     @staticmethod
@@ -17,7 +17,7 @@ class GeneralError:
         return "Empty JSON5 document"
 
 
-class NumberGeneralError:
+class NumberDecoderErr:
     """Errors related to number lexer"""
 
     @staticmethod
@@ -53,7 +53,7 @@ class NumberGeneralError:
         return f"Invalid constant, expected {expected}, got {actual}"
 
 
-class StringGeneralError:
+class StringDecoderErr:
     """Errors related to string lexer"""
 
     @staticmethod
@@ -69,7 +69,7 @@ class StringGeneralError:
         return f"Unexpected escape sequence: <{char}>"
 
 
-class IdentifierGeneralError:
+class IdentifierDecoderErr:
     """Errors related to identifier lexer"""
 
     @staticmethod
@@ -120,6 +120,14 @@ class ParseErrors:
     def invalid_control_char() -> str:
         return "Invalid control character in string"
 
+    @staticmethod
+    def invalid_object_hook() -> str:
+        return "Object hook must takes in a dictionary"
+
+    @staticmethod
+    def invalid_object_pairs_hook() -> str:
+        return "Object pairs hook must takes in a list of tuples with two elements"
+
 
 class EncoderErrors:
     """Encoder errors"""
@@ -141,3 +149,7 @@ class EncoderErrors:
     @staticmethod
     def unable_to_encode(obj: Any) -> str:
         return f"Object of type {obj.__class__.__name__} is not JSON serializable"
+
+    @staticmethod
+    def invalid_typed_dict(obj: Any) -> str:
+        return f"Object of type {obj.__class__.__name__} is not a TypedDict"

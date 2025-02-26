@@ -1,0 +1,16 @@
+{
+  "height": 180,
+  "weight": 70,
+  "age": 30,
+  "name": "Alpha",
+  "courses": {
+    "CS101": 90,
+    "ART101": 80,
+    "HIS101": 70,
+  },
+  "hobbies": [
+    "reading",
+    "swimming",
+    "coding",
+  ],
+}

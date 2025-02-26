@@ -13,13 +13,35 @@ disable=
     R0914,  # too-many-locals
     R0913,  # too-many-arguments
     R0902,  # too-many-instance-attributes
+    E0401,  # unable to import
 
 [REPORTS]
 # Tells whether to display a full report or only the messages.
 reports=no
+score=yes
 
 [FORMAT]
 # Maximum number of characters on a single line.
-max-line-length=88
+max-line-length=95
+# String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
+# tab).
+indent-string='    '
 
 [DESIGN]
+
+[SIMILARITIES]
+
+# Minimum lines number of a similarity.
+min-similarity-lines=6
+
+# Ignore comments when computing similarities.
+ignore-comments=yes
+
+# Ignore docstrings when computing similarities.
+ignore-docstrings=yes
+
+# Ignore imports when computing similarities.
+ignore-imports=yes
+
+# Signatures are removed from the similarity computation
+ignore-signatures=yes

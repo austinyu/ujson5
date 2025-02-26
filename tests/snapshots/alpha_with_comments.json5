@@ -1,0 +1,23 @@
+{
+  "height": 180,  // height of the creature
+  // weight of the creature
+  // weight cannot be too high!
+  "weight": 70,
+  // age of the human
+  "age": 30,  // human can be very old!
+  // name of the human
+  "name": "Alpha",  // human can be very intelligent
+  "courses": {
+    // you can also add comments in the TypedDict
+    "CS101": 90,  // Multi-line comments are also supported
+    // In this case, the comments in JSON5 will also be multi-line
+    // The entries of dictionaries that implement this TypedDict will be commented
+    "ART101": 80,
+    "HIS101": 70,  // a comment can also be in-line
+  },  // hard-working human
+  "hobbies": [
+    "reading",
+    "swimming",
+    "coding",
+  ],  // hobbies takes a lot of time...
+}

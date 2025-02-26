@@ -80,7 +80,7 @@ def test_dump_load_examples(path: str, tmp_path: Path) -> None:
         pyjp5.dump(py_obj, file, indent=4, ensure_ascii=not non_ascii)
 
     with open(dump_path_default, "w", encoding="utf8") as file:
-        pyjp5.dump(py_obj, file, indent=4, ensure_ascii=not non_ascii)
+        pyjp5.dump(py_obj, file)
 
     with open(dump_path_config, "r", encoding="utf8") as file:
         new_content = pyjp5.load(file)

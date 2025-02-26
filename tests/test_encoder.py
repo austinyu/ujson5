@@ -1,6 +1,7 @@
 """Test encoder."""
 
 from typing import Any
+from pathlib import Path
 
 import pytest
 
@@ -79,11 +80,11 @@ def test_valid_examples(py_obj: Any, json5_obj: str) -> None:
     "array": [
         1,
         2,
-        3
+        3,
     ],
     "obj": {
-        "key": "value"
-    }
+        "key": "value",
+    },
 }""",
         )
     ],
@@ -224,3 +225,13 @@ def test_replace_unicode() -> None:
 def test_replace_ascii(py_obj: str, json5_str: str) -> None:
     """Test ASCII replacement"""
     assert pyjp5.dumps(py_obj, ensure_ascii=True) == json5_str
+
+
+def test_invalid_typed_dict_cls(tmp_path: Path) -> None:
+    """Test raise when TypedDict class is not valid."""
+    with pytest.raises(pyjp5.JSON5EncodeError):
+        pyjp5.dumps({}, typed_dict_cls=int)
+
+    with pytest.raises(pyjp5.JSON5EncodeError):
+        with open(tmp_path / "dump.json5", "w", encoding="utf8") as file:
+            pyjp5.dump({}, file, typed_dict_cls=int)

@@ -9,10 +9,10 @@ import re
 
 from .core import JSON5DecodeError, Token, TokenResult, TOKEN_TYPE
 from .err_msg import (
-    GeneralError,
-    NumberGeneralError,
-    StringGeneralError,
-    IdentifierGeneralError,
+    DecoderErr,
+    NumberDecoderErr,
+    StringDecoderErr,
+    IdentifierDecoderErr,
 )
 from . import consts
 
@@ -75,7 +75,7 @@ def _handle_unexpected_char(buffer: str, idx: int, char: str) -> None:
         JSON5DecodeError: if the character is unexpected
     """
     raise JSON5DecodeError(
-        msg=NumberGeneralError.unexpected_char_in_number(char),
+        msg=NumberDecoderErr.unexpected_char_in_number(char),
         doc=buffer,
         pos=idx,
     )
@@ -107,7 +107,7 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
                     state = "INFINITY"
                     break
                 raise JSON5DecodeError(
-                    msg=NumberGeneralError.invalid_constant(
+                    msg=NumberDecoderErr.invalid_constant(
                         "Infinity", buffer[start_idx:inf_end]
                     ),
                     doc=buffer,
@@ -122,7 +122,7 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
                     state = "NAN"
                     break
                 raise JSON5DecodeError(
-                    msg=NumberGeneralError.invalid_constant(
+                    msg=NumberDecoderErr.invalid_constant(
                         "NaN", buffer[start_idx:nan_end]
                     ),
                     doc=buffer,
@@ -148,7 +148,7 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
                 state = "EXP_START"
             elif char in consts.DIGITS:
                 raise JSON5DecodeError(
-                    msg=NumberGeneralError.leading_zero_followed_by_digit(),
+                    msg=NumberDecoderErr.leading_zero_followed_by_digit(),
                     doc=buffer,
                     pos=idx,
                 )
@@ -217,37 +217,37 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
         )
     if state == "NUMBER_START":
         raise JSON5DecodeError(
-            msg=NumberGeneralError.no_number(),
+            msg=NumberDecoderErr.no_number(),
             doc=buffer,
             pos=idx,
         )
     if state == "SIGN":
         raise JSON5DecodeError(
-            msg=NumberGeneralError.no_number(),
+            msg=NumberDecoderErr.no_number(),
             doc=buffer,
             pos=idx,
         )
     if state == "DOT_NOINT":
         raise JSON5DecodeError(
-            msg=NumberGeneralError.trailing_dot(),
+            msg=NumberDecoderErr.trailing_dot(),
             doc=buffer,
             pos=idx,
         )
     if state == "EXP_START":
         raise JSON5DecodeError(
-            msg=NumberGeneralError.trailing_exponent(),
+            msg=NumberDecoderErr.trailing_exponent(),
             doc=buffer,
             pos=idx,
         )
     if state == "HEX_START":
         raise JSON5DecodeError(
-            msg=NumberGeneralError.no_hex_digits(),
+            msg=NumberDecoderErr.no_hex_digits(),
             doc=buffer,
             pos=idx,
         )
     assert state == "EXP_SIGN", state
     raise JSON5DecodeError(
-        msg=NumberGeneralError.trailing_exponent_sign(),
+        msg=NumberDecoderErr.trailing_exponent_sign(),
         doc=buffer,
         pos=idx,
     )
@@ -278,7 +278,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
     buffer_len = len(buffer)
     if idx + 1 == buffer_len:
         raise JSON5DecodeError(
-            msg=GeneralError.unexpected_eof(),
+            msg=DecoderErr.unexpected_eof(),
             doc=buffer,
             pos=idx,
         )
@@ -297,7 +297,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
             idx += 1
         if idx == buffer_len:
             raise JSON5DecodeError(
-                msg=GeneralError.unexpected_eof(),
+                msg=DecoderErr.unexpected_eof(),
                 doc=buffer,
                 pos=idx,
             )
@@ -305,7 +305,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
             idx += 1
         else:
             raise JSON5DecodeError(
-                msg=StringGeneralError.unexpected_end_of_string(),
+                msg=StringDecoderErr.unexpected_end_of_string(),
                 doc=buffer,
                 pos=idx,
             )
@@ -314,7 +314,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
     elif next_char == "u":  # Unicode escape sequence
         if idx + 5 >= buffer_len:
             raise JSON5DecodeError(
-                msg=GeneralError.unexpected_eof(),
+                msg=DecoderErr.unexpected_eof(),
                 doc=buffer,
                 pos=idx,
             )
@@ -322,7 +322,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
             idx += 6
         else:
             raise JSON5DecodeError(
-                msg=StringGeneralError.unexpected_escape_sequence(
+                msg=StringDecoderErr.unexpected_escape_sequence(
                     f"\\u{buffer[idx + 2 : idx + 6]}"
                 ),
                 doc=buffer,
@@ -331,7 +331,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
     elif next_char == "x":  # Hexadecimal escape sequence
         if idx + 3 >= buffer_len:
             raise JSON5DecodeError(
-                msg=GeneralError.unexpected_eof(),
+                msg=DecoderErr.unexpected_eof(),
                 doc=buffer,
                 pos=idx,
             )
@@ -339,7 +339,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
             idx += 4
         else:
             raise JSON5DecodeError(
-                msg=StringGeneralError.unexpected_escape_sequence(
+                msg=StringDecoderErr.unexpected_escape_sequence(
                     f"\\x{buffer[idx + 2 : idx + 4]}"
                 ),
                 doc=buffer,
@@ -347,7 +347,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
             )
     else:
         raise JSON5DecodeError(
-            msg=StringGeneralError.unexpected_escape_sequence(f"\\{next_char}"),
+            msg=StringDecoderErr.unexpected_escape_sequence(f"\\{next_char}"),
             doc=buffer,
             pos=idx,
         )
@@ -380,7 +380,7 @@ def tokenize_string(buffer: str, idx: int) -> TokenResult:
         start_idx += 1
     else:
         raise JSON5DecodeError(
-            msg=StringGeneralError.string_invalid_start(quote),
+            msg=StringDecoderErr.string_invalid_start(quote),
             doc=buffer,
             pos=idx,
         )
@@ -419,7 +419,7 @@ def tokenize_string(buffer: str, idx: int) -> TokenResult:
             idx + 1,  # Skip the closing quote
         )
     raise JSON5DecodeError(
-        msg=StringGeneralError.unexpected_end_of_string(),
+        msg=StringDecoderErr.unexpected_end_of_string(),
         doc=buffer,
         pos=idx,
     )
@@ -444,7 +444,7 @@ def validate_identifier_start(buffer: str, idx: int) -> int:
     elif start_char == "\\":  # unicode escape sequence
         if idx + 5 >= len(buffer):
             raise JSON5DecodeError(
-                msg=GeneralError.unexpected_eof(),
+                msg=DecoderErr.unexpected_eof(),
                 doc=buffer,
                 pos=idx,
             )
@@ -454,7 +454,7 @@ def validate_identifier_start(buffer: str, idx: int) -> int:
             idx += 6
         else:
             raise JSON5DecodeError(
-                msg=IdentifierGeneralError.invalid_start(
+                msg=IdentifierDecoderErr.invalid_start(
                     f"\\{buffer[idx + 1 : idx + 6]}"
                 ),
                 doc=buffer,
@@ -462,7 +462,7 @@ def validate_identifier_start(buffer: str, idx: int) -> int:
             )
     else:
         raise JSON5DecodeError(
-            msg=IdentifierGeneralError.invalid_start(start_char),
+            msg=IdentifierDecoderErr.invalid_start(start_char),
             doc=buffer,
             pos=idx,
         )
@@ -508,7 +508,7 @@ def tokenize_identifier(buffer: str, idx: int) -> TokenResult:
             idx += 1
         else:
             raise JSON5DecodeError(
-                msg=IdentifierGeneralError.invalid_char(char),
+                msg=IdentifierDecoderErr.invalid_char(char),
                 doc=buffer,
                 pos=idx,
             )
@@ -538,7 +538,7 @@ def validate_comment(buffer: str, idx: int) -> int:
     assert buffer[idx] == "/"
     if idx + 1 >= len(buffer):
         raise JSON5DecodeError(
-            msg=GeneralError.unexpected_eof(),
+            msg=DecoderErr.unexpected_eof(),
             doc=buffer,
             pos=idx,
         )
@@ -551,7 +551,7 @@ def validate_comment(buffer: str, idx: int) -> int:
         idx += 1
     if idx + 1 == len(buffer):
         raise JSON5DecodeError(
-            msg=GeneralError.unexpected_eof(),
+            msg=DecoderErr.unexpected_eof(),
             doc=buffer,
             pos=idx,
         )
