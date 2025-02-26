@@ -90,7 +90,7 @@ def tokenize_number(buffer: str, idx: int) -> TokenResult:
     while idx < buffer_len:
         char = buffer[idx]
 
-        if char.isspace() or char in {",", "]", "}"}:
+        if char.isspace() or char in consts.PUNCTUATORS:
             break
 
         if state in {"NUMBER_START", "SIGN"}:
@@ -305,7 +305,7 @@ def _escape_handler(buffer: str, idx: int) -> int:
             idx += 1
         else:
             raise JSON5DecodeError(
-                msg=StringDecoderErr.unexpected_end_of_string(),
+                msg=DecoderErr.bad_string_continuation(),
                 doc=buffer,
                 pos=idx,
             )

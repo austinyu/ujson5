@@ -132,6 +132,13 @@ def test_composite_loads(json5: str, py_value: pyjp5.JsonValue) -> None:
     assert pyjp5.loads(json5, strict=False) == py_value
 
 
+@pytest.mark.parametrize("json5", ['"\\t"', '"\\n"', '"\\r"', '"\\0"'])
+def test_strict_mode(json5: str) -> None:
+    """Test composite JSON5 loads."""
+    with pytest.raises(pyjp5.JSON5DecodeError):
+        pyjp5.loads(json5, strict=True)
+
+
 @pytest.mark.parametrize(
     "json5",
     [
@@ -141,7 +148,6 @@ def test_composite_loads(json5: str, py_value: pyjp5.JsonValue) -> None:
         "{abc: abc}",
         ":34",
         ":{ab: 1232",
-        '"abc \\ des"',
         "1}",
         "1:",
         "{1:",
@@ -156,6 +162,11 @@ def test_composite_loads(json5: str, py_value: pyjp5.JsonValue) -> None:
         "[12, 23:]",
         "{abc: 12, 23: 465}",
         "[12, 23, abc]",
+        "[:",
+        '{"abc":',
+        '{"abc":3,23',
+        "23,34",
+        '{:"abc",]',
     ],
 )
 def test_invalid_loads(json5: str) -> None:

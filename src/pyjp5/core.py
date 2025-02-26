@@ -1,6 +1,6 @@
 """Core JSON5 classes and exceptions."""
 
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 JsonValue = dict | list | int | float | str | None | bool
 JsonValuePairs = list[tuple[str, JsonValue]]
@@ -29,15 +29,47 @@ class JSON5DecodeError(ValueError):
         self.lineno = lineno
         self.colno = colno
 
-    def __reduce__(self) -> tuple:
+    def __reduce__(self) -> tuple:  # pragma: no cover
         return self.__class__, (self.msg, self.doc, self.pos)
+
+    def __str__(self) -> str:  # pragma: no cover
+        # Get the line where the error occurred
+        line_start = self.doc.rfind("\n", 0, self.pos) + 1
+        line_end = self.doc.find("\n", self.pos)
+        if line_end == -1:
+            line_end = len(self.doc)
+        error_line = self.doc[line_start:line_end]
+
+        # Create a pointer to the error column
+        pointer = " " * (self.colno - 1) + "^"
+
+        # Format the error message
+        return (
+            f"{self.msg}: line {self.lineno} column {self.colno} (char {self.pos})\n"
+            f"{error_line}\n"
+            f"{pointer}"
+        )
 
 
 class JSON5EncodeError(ValueError):
     """Subclass of ValueError raised when encoding fails."""
 
 
-TOKEN_TYPE = {
+TokenTypesKey = Literal[
+    "IDENTIFIER",
+    "STRING",
+    "NUMBER",
+    "BOOLEAN",
+    "NULL",
+    "PUN_OPEN_BRACE",
+    "PUN_CLOSE_BRACE",
+    "PUN_OPEN_BRACKET",
+    "PUN_CLOSE_BRACKET",
+    "PUN_COLON",
+    "PUN_COMMA",
+]
+
+TOKEN_TYPE: dict[TokenTypesKey, int] = {
     "IDENTIFIER": 0,
     "STRING": 1,
     "NUMBER": 2,
@@ -50,6 +82,8 @@ TOKEN_TYPE = {
     "PUN_COLON": 9,
     "PUN_COMMA": 10,
 }
+
+TOKEN_TYPE_MAP: dict[int, TokenTypesKey] = {v: k for k, v in TOKEN_TYPE.items()}
 
 
 class Token(NamedTuple):

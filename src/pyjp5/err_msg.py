@@ -2,19 +2,8 @@
 
 # pylint: disable=C0116
 
-from typing import Any
-
-
-class DecoderErr:
-    """General errors"""
-
-    @staticmethod
-    def unexpected_eof() -> str:
-        return "Unexpected end of file"
-
-    @staticmethod
-    def empty_json5() -> str:
-        return "Empty JSON5 document"
+from typing import Any, Literal
+from .core import TOKEN_TYPE_MAP
 
 
 class NumberDecoderErr:
@@ -85,28 +74,66 @@ class IdentifierDecoderErr:
         return f"Reserved word cannot be used as identifier: <{word}>"
 
 
-class ParseErrors:
+class DecoderErr:
     """General parse errors"""
+
+    @staticmethod
+    def unexpected_eof() -> str:
+        return "Unexpected end of file"
+
+    @staticmethod
+    def empty_json5() -> str:
+        return "Empty JSON5 document"
 
     @staticmethod
     def expecting_value() -> str:
         return "Expecting value"
 
     @staticmethod
-    def expecting_property_name() -> str:
-        return "Expecting property name followed by ':'"
+    def unexpected_identifier() -> str:
+        return "Unexpected identifier used as value. Hint: Use quotes for a string"
+
+    @staticmethod
+    def expecting_property_name(tk_type: int | None = None) -> str:
+        base_msg: str = (
+            "Expecting property name that can be either an identifier or a string"
+        )
+        if tk_type is not None:
+            return base_msg + f", got {TOKEN_TYPE_MAP[tk_type]}"
+        return base_msg
+
+    @staticmethod
+    def expecting_property_value(tk_type: int | None = None) -> str:
+        return (
+            "Expecting property value that can be one of "
+            "{string, number, bool, null, list, object}"
+            + f", got {TOKEN_TYPE_MAP[tk_type]}"
+            if tk_type is not None
+            else ""
+        )
 
     @staticmethod
     def unexpected_punctuation(actual: str) -> str:
-        return f"Unexpected punctuation: <{actual}>"
+        return f"Unexpected punctuation: `{actual}`"
 
     @staticmethod
-    def expecting_punctuation(expected: str) -> str:
-        return f"Expecting punctuation: <{expected}>"
+    def unexpected_colon_in_array() -> str:
+        return "Unexpected colon in array"
 
     @staticmethod
-    def unexpected_token_after_colon(token_type: str) -> str:
-        return f"Unexpected token: {token_type} after ':'"
+    def missing_key_with_colon() -> str:
+        return (
+            "Object entry should have a key of type string or "
+            "identifier followed by a colon"
+        )
+
+    @staticmethod
+    def missing_comma(within: Literal["array", "object"]) -> str:
+        return "Missing comma between elements in " + within
+
+    @staticmethod
+    def missing_colon() -> str:
+        return "Missing colon after object key"
 
     @staticmethod
     def multiple_root() -> str:
@@ -114,7 +141,7 @@ class ParseErrors:
 
     @staticmethod
     def bad_string_continuation() -> str:
-        return "Bad string continuation. `\\` must be followed by a newline"
+        return "Bad string continuation. `\\` must be followed by spaces and a newline"
 
     @staticmethod
     def invalid_control_char() -> str:

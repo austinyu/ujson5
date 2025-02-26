@@ -13,7 +13,7 @@ from .core import (
     TOKEN_TYPE,
 )
 from .consts import ESCAPE_SEQUENCE
-from .err_msg import DecoderErr, ParseErrors
+from .err_msg import DecoderErr
 from .lexer import tokenize
 
 ObjectHookArg = dict[str, JsonValue]
@@ -78,7 +78,7 @@ class Json5Decoder:
                 if top_last_key is None:
                     # We didn't expect a value without a key
                     raise JSON5DecodeError(
-                        ParseErrors.expecting_property_name(), json5_str, 0
+                        DecoderErr.expecting_property_name(), json5_str, 0
                     )
                 # Insert into dict under the key
                 if self._object_pairs_hook is not None:
@@ -98,17 +98,19 @@ class Json5Decoder:
                 }:
                     # it is not the first element and the comma is missing
                     raise JSON5DecodeError(
-                        ParseErrors.expecting_punctuation(","),
+                        DecoderErr.missing_comma("array"),
                         json5_str,
                         tokens[local_idx].value[0],
                     )
                 top_data.append(value)
             return None  # The root remains unchanged unless stack was empty
 
-        def update_root(new_root: JsonValue) -> None:
+        def update_root(new_root: JsonValue, root_start: int) -> None:
             nonlocal root, root_defined
             if root_defined:
-                raise JSON5DecodeError(ParseErrors.multiple_root(), json5_str, 0)
+                raise JSON5DecodeError(
+                    DecoderErr.multiple_root(), json5_str, root_start
+                )
             root = new_root
             root_defined = True
 
@@ -119,7 +121,7 @@ class Json5Decoder:
             ):
                 # key should always be followed by a colon
                 raise JSON5DecodeError(
-                    ParseErrors.expecting_punctuation(":"),
+                    DecoderErr.missing_colon(),
                     json5_str,
                     tokens[local_idx].value[0],
                 )
@@ -129,7 +131,7 @@ class Json5Decoder:
             }:
                 # it is not the first key-value pair and the comma is missing
                 raise JSON5DecodeError(
-                    ParseErrors.expecting_punctuation(","),
+                    DecoderErr.missing_comma("array"),
                     json5_str,
                     tokens[local_idx].value[0],
                 )
@@ -153,12 +155,12 @@ class Json5Decoder:
             elif tk_typ == TOKEN_TYPE["PUN_CLOSE_BRACE"]:
                 if not stack or stack[-1][0] != "object":
                     raise JSON5DecodeError(
-                        ParseErrors.unexpected_punctuation("}"), json5_str, tk_start
+                        DecoderErr.unexpected_punctuation("}"), json5_str, tk_start
                     )
                 top_layer = stack.pop()
                 if not stack:
                     # If stack is now empty, that means this object is the root
-                    update_root(top_layer[1])
+                    update_root(top_layer[1], tk_start)
 
             elif tk_typ == TOKEN_TYPE["PUN_OPEN_BRACKET"]:
                 new_arr: list[JsonValue] = []
@@ -168,27 +170,25 @@ class Json5Decoder:
             elif tk_typ == TOKEN_TYPE["PUN_CLOSE_BRACKET"]:
                 if not stack or stack[-1][0] != "array":
                     raise JSON5DecodeError(
-                        ParseErrors.unexpected_punctuation("]"), json5_str, tk_start
+                        DecoderErr.unexpected_punctuation("]"), json5_str, tk_start
                     )
                 top_layer = stack.pop()
                 if not stack:
                     # If stack is now empty, that means this array is the root
-                    update_root(top_layer[1])
+                    update_root(top_layer[1], tk_start)
 
             elif tk_typ == TOKEN_TYPE["IDENTIFIER"]:
                 if not stack or stack[-1][0] == "array" or stack[-1][2] is not None:
                     # identifier can only be used as a key in an object
-                    raise JSON5DecodeError(ParseErrors.expecting_value(), json5_str, 0)
+                    raise JSON5DecodeError(
+                        DecoderErr.unexpected_identifier(), json5_str, tk_start
+                    )
                 update_last_key(self._parse_identifier(tk_str), idx)
             elif tk_typ == TOKEN_TYPE["STRING"]:
-                if not self._validate_line_continuation(tk_str):
-                    raise JSON5DecodeError(
-                        ParseErrors.bad_string_continuation(), json5_str, tk_start
-                    )
                 parsed_str = self._parse_string(tk_str, json5_str, tk_start)
                 if not stack:
                     # A bare string is a root-level scalar
-                    update_root(parsed_str)
+                    update_root(parsed_str, tk_start)
                 else:
                     top_type, _, top_last_key = stack[-1]
                     if top_type == "object":
@@ -207,7 +207,7 @@ class Json5Decoder:
                 # These are scalar values
                 if not stack:
                     # A bare scalar is root-level
-                    update_root(parsed_number)
+                    update_root(parsed_number, tk_start)
                 else:
                     add_value_to_top(parsed_number, idx)
 
@@ -215,14 +215,14 @@ class Json5Decoder:
                 assert tk_str in {"true", "false"}
                 parsed_bool = tk_str == "true"
                 if not stack:
-                    update_root(parsed_bool)
+                    update_root(parsed_bool, tk_start)
                 else:
                     add_value_to_top(parsed_bool, idx)
 
             elif tk_typ == TOKEN_TYPE["NULL"]:
                 assert tk_str == "null"
                 if not stack:
-                    update_root(None)
+                    update_root(None, tk_start)
                 else:
                     add_value_to_top(None, idx)
 
@@ -230,17 +230,21 @@ class Json5Decoder:
                 # Just validate that we are in an object and have a last_key
                 if not stack:
                     raise JSON5DecodeError(
-                        ParseErrors.expecting_value(), json5_str, tk_start
+                        DecoderErr.expecting_value(), json5_str, tk_start
                     )
                 top_type, _, top_last_key = stack[-1]
-                if top_type != "object" or top_last_key is None:
-                    # Colon should only be used in an object and after a key
+                # Colon should only be used in an object and after a key
+                if top_type != "object":
                     raise JSON5DecodeError(
-                        ParseErrors.unexpected_punctuation(":"), json5_str, tk_start
+                        DecoderErr.unexpected_colon_in_array(), json5_str, tk_start
+                    )
+                if top_last_key is None:
+                    raise JSON5DecodeError(
+                        DecoderErr.missing_key_with_colon(), json5_str, tk_start
                     )
                 if idx + 1 >= len(tokens):
                     raise JSON5DecodeError(
-                        ParseErrors.expecting_value(), json5_str, tk_start
+                        DecoderErr.unexpected_eof(), json5_str, tk_start
                     )
                 if tokens[idx + 1].tk_type in {
                     TOKEN_TYPE["PUN_CLOSE_BRACE"],
@@ -249,7 +253,7 @@ class Json5Decoder:
                     TOKEN_TYPE["PUN_COLON"],
                 }:
                     raise JSON5DecodeError(
-                        ParseErrors.unexpected_punctuation(
+                        DecoderErr.unexpected_punctuation(
                             json5_str[tokens[idx + 1].value[0]]
                         ),
                         json5_str,
@@ -260,9 +264,12 @@ class Json5Decoder:
                 assert tk_typ == TOKEN_TYPE["PUN_COMMA"]
                 if idx + 1 >= len(tokens) or idx == 0:
                     raise JSON5DecodeError(
-                        ParseErrors.expecting_value(), json5_str, tk_start
+                        DecoderErr.expecting_value(), json5_str, tk_start
                     )
-
+                if not stack:
+                    raise JSON5DecodeError(
+                        DecoderErr.unexpected_punctuation(","), json5_str, tk_start
+                    )
                 if stack[-1][0] == "object":
                     # in an object, anything before a comma should be a value
                     if tokens[idx - 1].tk_type not in {
@@ -274,7 +281,11 @@ class Json5Decoder:
                         TOKEN_TYPE["PUN_CLOSE_BRACKET"],
                     }:
                         raise JSON5DecodeError(
-                            ParseErrors.expecting_property_name(), json5_str, tk_start
+                            DecoderErr.expecting_property_value(
+                                tokens[idx - 1].tk_type
+                            ),
+                            json5_str,
+                            tk_start,
                         )
                     # in an object, anything after a comma should be a key
                     # or the end of the object
@@ -284,7 +295,9 @@ class Json5Decoder:
                         TOKEN_TYPE["PUN_CLOSE_BRACE"],
                     }:
                         raise JSON5DecodeError(
-                            ParseErrors.expecting_property_name(), json5_str, tk_start
+                            DecoderErr.expecting_property_name(tokens[idx + 1].tk_type),
+                            json5_str,
+                            tokens[idx + 1].value[0],
                         )
                 elif stack[-1][0] == "array":
                     # in an array, anything before a comma should be a value
@@ -297,7 +310,7 @@ class Json5Decoder:
                         TOKEN_TYPE["PUN_CLOSE_BRACKET"],
                     }:
                         raise JSON5DecodeError(
-                            ParseErrors.expecting_value(), json5_str, tk_start
+                            DecoderErr.expecting_value(), json5_str, tk_start
                         )
                     # in an array, anything after a comma should be a value
                     # or the end of the array
@@ -311,20 +324,14 @@ class Json5Decoder:
                         TOKEN_TYPE["PUN_OPEN_BRACE"],
                     }:
                         raise JSON5DecodeError(
-                            ParseErrors.expecting_value(), json5_str, tk_start
+                            DecoderErr.expecting_value(), json5_str, tk_start
                         )
-
-                else:  # comma outside of object or array
-                    raise JSON5DecodeError(
-                        ParseErrors.unexpected_punctuation(","), json5_str, tk_start
-                    )
-
             idx += 1
 
         # If everything is parsed, the stack should be empty (all objects/arrays closed)
         if stack:
             raise JSON5DecodeError(
-                ParseErrors.expecting_value(), json5_str, tokens[-1].value[0]
+                DecoderErr.expecting_value(), json5_str, tokens[-1].value[0]
             )
 
         if self._object_pairs_hook is None and self._object_hook is not None:
@@ -332,14 +339,14 @@ class Json5Decoder:
                 return self._object_hook(root) if isinstance(root, dict) else root
             except Exception as e:
                 raise JSON5DecodeError(
-                    ParseErrors.invalid_object_hook(), json5_str, tokens[-1].value[0]
+                    DecoderErr.invalid_object_hook(), json5_str, tokens[-1].value[0]
                 ) from e
         if self._object_pairs_hook is not None:
             try:
                 return self._object_pairs_hook(root)  # type: ignore
             except Exception as e:
                 raise JSON5DecodeError(
-                    ParseErrors.invalid_object_pairs_hook(),
+                    DecoderErr.invalid_object_pairs_hook(),
                     json5_str,
                     tokens[-1].value[0],
                 ) from e
@@ -371,26 +378,6 @@ class Json5Decoder:
             )
         return int(num_str) if self._parse_int is None else self._parse_int(num_str)
 
-    def _validate_line_continuation(self, str_str: str) -> bool:
-        """Validate line continuation in a string. Line continuation is a `\\`
-        followed by a newline character. This function returns True if `\\` is followed
-        by any number of space and a new line. Otherwise, if `\\` is followed by at
-        least one space and any character other than a newline, it returns False.
-
-        Args:
-            text (str): string to validate
-
-        Returns:
-            bool: True if line continuation is valid, False otherwise
-        """
-        if "\\" not in str_str:
-            return True
-        candidates = re.finditer(r"\\\s+[^\n]", str_str)
-        for match in candidates:
-            if not bool(re.search(r"\\\s*\n", match.group())):
-                return False
-        return True
-
     def _parse_string(self, str_str: str, json5_str: str, str_start_idx: int) -> str:
         def replace_escape_sequences_and_continuations(match):
             """Unescape escape sequences, unicode escape sequence
@@ -404,7 +391,7 @@ class Json5Decoder:
                 # in strict mode, control characters are not allowed
                 if self._strict and match.group(1) in {"t", "n", "r", "0"}:
                     raise JSON5DecodeError(
-                        ParseErrors.invalid_control_char(),
+                        DecoderErr.invalid_control_char(),
                         json5_str,
                         str_start_idx + match.start(),
                     )
