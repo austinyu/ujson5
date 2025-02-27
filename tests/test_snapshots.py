@@ -4,6 +4,9 @@ If any of the tests fail, you should observe and confirm the changes before
 re-generating the snapshots.
 """
 
+import sys
+
+import pytest
 import pyjp5
 
 from . import snapshots
@@ -32,6 +35,10 @@ def test_alpha_default():
 
 def test_alpha_with_comments():
     """Test dump consistency."""
+    if sys.version_info < (3, 12):
+        # `__orig_bases__` is not available before Python 3.12,
+        # we will find a way to test this in the future
+        pytest.skip("Currently only support at least Python 3.12")
     with open(
         snapshots.SNAPSHOTS_ROOT / snapshots.SNAPSHOT_NAMES["alpha_with_comments"],
         "r",
