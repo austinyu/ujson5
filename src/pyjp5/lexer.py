@@ -22,7 +22,7 @@ def simplify_escapes(text: str) -> str:
     continuation sequences with a newline character.
 
     Args:
-        text (str): string with escape sequences
+        text: string with escape sequences
 
     Returns:
         str: string with escape sequences simplified
@@ -82,7 +82,18 @@ def _handle_unexpected_char(buffer: str, idx: int, char: str) -> None:
 
 
 def tokenize_number(buffer: str, idx: int) -> TokenResult:
-    """Transition Table"""
+    """Tokenize a number and return the token and the updated index.
+
+    Args:
+        buffer: JSON5 document
+        idx: current index. Must point to the start of the number
+
+    Returns:
+        TokenResult: Token and updated index
+
+    Raises:
+        JSON5DecodeError: if the number is invalid
+    """
     state: NumberState = "NUMBER_START"
     start_idx = idx
 
@@ -262,11 +273,16 @@ StringState = Literal[
 
 
 def _escape_handler(buffer: str, idx: int) -> int:
-    """Handle escape sequences
+    """Handle escape sequences. There are a few case to consider:
+    - Line continuation: `\\` followed by a newline character
+    - Single character escape sequence: `\\` followed by a character in
+      consts.ESCAPE_SEQUENCE
+    - Unicode escape sequence: `\\u` followed by 4 hexadecimal digits
+    - Hexadecimal escape sequence: `\\x` followed by 2 hexadecimal digits
 
     Args:
-        buffer (str): JSON5 document
-        idx (int): current index. Must point to the escape character
+        buffer: JSON5 document
+        idx: current index. Must point to the escape character
 
     Returns:
         int: updated index
@@ -358,8 +374,8 @@ def tokenize_string(buffer: str, idx: int) -> TokenResult:
     """Tokenize a string and return the token and the updated index.
 
     Args:
-        buffer (str): JSON5 document
-        idx (int): current index. Must point to the opening quote
+        buffer: JSON5 document
+        idx: current index. Must point to the opening quote
 
     Returns:
         TokenResult: Token and updated index
@@ -426,11 +442,13 @@ def tokenize_string(buffer: str, idx: int) -> TokenResult:
 
 
 def validate_identifier_start(buffer: str, idx: int) -> int:
-    """Validate the start of an identifier.
+    """Validate the start of an identifier. An identifier must start with a
+    letter, underscore or dollar sign. It can also start with a unicode escape
+    sequence.
 
     Args:
-        buffer (str): JSON5 document
-        idx (int): current index. Must point to the start of the identifier
+        buffer: JSON5 document
+        idx: current index. Must point to the start of the identifier
 
     Returns:
         int: updated index
@@ -473,8 +491,8 @@ def tokenize_identifier(buffer: str, idx: int) -> TokenResult:
     """Tokenize an identifier and return the token and the updated index.
 
     Args:
-        buffer (str): JSON5 document
-        idx (int): current index. Must point to the start of the identifier
+        buffer: JSON5 document
+        idx: current index. Must point to the start of the identifier
 
     Returns:
         TokenResult: Token and updated index
@@ -523,11 +541,12 @@ def tokenize_identifier(buffer: str, idx: int) -> TokenResult:
 
 
 def validate_comment(buffer: str, idx: int) -> int:
-    """Validate a comment.
+    """Validate a comment. An inline comment starts with `//` and ends with a
+    newline character. A block comment starts with `/*` and ends with `*/`.
 
     Args:
-        buffer (str): JSON5 document
-        idx (int): current index. Must point to the start of the comment
+        buffer: JSON5 document
+        idx: current index. Must point to the start of the comment
 
     Returns:
         int: updated index
@@ -562,10 +581,13 @@ def tokenize(buffer: str) -> list[Token]:
     """Tokenize a JSON5 document.
 
     Args:
-        buffer (str): JSON5 document
+        buffer: JSON5 document
 
     Returns:
         list[Token]: List of tokens
+
+    Raises:
+        JSON5DecodeError: if the document is invalid
     """
     buffer = simplify_escapes(buffer)
     tokens: list[Token] = []

@@ -6,9 +6,9 @@
 	],
 	"settings": {
 		"cSpell.words": [],
-		"python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+		"python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
 		"pylint.interpreter": [
-			"${workspaceFolder}\\.venv\\Scripts\\python.exe"
+			"${workspaceFolder}/.venv/Scripts/python.exe"
 		],
 		"editor.rulers": [
 			95
@@ -27,6 +27,10 @@
 		],
 		"pylint.path": [
 			"${workspaceFolder}\\tests"
+		],
+		"mypy-type-checker.importStrategy": "fromEnvironment",
+		"mypy-type-checker.interpreter": [
+			"${workspaceFolder}/.venv/Scripts/python.exe"
 		]
 	}
 }

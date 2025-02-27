@@ -1,8 +1,5 @@
 site_name: pyjp5
 site_url: https://austinyu.github.io/pyjp5/
-nav:
-- Home: index.md
-- About: about.md
 
 theme:
   name: material
@@ -29,17 +26,33 @@ theme:
       icon: material/lightbulb-auto-outline
       name: "Switch to system preference"
   features:
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - announce.dismiss
     - navigation.tabs
-    - navigation.tabs.sticky
-    - navigation.sections
-    - navigation.expand
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.preview
+    - navigation.instant.progress
     - navigation.path
-    - toc.integrate
+    - navigation.sections
     - navigation.top
-    - search
+    - navigation.tracking
     - search.suggest
-    - search.highlight
-    - search.share
+    - toc.follow
 
 repo_name: austinyu/pyjp5
 repo_url: https://github.com/austinyu/pyjp5
+
+nav:
+- Get Started:
+  - Welcome to pyjp5: index.md
+  - Quick Start: quick_start.md
+- API Reference:
+  - Overview: api_reference/overview.md
+  - Core: api_reference/core.md
+  - Decode: api_reference/decode.md
+  - Encode: api_reference/encode.md
+- About:
+  - About pyjp5: about.md

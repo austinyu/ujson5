@@ -23,3 +23,5 @@ coverage.xml
 dist/*
 
 site/*
+
+.venv-3.10/*

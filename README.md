@@ -25,6 +25,8 @@ TODOs
 - ruler implementation
 - CLI implementation
 - comments extraction
+- versioning docs using `mike`
+- add docstring examples
 
 ## Comment Extraction Examples
 

@@ -1,8 +1,8 @@
-"""TODO"""
+"""Implements the JSON5Encoder class and the dumps and dump functions."""
 
 import sys
 from collections.abc import Callable, Iterable
-from typing import Any, TextIO, TypedDict, is_typeddict
+from typing import Any, TextIO, TypedDict, is_typeddict, Literal
 import re
 import inspect
 from warnings import warn
@@ -55,12 +55,32 @@ CommentsCache = dict[str, EntryComments]
 
 def extend_key_path(base_path: str, key: str) -> str:
     """Generate a unique name for each key in a composite dictionary by concatenating the
-    base path and the key"""
+    base path and the key
+
+    Args:
+        base_path: The base path
+        key: The key to be added to the base path
+
+    Returns:
+        str: The extended key path
+    """
     return f"{base_path}/{key}"
 
 
 def get_comments(typed_dict_cls: Any) -> CommentsCache:
-    """Extract comments from a TypedDict class"""
+    """Extract comments from a TypedDict class
+
+    Warning:
+        Comments extraction is currently only fully supported on Python 3.12+. On older
+        versions, the function will still work but will not extract all comments from the
+        parent TypedDicts.
+
+    Args:
+        typed_dict_cls: The TypedDict class
+
+    Returns:
+        CommentsCache: A dictionary containing comments related to each TypedDict entry
+    """
     assert is_typeddict(typed_dict_cls)
 
     comments: CommentsCache = {}
@@ -103,8 +123,72 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
     return comments
 
 
+KeyQuotation = Literal["single", "double", "none"]
+
+
 class JSON5Encoder:
-    """TODO"""
+    """JSON5 encoder class. This encoder is used to serialize Python objects to JSON5
+    strings. This class mirrors the standard library's JSONEncoder class, with the
+    addition of a few extra options and features. This class will transform common data
+    structures according to this table:
+
+    +-------------------+---------------+
+    | Python            | JSON          |
+    +===================+===============+
+    | dict              | object        |
+    +-------------------+---------------+
+    | list, tuple       | array         |
+    +-------------------+---------------+
+    | str               | string        |
+    +-------------------+---------------+
+    | int, float        | number        |
+    +-------------------+---------------+
+    | True              | true          |
+    +-------------------+---------------+
+    | False             | false         |
+    +-------------------+---------------+
+    | None              | null          |
+    +-------------------+---------------+
+
+    To extend the encoder, subclass this class and override the `.default()` method, which
+    will try to encode the data structures that are not supported by default. The `.default()`
+    method should return a serializable object. If the `.default()` method is not overridden,
+    the encoder will raise a JSON5EncodeError when trying to encode an unsupported object.
+    The overridden `.default()` method should also call the parent class's `.default()`
+    method to handle the default encoding.
+
+    The constructor also takes in a `default` argument, which can be used to set a default
+    function that will be called when trying to encode an unsupported object. This argument
+    will take precedence over the overridden `.default()` method.
+
+    All arguments are keyword-only arguments.
+
+    Args:
+        default: A function that returns a serializable object when trying to encode an
+            unsupported object. If None, the default`.default()` method will be used.
+            Defaults to None.
+        skip_keys: If True, keys with unsupported types (anything other than str, int, float,
+            bool, or None) will be skipped. Otherwise, an exception will be raised.
+            Defaults to False.
+        ensure_ascii: If True, all non-ASCII characters will be escaped. Defaults to True.
+        check_circular: If True, circular references will be checked. This will introduce a
+            small performance hit. Defaults to True.
+        allow_nan: If True, NaN, Infinity, and -Infinity will be allowed. Otherwise, an
+            exception will be raised when trying to encode these values. Defaults to True.
+        indent: If not None, the output will be formatted with the given indent level.
+            Otherwise, the output will be compact. Defaults to None.
+        separators: A tuple containing the item separator and the key-value separator.
+            Defaults to None. If None, it will be set to (", ", ": ") if indent is None,
+            and (",", ":") if indent is not None.
+        sort_keys: If True, the keys will be sorted. Defaults to False.
+        key_quotation: The quotation style to be used for keys. Can be one of "single",
+            "double", or "none". If "single" or "double", the keys will be enclosed in
+            single or double quotes, respectively. If "none", the keys will not be enclosed
+            in quotes. Defaults to "none".
+        trailing_comma: If True, a trailing comma will be added to the last item in
+            a list or dictionary. If None, a trailing comma will be added if indent
+            is not None. Defaults to None.
+    """
 
     def __init__(
         self,
@@ -117,7 +201,7 @@ class JSON5Encoder:
         indent: int | None = None,
         separators: tuple[str, str] | None = None,
         sort_keys: bool = False,
-        quoted_keys: bool = False,
+        key_quotation: KeyQuotation = "none",
         trailing_comma: bool | None = None,
     ) -> None:
         self._skip_keys: bool = skip_keys
@@ -127,7 +211,7 @@ class JSON5Encoder:
         self._indent_str: str | None = " " * indent if indent is not None else None
         self._item_separator: str = ", "
         self._key_separator: str = ": "
-        self._quoted_keys: bool = quoted_keys
+        self._key_quotation: str = key_quotation
         if indent is not None:
             self._item_separator = ","
         self._trailing_comma: bool = indent is not None
@@ -147,7 +231,20 @@ class JSON5Encoder:
         self._comments_cache: CommentsCache = {}
 
     def encode(self, obj: Any, typed_dict_cls: Any | None = None) -> str:
-        """TODO"""
+        """Return a JSON5 string representation of a Python object.
+
+        Args:
+            obj: The Python object to be serialized
+            typed_dict_cls: A TypedDict class that will be used to extract comments from
+                the TypedDict entries. Defaults to None.
+
+        Returns:
+            str: The JSON5 string representation of the Python object
+
+        Raises:
+            JSON5EncodeError: If the TypedDict class is not a TypedDict subclass or if the
+                object cannot be serialized
+        """
         if typed_dict_cls is not None and not is_typeddict(typed_dict_cls):
             raise JSON5EncodeError(EncoderErrors.invalid_typed_dict(typed_dict_cls))
         if isinstance(obj, str):
@@ -167,7 +264,21 @@ class JSON5Encoder:
         return "".join(chunks)
 
     def iterencode(self, obj: Any, typed_dict_cls: Any | None = None) -> Iterable[str]:
-        """TODO"""
+        """Encode the given object and yield each part of the JSON5 string representation
+
+        Args:
+            obj: The Python object to be serialized
+            typed_dict_cls: A TypedDict class that will be used to extract comments from
+                the TypedDict entries. Defaults to None.
+
+        Returns:
+            Iterable[str]: An iterable of strings representing the JSON5 serialization of the
+                Python object
+
+        Raises:
+            JSON5EncodeError: If the TypedDict class is not a TypedDict subclass or if the
+                object cannot be serialized
+        """
         if is_typeddict(typed_dict_cls):
             self._comments_cache = get_comments(typed_dict_cls)
         elif typed_dict_cls is not None:
@@ -175,7 +286,20 @@ class JSON5Encoder:
         return self._iterencode(obj, indent_level=0, key_path="")
 
     def default(self, obj: Any) -> Serializable:
-        """TODO"""
+        """Override this method in a subclass to implement custom serialization
+        for objects that are not serializable by default. This method should return
+        a serializable object. If this method is not overridden, the encoder will
+        raise a JSON5EncodeError when trying to encode an unsupported object.
+
+        Args:
+            obj: The object to be serialized that is not supported by default
+
+        Returns:
+            Serializable: A serializable object
+
+        Raises:
+            JSON5EncodeError: If the object cannot be serialized
+        """
         raise JSON5EncodeError(EncoderErrors.unable_to_encode(obj))
 
     def _encode_int(self, obj: int) -> str:
@@ -219,8 +343,13 @@ class JSON5Encoder:
 
         if self._ensure_ascii:
             return f'"{ESCAPE_ASCII.sub(replace_ascii, obj)}"'
-        if key_str and not self._quoted_keys:
+        if not key_str:
+            return f'"{ESCAPE.sub(replace_unicode, obj)}"'
+        if self._key_quotation == "none":
             return ESCAPE.sub(replace_unicode, obj)
+        if self._key_quotation == "single":
+            return f"'{ESCAPE.sub(replace_unicode, obj)}'"
+        assert self._key_quotation == "double", self._key_quotation
         return f'"{ESCAPE.sub(replace_unicode, obj)}"'
 
     def _iterencode(self, obj: Any, indent_level: int, key_path: str) -> Iterable[str]:
@@ -389,8 +518,7 @@ _default_encoder = JSON5Encoder(
     indent=None,
     separators=None,
     default=None,
-    quoted_keys=False,
-    sort_keys=False,
+    key_quotation="none",
     trailing_comma=None,
 )
 
@@ -408,7 +536,7 @@ def dumps(
     separators: tuple[str, str] | None = None,
     default: DefaultInterface | None = None,
     sort_keys: bool = False,
-    quoted_keys: bool = False,
+    key_quotation: KeyQuotation = "none",
     trailing_comma: bool | None = None,
 ) -> str:
     """TODO"""
@@ -422,7 +550,7 @@ def dumps(
         and separators is None
         and default is None
         and not sort_keys
-        and not quoted_keys
+        and key_quotation == "none"
         and trailing_comma is None
     ):
         return _default_encoder.encode(obj, typed_dict_cls)
@@ -437,7 +565,7 @@ def dumps(
         separators=separators,
         default=default,
         sort_keys=sort_keys,
-        quoted_keys=quoted_keys,
+        key_quotation=key_quotation,
         trailing_comma=trailing_comma,
     ).encode(obj, typed_dict_cls)
 
@@ -456,7 +584,7 @@ def dump(
     separators: tuple[str, str] | None = None,
     default: DefaultInterface | None = None,
     sort_keys: bool = False,
-    quoted_keys: bool = False,
+    key_quotation: KeyQuotation = "none",
     trailing_comma: bool | None = None,
 ) -> None:
     """TODO"""
@@ -470,7 +598,7 @@ def dump(
         and separators is None
         and default is None
         and not sort_keys
-        and not quoted_keys
+        and key_quotation == "none"
         and trailing_comma is None
     ):
         iterable = _default_encoder.iterencode(obj, typed_dict_cls)
@@ -486,7 +614,7 @@ def dump(
             separators=separators,
             default=default,
             sort_keys=sort_keys,
-            quoted_keys=quoted_keys,
+            key_quotation=key_quotation,
             trailing_comma=trailing_comma,
         ).iterencode(obj, typed_dict_cls)
     for chunk in iterable:

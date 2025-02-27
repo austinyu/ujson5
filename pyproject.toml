@@ -44,16 +44,22 @@ flake8-no-implicit-concat = "^0.3.7"
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.6.5"
+mkdocstrings-python = "^1.16.2"
 
 [tool.bandit]
 skips = ["B101", "B311"]
 
 [tool.pytest.ini_options]
 addopts = """
-    --cov pyjp5
+    --cov .
     --cov-report xml:tests/.coverage/cov.xml
     --cov-report html:tests/.coverage/html
 """
+
+[tool.coverage.report]
+exclude_also = [
+    'pytest.skip',
+]
 
 [tool.poetry-dynamic-versioning]
 enable = true
