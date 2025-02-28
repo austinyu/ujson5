@@ -12,12 +12,14 @@ jobs:
   benchmarks:
     name: Run benchmarks
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [1,2,3,4,5]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-
       #----------------------------------------------
       #  -----  install & configure poetry  -----
       #----------------------------------------------
@@ -38,11 +40,10 @@ jobs:
       #----------------------------------------------
       #       run test suite & publish coverage
       #----------------------------------------------
-
       - name: Run benchmarks
         uses: CodSpeedHQ/action@v3
         env:
           CI_ENV: true
         with:
+          run: poetry run pytest tests/ --codspeed --test-group=${{ matrix.shard }} --test-group-count=5
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: poetry run pytest --codspeed
