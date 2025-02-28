@@ -25,3 +25,5 @@ dist/*
 site/*
 
 .venv-3.10/*
+.benchmarks/*
+.codspeed/*

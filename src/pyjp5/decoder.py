@@ -44,6 +44,8 @@ class Json5Decoder:
 
     def decode(self, json5_str: str) -> Any:
         """TODO"""
+        print("=== decode ===")
+        print(json5_str)
         tokens = tokenize(json5_str)
         return self._parse_json5(json5_str, tokens)
 

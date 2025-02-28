@@ -45,6 +45,13 @@ theme:
 repo_name: austinyu/pyjp5
 repo_url: https://github.com/austinyu/pyjp5
 
+plugins:
+- mkdocstrings:
+    handlers:
+      python:
+        paths: [src]
+        options:
+          docstring_style: google
 nav:
 - Get Started:
   - Welcome to pyjp5: index.md

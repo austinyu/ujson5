@@ -11,6 +11,8 @@ from .core import JSON5EncodeError
 from .err_msg import EncoderErrors
 
 Serializable = dict | list | tuple | int | float | str | None | bool
+"""Python objects that can be serialized to JSON5"""
+
 DefaultInterface = (
     Callable[[Any], dict]
     | Callable[[Any], list]
@@ -21,6 +23,8 @@ DefaultInterface = (
     | Callable[[Any], None]
     | Callable[[Any], bool]
 )
+"""A callable that takes in an object that is not
+serializable and returns a serializable object"""
 
 ESCAPE = re.compile(r'[\x00-\x1f\\"\b\f\n\r\t]')
 ESCAPE_ASCII = re.compile(r'([\\"]|[^\ -~])')
@@ -124,6 +128,7 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
 
 
 KeyQuotation = Literal["single", "double", "none"]
+"""The quotation style to be used for keys in a json5 object."""
 
 
 class JSON5Encoder:
@@ -132,23 +137,15 @@ class JSON5Encoder:
     addition of a few extra options and features. This class will transform common data
     structures according to this table:
 
-    +-------------------+---------------+
     | Python            | JSON          |
-    +===================+===============+
+    |-------------------|---------------|
     | dict              | object        |
-    +-------------------+---------------+
     | list, tuple       | array         |
-    +-------------------+---------------+
     | str               | string        |
-    +-------------------+---------------+
     | int, float        | number        |
-    +-------------------+---------------+
     | True              | true          |
-    +-------------------+---------------+
     | False             | false         |
-    +-------------------+---------------+
     | None              | null          |
-    +-------------------+---------------+
 
     To extend the encoder, subclass this class and override the `.default()` method, which
     will try to encode the data structures that are not supported by default. The `.default()`
@@ -527,19 +524,57 @@ def dumps(
     obj: Any,
     typed_dict_cls: Any | None = None,
     *,
+    cls: type[JSON5Encoder] | None = None,
+    default: DefaultInterface | None = None,
     skip_keys: bool = False,
     ensure_ascii: bool = True,
     check_circular: bool = True,
     allow_nan: bool = True,
-    cls: type[JSON5Encoder] | None = None,
     indent: int | None = None,
     separators: tuple[str, str] | None = None,
-    default: DefaultInterface | None = None,
     sort_keys: bool = False,
     key_quotation: KeyQuotation = "none",
     trailing_comma: bool | None = None,
 ) -> str:
-    """TODO"""
+    """Serialize `obj` to a JSON5 formatted `str`.
+    All arguments except `obj` and `typed_dict_cls` are keyword-only arguments.
+
+    Args:
+        cls: The encoder class to be used. a custom [`JSON5Encoder`][pyjp5.JSON5Encoder]
+            subclass (e.g. one that overrides the [`.default()`][pyjp5.JSON5Encoder.default]
+            method to serialize additional types) can be provided. If None, the default
+            [`JSON5Encoder`][pyjp5.JSON5Encoder] class will be used. Defaults to None.
+        default: A function that returns a serializable object when trying to encode an
+            unsupported object. If None, the default
+            [`.default()`][pyjp5.JSON5Encoder.default] method will be used. Defaults to None.
+        skip_keys: If True, keys with unsupported types (anything other than str, int, float,
+            bool, or None) will be skipped. Otherwise, an exception will be raised.
+            Defaults to False.
+        ensure_ascii: If True, all non-ASCII characters will be escaped. Defaults to True.
+        check_circular: If True, circular references will be checked. This will introduce a
+            small performance hit. Defaults to True.
+        allow_nan: If True, NaN, Infinity, and -Infinity will be allowed. Otherwise, an
+            exception will be raised when trying to encode these values. Defaults to True.
+        indent: If not None, the output will be formatted with the given indent level.
+            Otherwise, the output will be compact. Defaults to None.
+        separators: A tuple containing the item separator and the key-value separator.
+            Defaults to None. If None, it will be set to (", ", ": ") if indent is None,
+            and (",", ":") if indent is not None.
+        sort_keys: If True, the keys will be sorted. Defaults to False.
+        key_quotation: The quotation style to be used for keys. Can be one of "single",
+            "double", or "none". If "single" or "double", the keys will be enclosed in
+            single or double quotes, respectively. If "none", the keys will not be enclosed
+            in quotes. Defaults to "none".
+        trailing_comma: If True, a trailing comma will be added to the last item in
+            a list or dictionary. If None, a trailing comma will be added if indent
+            is not None. Defaults to None.
+
+    Returns:
+        str: The JSON5 formatted string representation of the Python object
+
+    Raises:
+        JSON5EncodeError: If the object cannot be serialized
+    """
     if (
         not skip_keys  # pylint: disable=R0916
         and ensure_ascii
@@ -587,7 +622,45 @@ def dump(
     key_quotation: KeyQuotation = "none",
     trailing_comma: bool | None = None,
 ) -> None:
-    """TODO"""
+    """Serialize `obj` as a JSON formatted stream to `fp` (a `.write()`-supporting
+    file-like object).
+
+    Args:
+        cls: The encoder class to be used. a custom [`JSON5Encoder`][pyjp5.JSON5Encoder]
+            subclass (e.g. one that overrides the [`.default()`][pyjp5.JSON5Encoder.default]
+            method to serialize additional types) can be provided. If None, the default
+            [`JSON5Encoder`][pyjp5.JSON5Encoder] class will be used. Defaults to None.
+        default: A function that returns a serializable object when trying to encode an
+            unsupported object. If None, the default
+            [`.default()`][pyjp5.JSON5Encoder.default] method will be used. Defaults to None.
+        skip_keys: If True, keys with unsupported types (anything other than str, int, float,
+            bool, or None) will be skipped. Otherwise, an exception will be raised.
+            Defaults to False.
+        ensure_ascii: If True, all non-ASCII characters will be escaped. Defaults to True.
+        check_circular: If True, circular references will be checked. This will introduce a
+            small performance hit. Defaults to True.
+        allow_nan: If True, NaN, Infinity, and -Infinity will be allowed. Otherwise, an
+            exception will be raised when trying to encode these values. Defaults to True.
+        indent: If not None, the output will be formatted with the given indent level.
+            Otherwise, the output will be compact. Defaults to None.
+        separators: A tuple containing the item separator and the key-value separator.
+            Defaults to None. If None, it will be set to (", ", ": ") if indent is None,
+            and (",", ":") if indent is not None.
+        sort_keys: If True, the keys will be sorted. Defaults to False.
+        key_quotation: The quotation style to be used for keys. Can be one of "single",
+            "double", or "none". If "single" or "double", the keys will be enclosed in
+            single or double quotes, respectively. If "none", the keys will not be enclosed
+            in quotes. Defaults to "none".
+        trailing_comma: If True, a trailing comma will be added to the last item in
+            a list or dictionary. If None, a trailing comma will be added if indent
+            is not None. Defaults to None.
+
+    Returns:
+        str: The JSON5 formatted string representation of the Python object
+
+    Raises:
+        JSON5EncodeError: If the object cannot be serialized
+    """
     if (
         not skip_keys  # pylint: disable=R0916
         and ensure_ascii

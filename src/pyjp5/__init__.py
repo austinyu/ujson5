@@ -2,7 +2,7 @@
 
 from .core import JsonValue, JSON5DecodeError, JSON5EncodeError
 from .decoder import Json5Decoder, load, loads, ObjectPairsHookArg, ObjectHookArg
-from .encoder import JSON5Encoder, dump, dumps
+from .encoder import JSON5Encoder, dump, dumps, Serializable
 
 __all__ = [
     "JsonValue",
@@ -16,4 +16,5 @@ __all__ = [
     "dump",
     "ObjectPairsHookArg",
     "ObjectHookArg",
+    "Serializable",
 ]

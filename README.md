@@ -27,6 +27,7 @@ TODOs
 - comments extraction
 - versioning docs using `mike`
 - add docstring examples
+- add optional arg to encode to cache comments in frozen or optimized mode
 
 ## Comment Extraction Examples
 

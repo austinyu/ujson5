@@ -27,6 +27,7 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
+pytest-codspeed = "^3.2.0"
 black = "^25.1.0"
 flake8 = "^7.1.1"
 pylint = "^3.3.4"
@@ -59,6 +60,11 @@ addopts = """
 [tool.coverage.report]
 exclude_also = [
     'pytest.skip',
+]
+
+[tool.coverage.run]
+omit = [
+    "tests/generate_snapshots.py"
 ]
 
 [tool.poetry-dynamic-versioning]
