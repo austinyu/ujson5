@@ -1274,6 +1274,21 @@ pytest = ">=4.6"
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
+name = "pytest-test-groups"
+version = "1.1.0"
+description = "A Pytest plugin for running a subset of your tests by splitting them in to equally sized groups."
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "pytest_test_groups-1.1.0-py3-none-any.whl", hash = "sha256:8210002934b1932a2a1ee94f817109610f3ff371cf48c8c08f709c2f503db71e"},
+    {file = "pytest_test_groups-1.1.0.tar.gz", hash = "sha256:c17a445676969dd4442e1fe03acd8d8dda87bc8f3beee00a80d5d87adc33eb43"},
+]
+
+[package.dependencies]
+pytest = ">=7.0.0"
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 description = "Extensions to the standard Python datetime module"
@@ -1677,4 +1692,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "0a9b46a28008927727acf7b7405d170d3c7e06f2b265efae67dcfd1d6e38056f"
+content-hash = "a1f815f1397ae268f4c5e1d769d16b2666e2be8a5e33a6dc1f0efeb4d172aa6c"
