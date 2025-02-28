@@ -45,4 +45,4 @@ jobs:
           CI_ENV: true
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: pytest tests/ --codspeed
+          run: poetry run pytest --codspeed
