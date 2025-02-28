@@ -12,7 +12,7 @@
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 
-https://github.com/marketplace/actions/install-poetry-action
+[Website](https://austinyu.github.io/pyjp5/)
 
 ## Setup development environment
 
@@ -28,6 +28,7 @@ TODOs
 - versioning docs using `mike`
 - add docstring examples
 - add optional arg to encode to cache comments in frozen or optimized mode
+- makefile automation
 
 ## Comment Extraction Examples
 
