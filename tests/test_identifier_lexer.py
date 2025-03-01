@@ -4,11 +4,11 @@ from copy import copy
 from random import choice, randint, sample
 import pytest
 
-from pyjp5.core import JSON5DecodeError, TOKEN_TYPE
-from pyjp5.lexer import (
+from ujson5.core import JSON5DecodeError, TOKEN_TYPE
+from ujson5.lexer import (
     tokenize_identifier,
 )
-from pyjp5.consts import (
+from ujson5.consts import (
     UNICODE_LETTERS,
     UNICODE_COMBINING_MARKS,
     UNICODE_DIGITS,

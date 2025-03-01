@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-import pyjp5
+import ujson5
 
 
 @pytest.mark.parametrize(
@@ -62,8 +62,8 @@ import pyjp5
 )
 def test_valid_examples(py_obj: Any, json5_obj: str) -> None:
     """Test valid JSON5 examples."""
-    assert pyjp5.dumps(py_obj, check_circular=False) == json5_obj
-    assert pyjp5.dumps(py_obj, check_circular=True) == json5_obj
+    assert ujson5.dumps(py_obj, check_circular=False) == json5_obj
+    assert ujson5.dumps(py_obj, check_circular=True) == json5_obj
 
 
 @pytest.mark.parametrize(
@@ -91,7 +91,7 @@ def test_valid_examples(py_obj: Any, json5_obj: str) -> None:
 )
 def test_indent(py_obj: Any, json5_obj: str) -> None:
     """Test indent."""
-    assert pyjp5.dumps(py_obj, indent=4) == json5_obj
+    assert ujson5.dumps(py_obj, indent=4) == json5_obj
 
 
 example_sets: Any = [
@@ -107,16 +107,16 @@ example_sets: Any = [
 )
 def test_invalid_examples(py_obj: Any) -> None:
     """Test invalid JSON5 examples."""
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(py_obj)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(py_obj)
 
 
 def test_skip_keys() -> None:
     """Test skip keys."""
     obj = {("non-string-key", "is here"): "value", "key2": "value2"}
-    pyjp5.dumps(obj, skip_keys=True)
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(obj, skip_keys=False)
+    ujson5.dumps(obj, skip_keys=True)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(obj, skip_keys=False)
 
 
 @pytest.mark.parametrize(
@@ -129,34 +129,34 @@ def test_skip_keys() -> None:
 )
 def test_nan_not_allowed(py_obj: float) -> None:
     """Test NaN not allowed."""
-    pyjp5.dumps(py_obj, allow_nan=True)
+    ujson5.dumps(py_obj, allow_nan=True)
 
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(py_obj, allow_nan=False)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(py_obj, allow_nan=False)
 
 
 def test_circular_ref() -> None:
     """Test circular reference."""
     obj: dict = {}
     obj["self"] = obj
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(obj)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(obj)
 
     lst: list = []
     lst.append(obj)
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(lst)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(lst)
 
     lst = []
     lst.append(lst)
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(lst)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(lst)
 
     obj = {}
     obj["list"] = []
     obj["list"].append(obj)
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(obj)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(obj)
 
     class Custom:
         """Custom class."""
@@ -166,42 +166,42 @@ def test_circular_ref() -> None:
 
     subset = Custom(1)
     subset.value = subset
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps(subset, default=lambda v: v.value)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps(subset, default=lambda v: v.value)
 
     subset = Custom(1)
-    pyjp5.dumps(subset, default=lambda v: v.value, check_circular=False)
+    ujson5.dumps(subset, default=lambda v: v.value, check_circular=False)
 
 
 def test_sort_keys() -> None:
     """Test sort keys."""
     obj = {"key2": "value2", "key1": "value1"}
-    assert pyjp5.dumps(obj, sort_keys=True) == '{"key1": "value1", "key2": "value2"}'
-    assert pyjp5.dumps(obj, sort_keys=False) == '{"key2": "value2", "key1": "value1"}'
+    assert ujson5.dumps(obj, sort_keys=True) == '{"key1": "value1", "key2": "value2"}'
+    assert ujson5.dumps(obj, sort_keys=False) == '{"key2": "value2", "key1": "value1"}'
 
 
 def test_default_set() -> None:
     """Test default set."""
     py_set = set([1, 2, 3])
-    pyjp5.dumps(py_set, default=list)
+    ujson5.dumps(py_set, default=list)
 
     py_lst = [1, 2, 3, set([1, 2, 3])]
-    pyjp5.dumps(py_lst, default=list)
+    ujson5.dumps(py_lst, default=list)
 
 
 def test_separators() -> None:
     """Test separators."""
     py_obj = {"key1": "value1", "key2": "value2"}
     assert (
-        pyjp5.dumps(py_obj, separators=(",", ":"))
+        ujson5.dumps(py_obj, separators=(",", ":"))
         == '{"key1":"value1","key2":"value2"}'
     )
     assert (
-        pyjp5.dumps(py_obj, separators=(",", ": "))
+        ujson5.dumps(py_obj, separators=(",", ": "))
         == '{"key1": "value1","key2": "value2"}'
     )
     assert (
-        pyjp5.dumps(py_obj, separators=("|", ">"))
+        ujson5.dumps(py_obj, separators=("|", ">"))
         == '{"key1">"value1"|"key2">"value2"}'
     )
 
@@ -211,7 +211,7 @@ def test_replace_unicode() -> None:
     py_obj = f"Hello\nWorld {chr(0x19)}"
     uni_char = f"\\u{0x19:04x}"
     expected_output = f'"Hello\\nWorld {uni_char}"'
-    assert pyjp5.dumps(py_obj, ensure_ascii=False) == expected_output
+    assert ujson5.dumps(py_obj, ensure_ascii=False) == expected_output
 
 
 @pytest.mark.parametrize(
@@ -224,14 +224,14 @@ def test_replace_unicode() -> None:
 )
 def test_replace_ascii(py_obj: str, json5_str: str) -> None:
     """Test ASCII replacement"""
-    assert pyjp5.dumps(py_obj, ensure_ascii=True) == json5_str
+    assert ujson5.dumps(py_obj, ensure_ascii=True) == json5_str
 
 
 def test_invalid_typed_dict_cls(tmp_path: Path) -> None:
     """Test raise when TypedDict class is not valid."""
-    with pytest.raises(pyjp5.JSON5EncodeError):
-        pyjp5.dumps({}, typed_dict_cls=int)
+    with pytest.raises(ujson5.JSON5EncodeError):
+        ujson5.dumps({}, typed_dict_cls=int)
 
-    with pytest.raises(pyjp5.JSON5EncodeError):
+    with pytest.raises(ujson5.JSON5EncodeError):
         with open(tmp_path / "dump.json5", "w", encoding="utf8") as file:
-            pyjp5.dump({}, file, typed_dict_cls=int)
+            ujson5.dump({}, file, typed_dict_cls=int)

@@ -540,13 +540,13 @@ def dumps(
     All arguments except `obj` and `typed_dict_cls` are keyword-only arguments.
 
     Args:
-        cls: The encoder class to be used. a custom [`JSON5Encoder`][pyjp5.JSON5Encoder]
-            subclass (e.g. one that overrides the [`.default()`][pyjp5.JSON5Encoder.default]
+        cls: The encoder class to be used. a custom [`JSON5Encoder`][ujson5.JSON5Encoder]
+            subclass (e.g. one that overrides the [`.default()`][ujson5.JSON5Encoder.default]
             method to serialize additional types) can be provided. If None, the default
-            [`JSON5Encoder`][pyjp5.JSON5Encoder] class will be used. Defaults to None.
+            [`JSON5Encoder`][ujson5.JSON5Encoder] class will be used. Defaults to None.
         default: A function that returns a serializable object when trying to encode an
             unsupported object. If None, the default
-            [`.default()`][pyjp5.JSON5Encoder.default] method will be used. Defaults to None.
+            [`.default()`][ujson5.JSON5Encoder.default] method will be used. Defaults to None.
         skip_keys: If True, keys with unsupported types (anything other than str, int, float,
             bool, or None) will be skipped. Otherwise, an exception will be raised.
             Defaults to False.
@@ -626,13 +626,13 @@ def dump(
     file-like object).
 
     Args:
-        cls: The encoder class to be used. a custom [`JSON5Encoder`][pyjp5.JSON5Encoder]
-            subclass (e.g. one that overrides the [`.default()`][pyjp5.JSON5Encoder.default]
+        cls: The encoder class to be used. a custom [`JSON5Encoder`][ujson5.JSON5Encoder]
+            subclass (e.g. one that overrides the [`.default()`][ujson5.JSON5Encoder.default]
             method to serialize additional types) can be provided. If None, the default
-            [`JSON5Encoder`][pyjp5.JSON5Encoder] class will be used. Defaults to None.
+            [`JSON5Encoder`][ujson5.JSON5Encoder] class will be used. Defaults to None.
         default: A function that returns a serializable object when trying to encode an
             unsupported object. If None, the default
-            [`.default()`][pyjp5.JSON5Encoder.default] method will be used. Defaults to None.
+            [`.default()`][ujson5.JSON5Encoder.default] method will be used. Defaults to None.
         skip_keys: If True, keys with unsupported types (anything other than str, int, float,
             bool, or None) will be skipped. Otherwise, an exception will be raised.
             Defaults to False.

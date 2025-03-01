@@ -4,8 +4,8 @@ from random import randint
 
 import pytest
 
-from pyjp5.core import JSON5DecodeError, TOKEN_TYPE
-from pyjp5.lexer import tokenize_number
+from ujson5.core import JSON5DecodeError, TOKEN_TYPE
+from ujson5.lexer import tokenize_number
 
 number_valid_examples = [
     "0",

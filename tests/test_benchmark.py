@@ -1,10 +1,10 @@
-"""Benchmark tests for pyjp5."""
+"""Benchmark tests for ujson5."""
 
 import os
 
 import pytest
 
-import pyjp5
+import ujson5
 
 from . import example_consts
 
@@ -14,10 +14,10 @@ from . import example_consts
     example_consts.VALID_EXAMPLES,
 )
 @pytest.mark.skipif(not os.getenv("CI_ENV"), reason="Run only in CI environment")
-def test_pyjp5_benchmark(path: str, benchmark) -> None:
+def test_ujson5_benchmark(path: str, benchmark) -> None:
     """Test valid JSON5 examples."""
     with open(
         os.path.join(example_consts.EXAMPLE_ROOT, "arrays", path), "r", encoding="utf8"
     ) as file:
         content = file.read()
-    benchmark(pyjp5.loads, content)
+    benchmark(ujson5.loads, content)

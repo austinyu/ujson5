@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyjp5.lexer import validate_comment
+from ujson5.lexer import validate_comment
 
 
 @pytest.mark.parametrize(

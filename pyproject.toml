@@ -1,5 +1,5 @@
 [project]
-name = "pyjp5"
+name = "ujson5"
 description = "TODO"
 authors = [
     {name = "Austin Yu",email = "yuxm.austin1023@gmail.com"}

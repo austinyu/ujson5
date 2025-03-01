@@ -1,5 +1,5 @@
-site_name: pyjp5
-site_url: https://austinyu.github.io/pyjp5/
+site_name: ujson5
+site_url: https://austinyu.github.io/ujson5/
 
 theme:
   name: material
@@ -42,8 +42,8 @@ theme:
     - search.suggest
     - toc.follow
 
-repo_name: austinyu/pyjp5
-repo_url: https://github.com/austinyu/pyjp5
+repo_name: austinyu/ujson5
+repo_url: https://github.com/austinyu/ujson5
 
 plugins:
 - mkdocstrings:
@@ -66,7 +66,7 @@ plugins:
 
 nav:
 - Get Started:
-  - Welcome to pyjp5: index.md
+  - Welcome to ujson5: index.md
   - Quick Start: quick_start.md
 - API Reference:
   - Overview: api_reference/overview.md
@@ -74,4 +74,4 @@ nav:
   - Decode: api_reference/decode.md
   - Encode: api_reference/encode.md
 - About:
-  - About pyjp5: about.md
+  - About ujson5: about.md

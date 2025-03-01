@@ -1,4 +1,4 @@
-"""Snapshot tests for pyjp5.
+"""Snapshot tests for ujson5.
 Snapshot tests are used to test the consistency of the dump and load functions.
 If any of the tests fail, you should observe and confirm the changes before
 re-generating the snapshots.
@@ -7,7 +7,7 @@ re-generating the snapshots.
 import sys
 
 import pytest
-import pyjp5
+import ujson5
 
 from . import snapshots
 
@@ -20,7 +20,7 @@ def test_load_alpha_snapshots():
         with open(
             snapshots.SNAPSHOTS_ROOT / snapshot_name, "r", encoding="utf8"
         ) as file:
-            assert pyjp5.load(file) == snapshots.ALPHA
+            assert ujson5.load(file) == snapshots.ALPHA
 
 
 def test_alpha_default():
@@ -30,7 +30,7 @@ def test_alpha_default():
         "r",
         encoding="utf8",
     ) as file:
-        assert pyjp5.dumps(snapshots.ALPHA) == file.read().strip()
+        assert ujson5.dumps(snapshots.ALPHA) == file.read().strip()
 
 
 def test_alpha_with_comments():
@@ -45,7 +45,7 @@ def test_alpha_with_comments():
         encoding="utf8",
     ) as file:
         assert (
-            pyjp5.dumps(
+            ujson5.dumps(
                 snapshots.ALPHA, snapshots.Human, indent=snapshots.DEFAULT_INDENT
             )
             == file.read().strip()
@@ -60,7 +60,7 @@ def test_alpha_no_comments():
         encoding="utf8",
     ) as file:
         assert (
-            pyjp5.dumps(snapshots.ALPHA, indent=snapshots.DEFAULT_INDENT)
+            ujson5.dumps(snapshots.ALPHA, indent=snapshots.DEFAULT_INDENT)
             == file.read().strip()
         )
 
@@ -72,7 +72,7 @@ def test_alpha_no_indent():
         "r",
         encoding="utf8",
     ) as file:
-        assert pyjp5.dumps(snapshots.ALPHA) == file.read().strip()
+        assert ujson5.dumps(snapshots.ALPHA) == file.read().strip()
 
 
 def test_alpha_7_indent():
@@ -82,7 +82,7 @@ def test_alpha_7_indent():
         "r",
         encoding="utf8",
     ) as file:
-        assert pyjp5.dumps(snapshots.ALPHA, indent=7) == file.read().strip()
+        assert ujson5.dumps(snapshots.ALPHA, indent=7) == file.read().strip()
 
 
 def test_alpha_special_separators():
@@ -93,7 +93,7 @@ def test_alpha_special_separators():
         encoding="utf8",
     ) as file:
         assert (
-            pyjp5.dumps(
+            ujson5.dumps(
                 snapshots.ALPHA, indent=snapshots.DEFAULT_INDENT, separators=("|", "->")
             )
             == file.read().strip()
@@ -109,7 +109,7 @@ def test_alpha_with_trailing_comma():
         encoding="utf8",
     ) as file:
         assert (
-            pyjp5.dumps(
+            ujson5.dumps(
                 snapshots.ALPHA, indent=snapshots.DEFAULT_INDENT, trailing_comma=True
             )
             == file.read().strip()
@@ -124,7 +124,7 @@ def test_alpha_no_trailing_comma():
         encoding="utf8",
     ) as file:
         assert (
-            pyjp5.dumps(
+            ujson5.dumps(
                 snapshots.ALPHA, indent=snapshots.DEFAULT_INDENT, trailing_comma=False
             )
             == file.read().strip()

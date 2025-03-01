@@ -2,7 +2,7 @@
 Snapshot tests are used to test the consistency of the dump and load functions.
 """
 
-import pyjp5
+import ujson5
 
 from . import snapshots
 
@@ -14,14 +14,14 @@ def dump_alpha() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(snapshots.ALPHA, file)
+        ujson5.dump(snapshots.ALPHA, file)
 
     with open(
         snapshots.SNAPSHOTS_ROOT / snapshots.SNAPSHOT_NAMES["alpha_with_comments"],
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(
+        ujson5.dump(
             snapshots.ALPHA, file, snapshots.Human, indent=snapshots.DEFAULT_INDENT
         )
     with open(
@@ -29,28 +29,28 @@ def dump_alpha() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(snapshots.ALPHA, file, indent=snapshots.DEFAULT_INDENT)
+        ujson5.dump(snapshots.ALPHA, file, indent=snapshots.DEFAULT_INDENT)
 
     with open(
         snapshots.SNAPSHOTS_ROOT / snapshots.SNAPSHOT_NAMES["alpha_no_indent"],
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(snapshots.ALPHA, file)
+        ujson5.dump(snapshots.ALPHA, file)
 
     with open(
         snapshots.SNAPSHOTS_ROOT / snapshots.SNAPSHOT_NAMES["alpha_7_indent"],
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(snapshots.ALPHA, file, indent=7)
+        ujson5.dump(snapshots.ALPHA, file, indent=7)
 
     with open(
         snapshots.SNAPSHOTS_ROOT / snapshots.SNAPSHOT_NAMES["alpha_special_separators"],
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(
+        ujson5.dump(
             snapshots.ALPHA,
             file,
             indent=snapshots.DEFAULT_INDENT,
@@ -63,7 +63,7 @@ def dump_alpha() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(
+        ujson5.dump(
             snapshots.ALPHA,
             file,
             indent=snapshots.DEFAULT_INDENT,
@@ -75,7 +75,7 @@ def dump_alpha() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        pyjp5.dump(
+        ujson5.dump(
             snapshots.ALPHA,
             file,
             indent=snapshots.DEFAULT_INDENT,

@@ -1,6 +1,6 @@
 # Encode
 
-::: pyjp5.encoder
+::: ujson5.encoder
     options:
         members:
         - JSON5Encoder

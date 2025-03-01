@@ -4,7 +4,7 @@
     ".github/*",
     ".pre-commit-config.yaml",
     "tests/config.json5",
-    "pyjp5.code-workspace"
+    "ujson5.code-workspace"
   ],
   "dictionaryDefinitions": [],
   "dictionaries": [],
@@ -31,6 +31,7 @@
     "pytest",
     "Pythonic",
     "snok",
+    "ujson",
     "venv",
     "virtualenvs",
     "ZWNJ"

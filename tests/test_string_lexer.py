@@ -6,12 +6,12 @@ import re
 
 import pytest
 
-from pyjp5.core import JSON5DecodeError, TOKEN_TYPE
-from pyjp5.lexer import (
+from ujson5.core import JSON5DecodeError, TOKEN_TYPE
+from ujson5.lexer import (
     tokenize_string,
     simplify_escapes,
 )
-from pyjp5.consts import (
+from ujson5.consts import (
     ESCAPE_SEQUENCE,
     LINE_TERMINATOR_SEQUENCE,
 )
