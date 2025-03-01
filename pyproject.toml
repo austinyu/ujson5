@@ -1,6 +1,6 @@
 [project]
 name = "ujson5"
-description = "TODO"
+description = "A fast JSON5 encoder/decoder for Python"
 authors = [
     {name = "Austin Yu",email = "yuxm.austin1023@gmail.com"}
 ]
