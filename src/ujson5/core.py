@@ -3,6 +3,7 @@
 from typing import Literal, NamedTuple
 
 JsonValue = dict | list | int | float | str | None | bool
+"""Type hint for JSON5 values."""
 JsonValuePairs = list[tuple[str, JsonValue]]
 
 

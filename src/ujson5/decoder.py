@@ -1,9 +1,8 @@
-"""TODO"""
+"""Implementation of the JSON5 decoder."""
 
 from collections.abc import Callable
 import re
 from typing import Any, Literal, TextIO
-
 
 from .core import (
     JsonValue,
@@ -17,22 +16,70 @@ from .err_msg import DecoderErr
 from .lexer import tokenize
 
 ObjectHookArg = dict[str, JsonValue]
+"""Type hint for the argument of the `object_hook` function."""
 ObjectHook = Callable[[ObjectHookArg], Any]
+"""Type hint for the `object_hook` function signature."""
 ObjectPairsHookArg = list[tuple[str, JsonValue]]
+"""Type hint for the argument of the `object_pairs_hook` function."""
 ObjectPairsHook = Callable[[ObjectPairsHookArg], Any]
+"""Type hint for the `object_pairs_hook` function signature."""
 
 
 class Json5Decoder:
-    """TODO"""
+    """JSON5 decoder
+
+    Performs the following translations in decoding by default:
+
+    | JSON          | Python            |
+    |---------------|-------------------|
+    | object        | dict              |
+    | array         | list              |
+    | string        | str               |
+    | number (int)  | int               |
+    | number (real) | float             |
+    | true          | True              |
+    | false         | False             |
+    | null          | None              |
+
+    It also understands `NaN`, `Infinity`, and `-Infinity` as
+    their corresponding `float` values, which is outside the JSON spec.
+
+    Args:
+
+        parse_float: if specified, will be called with the string of every JSON float to be
+            decoded. By default this is equivalent to float(num_str). This can be used to use
+            another datatype or parser for JSON floats (e.g. decimal.Decimal).
+        parse_int: if specified, will be called with the string of every JSON int to be
+            decoded. By default this is equivalent to int(num_str). This can be used to
+            use another datatype or parser for JSON integers (e.g. float).
+        parse_constant: if specified, will be called with one of the following strings:
+            -Infinity, Infinity, NaN. This can be used to raise an exception if invalid
+            JSON numbers are encountered.
+        strict: control characters will be allowed inside strings if `strict` is False.
+            Control characters in this context are those with character codes in the 0-31
+            range, including `'\\t'` (tab), `'\\n'`, `'\\r'` and `'\\0'`.
+        object_hook: an optional function that will be called with the result of any object
+            literal decode (a `dict`). The return value of `object_hook` will be used instead
+            of the `dict`. This feature can be used to implement custom decoders
+            (e.g. JSON-RPC class hinting).
+        object_pairs_hook: if specified will be called with the result of every JSON object
+            decoded with an ordered list of pairs.  The return value of `object_pairs_hook`
+            will be used instead of the `dict`. This feature can be used to implement
+            custom decoders. If `object_hook` is also defined, the `object_pairs_hook`
+            takes priority.
+
+    Raises:
+        JSON5DecodeError: If the JSON5 string is invalid.
+    """
 
     def __init__(
         self,
         *,
-        object_hook: ObjectHook | None = None,
         parse_float: Callable[[str], Any] | None = None,
         parse_int: Callable[[str], Any] | None = None,
         parse_constant: Callable[[str], Any] | None = None,
         strict: bool = True,
+        object_hook: ObjectHook | None = None,
         object_pairs_hook: ObjectPairsHook | None = None,
     ) -> None:
         self._object_hook: ObjectHook | None = object_hook
@@ -43,14 +90,34 @@ class Json5Decoder:
         self._object_pairs_hook: ObjectPairsHook | None = object_pairs_hook
 
     def decode(self, json5_str: str) -> Any:
-        """TODO"""
-        print("=== decode ===")
-        print(json5_str)
+        """Deserialize a JSON5 string to a Python object.
+
+        Args:
+            json5_str: The JSON5 string to be deserialized.
+
+        Returns:
+            The Python object represented by the JSON5 string.
+
+        Raises:
+            JSON5DecodeError: If the JSON5 string is invalid.
+        """
         tokens = tokenize(json5_str)
         return self._parse_json5(json5_str, tokens)
 
     def raw_decode(self, json5_str: str) -> tuple[Any, int]:
-        """TODO"""
+        """Deserialize a JSON5 string to a Python object and return the index of the last
+        character parsed.
+
+        Args:
+            json5_str: The JSON5 string to be deserialized.
+
+        Returns:
+            A tuple of the Python object represented by the JSON5 string and the index
+                of the last character parsed.
+
+        Raises:
+            JSON5DecodeError: If the JSON5 string is invalid.
+        """
         tokens = tokenize(json5_str)
         if tokens[-1].tk_type == TOKEN_TYPE["STRING"]:
             # If the last token is a string, we need to skip the closing quote
@@ -429,38 +496,113 @@ class Json5Decoder:
 def loads(
     json5_str: str,
     *,
-    object_hook: ObjectHook | None = None,
+    cls: type[Json5Decoder] | None = None,
     parse_float: Callable[[str], Any] | None = None,
     parse_int: Callable[[str], Any] | None = None,
     parse_constant: Callable[[str], Any] | None = None,
     strict: bool = True,
+    object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
-    """TODO"""
-    decoder = Json5Decoder(
-        object_hook=object_hook,
-        parse_float=parse_float,
-        parse_int=parse_int,
-        parse_constant=parse_constant,
-        strict=strict,
-        object_pairs_hook=object_pairs_hook,
-    )
+    """Deserialize `json5_str` (a `str`, `bytes` or `bytearray` instance
+    containing a JSON document) to a Python object.
+
+    All arguments except `json5_str` are keyword-only.
+
+    Args:
+        json5_str: The JSON5 string to be deserialized.
+        cls: If specified, must be a `Json5Decoder` subclass. The `cls` will be used to
+            instantiate the decoder. If `cls` is not specified, the default `Json5Decoder`
+            will be used.
+        parse_float: if specified, will be called with the string of every JSON float to be
+            decoded. By default this is equivalent to float(num_str). This can be used to use
+            another datatype or parser for JSON floats (e.g. decimal.Decimal).
+        parse_int: if specified, will be called with the string of every JSON int to be
+            decoded. By default this is equivalent to int(num_str). This can be used to
+            use another datatype or parser for JSON integers (e.g. float).
+        parse_constant: if specified, will be called with one of the following strings:
+            -Infinity, Infinity, NaN. This can be used to raise an exception if invalid
+            JSON numbers are encountered.
+        strict: control characters will be allowed inside strings if `strict` is False.
+            Control characters in this context are those with character codes in the 0-31
+            range, including `'\\t'` (tab), `'\\n'`, `'\\r'` and `'\\0'`.
+        object_hook: an optional function that will be called with the result of any object
+            literal decode (a `dict`). The return value of `object_hook` will be used instead
+            of the `dict`. This feature can be used to implement custom decoders
+            (e.g. JSON-RPC class hinting).
+        object_pairs_hook: if specified will be called with the result of every JSON object
+            decoded with an ordered list of pairs.  The return value of `object_pairs_hook`
+            will be used instead of the `dict`. This feature can be used to implement
+            custom decoders. If `object_hook` is also defined, the `object_pairs_hook`
+            takes priority.
+    """
+    if cls is not None:
+        decoder: Json5Decoder = cls(
+            object_hook=object_hook,
+            parse_float=parse_float,
+            parse_int=parse_int,
+            parse_constant=parse_constant,
+            strict=strict,
+            object_pairs_hook=object_pairs_hook,
+        )
+    else:
+        decoder = Json5Decoder(
+            object_hook=object_hook,
+            parse_float=parse_float,
+            parse_int=parse_int,
+            parse_constant=parse_constant,
+            strict=strict,
+            object_pairs_hook=object_pairs_hook,
+        )
     return decoder.decode(json5_str)
 
 
 def load(
     file: TextIO,
     *,
-    object_hook: ObjectHook | None = None,
+    cls: type[Json5Decoder] | None = None,
     parse_float: Callable[[str], Any] | None = None,
     parse_int: Callable[[str], Any] | None = None,
     parse_constant: Callable[[str], Any] | None = None,
     strict: bool = True,
+    object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
-    """Convert JSON5 file to python data."""
+    """Deserialize `fp` (a `.read()`-supporting file-like object containing
+    a JSON document) to a Python object.
+
+    All arguments except `file` are keyword-only.
+
+    Args:
+        file: A file-like object containing a JSON document.
+        cls: If specified, must be a `Json5Decoder` subclass. The `cls` will be used to
+            instantiate the decoder. If `cls` is not specified, the default `Json5Decoder`
+            will be used.
+        parse_float: if specified, will be called with the string of every JSON float to be
+            decoded. By default this is equivalent to float(num_str). This can be used to use
+            another datatype or parser for JSON floats (e.g. decimal.Decimal).
+        parse_int: if specified, will be called with the string of every JSON int to be
+            decoded. By default this is equivalent to int(num_str). This can be used to
+            use another datatype or parser for JSON integers (e.g. float).
+        parse_constant: if specified, will be called with one of the following strings:
+            -Infinity, Infinity, NaN. This can be used to raise an exception if invalid
+            JSON numbers are encountered.
+        strict: control characters will be allowed inside strings if `strict` is False.
+            Control characters in this context are those with character codes in the 0-31
+            range, including `'\\t'` (tab), `'\\n'`, `'\\r'` and `'\\0'`.
+        object_hook: an optional function that will be called with the result of any object
+            literal decode (a `dict`). The return value of `object_hook` will be used instead
+            of the `dict`. This feature can be used to implement custom decoders
+            (e.g. JSON-RPC class hinting).
+        object_pairs_hook: if specified will be called with the result of every JSON object
+            decoded with an ordered list of pairs.  The return value of `object_pairs_hook`
+            will be used instead of the `dict`. This feature can be used to implement
+            custom decoders. If `object_hook` is also defined, the `object_pairs_hook`
+            takes priority.
+    """
     return loads(
         file.read(),
+        cls=cls,
         object_hook=object_hook,
         parse_float=parse_float,
         parse_int=parse_int,
