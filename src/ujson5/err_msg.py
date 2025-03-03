@@ -69,10 +69,6 @@ class IdentifierDecoderErr:
     def invalid_char(character: str) -> str:
         return f"Invalid character in identifier: <{character}>"
 
-    @staticmethod
-    def reserved_word(word: str) -> str:
-        return f"Reserved word cannot be used as identifier: <{word}>"
-
 
 class DecoderErr:
     """General parse errors"""
@@ -154,6 +150,10 @@ class DecoderErr:
     @staticmethod
     def invalid_object_pairs_hook() -> str:
         return "Object pairs hook must takes in a list of tuples with two elements"
+
+    @staticmethod
+    def reserved_word(word: str) -> str:
+        return f"Reserved word cannot be used as identifier: <{word}>"
 
 
 class EncoderErrors:

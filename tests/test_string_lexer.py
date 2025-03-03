@@ -1,7 +1,6 @@
 """Test the string lexer."""
 
 from random import choice, choices, randint
-import re
 
 
 import pytest
@@ -40,32 +39,6 @@ string_valid_examples_double: list[str] = [
     f'"{raw}"{" " * randint(1, 10)}{choice(list(LINE_TERMINATOR_SEQUENCE))}'
     for raw in string_valid_examples_raw
 ]
-
-
-def process_escape_sequences(text: str) -> str:
-    """Process escape sequences in a string."""
-    escape_sequence_re = re.compile(
-        r'\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|\\[\'"\\bfnrtv0]'
-    )
-
-    def replace_escape(match):
-        esc = match.group(0)
-        if esc.startswith("\\u") or esc.startswith("\\U"):
-            return chr(int(esc[2:], 16))
-        return {
-            "\\'": "'",
-            '\\"': '"',
-            "\\\\": "\\",
-            "\\b": "\b",
-            "\\f": "\f",
-            "\\n": "\n",
-            "\\r": "\r",
-            "\\t": "\t",
-            "\\v": "\x0b",
-            "\\0": "\x00",
-        }[esc]
-
-    return escape_sequence_re.sub(replace_escape, text)
 
 
 string_multi_lines_ext: list[tuple[list[str], int]] = [

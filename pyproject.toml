@@ -62,11 +62,13 @@ addopts = """
 [tool.coverage.report]
 exclude_also = [
     'pytest.skip',
+    'if sys.version_info < (3, 12): ',
 ]
 
 [tool.coverage.run]
 omit = [
-    "tests/generate_snapshots.py"
+    "tests/generate_snapshots.py",
+    "tests/test_benchmark.py",
 ]
 
 [tool.poetry-dynamic-versioning]

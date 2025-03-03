@@ -1,5 +1,7 @@
 # ujson5
 
+[Documentation](https://austinyu.github.io/ujson5/)
+
 [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5)
 

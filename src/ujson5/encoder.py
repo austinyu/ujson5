@@ -93,7 +93,7 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
         nonlocal comments
 
         if sys.version_info < (3, 12):
-            warn(
+            warn(  # pragma: no cover
                 "Comments extraction is currently only fully supported on Python 3.12+"
             )
         else:
@@ -208,7 +208,7 @@ class JSON5Encoder:
         key_quotation: The quotation style to be used for keys. Can be one of "single",
             "double", or "none". If "single" or "double", the keys will be enclosed in
             single or double quotes, respectively. If "none", the keys will not be enclosed
-            in quotes. Defaults to "none".
+            in quotes. Defaults to "double".
         trailing_comma: If True, a trailing comma will be added to the last item in
             a list or dictionary. If None, a trailing comma will be added if indent
             is not None. Defaults to None.
@@ -225,7 +225,7 @@ class JSON5Encoder:
         indent: int | None = None,
         separators: tuple[str, str] | None = None,
         sort_keys: bool = False,
-        key_quotation: KeyQuotation = "none",
+        key_quotation: KeyQuotation = "double",
         trailing_comma: bool | None = None,
     ) -> None:
         self._skip_keys: bool = skip_keys
@@ -366,15 +366,17 @@ class JSON5Encoder:
                 return f"\\u{s1:04x}\\u{s2:04x}"
 
         if self._ensure_ascii:
-            return f'"{ESCAPE_ASCII.sub(replace_ascii, obj)}"'
+            raw_str: str = ESCAPE_ASCII.sub(replace_ascii, obj)
+        else:
+            raw_str = ESCAPE.sub(replace_unicode, obj)
         if not key_str:
-            return f'"{ESCAPE.sub(replace_unicode, obj)}"'
+            return f'"{raw_str}"'
         if self._key_quotation == "none":
-            return ESCAPE.sub(replace_unicode, obj)
+            return raw_str
         if self._key_quotation == "single":
-            return f"'{ESCAPE.sub(replace_unicode, obj)}'"
+            return f"'{raw_str}'"
         assert self._key_quotation == "double", self._key_quotation
-        return f'"{ESCAPE.sub(replace_unicode, obj)}"'
+        return f'"{raw_str}"'
 
     def _iterencode(self, obj: Any, indent_level: int, key_path: str) -> Iterable[str]:
         if isinstance(obj, str):
@@ -542,7 +544,7 @@ _default_encoder = JSON5Encoder(
     indent=None,
     separators=None,
     default=None,
-    key_quotation="none",
+    key_quotation="double",
     trailing_comma=None,
 )
 
@@ -560,7 +562,7 @@ def dumps(
     indent: int | None = None,
     separators: tuple[str, str] | None = None,
     sort_keys: bool = False,
-    key_quotation: KeyQuotation = "none",
+    key_quotation: KeyQuotation = "double",
     trailing_comma: bool | None = None,
 ) -> str:
     """Serialize `obj` to a JSON5 formatted `str`.
@@ -600,7 +602,7 @@ def dumps(
         key_quotation: The quotation style to be used for keys. Can be one of "single",
             "double", or "none". If "single" or "double", the keys will be enclosed in
             single or double quotes, respectively. If "none", the keys will not be enclosed
-            in quotes. Defaults to "none".
+            in quotes. Defaults to "double".
         trailing_comma: If True, a trailing comma will be added to the last item in
             a list or dictionary. If None, a trailing comma will be added if indent
             is not None. Defaults to None.
@@ -621,7 +623,7 @@ def dumps(
         and separators is None
         and default is None
         and not sort_keys
-        and key_quotation == "none"
+        and key_quotation == "double"
         and trailing_comma is None
     ):
         return _default_encoder.encode(obj, typed_dict_cls)
@@ -655,7 +657,7 @@ def dump(
     separators: tuple[str, str] | None = None,
     default: DefaultInterface | None = None,
     sort_keys: bool = False,
-    key_quotation: KeyQuotation = "none",
+    key_quotation: KeyQuotation = "double",
     trailing_comma: bool | None = None,
 ) -> None:
     """Serialize `obj` as a JSON formatted stream to `fp` (a `.write()`-supporting
@@ -694,7 +696,7 @@ def dump(
         key_quotation: The quotation style to be used for keys. Can be one of "single",
             "double", or "none". If "single" or "double", the keys will be enclosed in
             single or double quotes, respectively. If "none", the keys will not be enclosed
-            in quotes. Defaults to "none".
+            in quotes. Defaults to "double".
         trailing_comma: If True, a trailing comma will be added to the last item in
             a list or dictionary. If None, a trailing comma will be added if indent
             is not None. Defaults to None.
@@ -715,7 +717,7 @@ def dump(
         and separators is None
         and default is None
         and not sort_keys
-        and key_quotation == "none"
+        and key_quotation == "double"
         and trailing_comma is None
     ):
         iterable = _default_encoder.iterencode(obj, typed_dict_cls)

@@ -4,11 +4,13 @@ from math import isnan
 from random import randint
 from typing import Any
 from collections.abc import Callable
+from copy import copy
 
 import pytest
 
 import ujson5
-from ujson5.decoder import Json5Decoder
+from ujson5.consts import RESERVED_WORDS
+
 
 BASIC_LOADS: list[tuple[str, Any]] = [
     ("null", None),
@@ -57,7 +59,7 @@ def test_basic_loads_raw(json5: str, py_value: Any) -> None:
     """Test basic JSON5 loads."""
     str_len: int = len(json5)
     json5 += " " * randint(1, 10)
-    loaded, idx = Json5Decoder().raw_decode(json5)
+    loaded, idx = ujson5.Json5Decoder().raw_decode(json5)
     try:
         if not isnan(py_value):
             assert loaded == py_value
@@ -254,3 +256,37 @@ def test_invalid_object_hook() -> None:
 
     with pytest.raises(ujson5.JSON5DecodeError):
         ujson5.loads("{}", object_pairs_hook=lambda v, k: 0)  # type: ignore
+
+
+class CustomDecoder(ujson5.Json5Decoder):
+    """Custom decoder class."""
+
+    def __init__(self, *_: Any, **__: Any) -> None:
+        super().__init__(parse_float=lambda v: float(v) + 1)
+
+
+def test_custom_decoder() -> None:
+    """Test custom decoder."""
+    content = ujson5.loads(
+        '{"key": 3.3}',
+        cls=CustomDecoder,
+    )
+    assert content == {"key": 4.3}
+
+
+NON_BOOL_RESERVED_WORDS = copy(RESERVED_WORDS)
+NON_BOOL_RESERVED_WORDS.remove("true")
+NON_BOOL_RESERVED_WORDS.remove("false")
+NON_BOOL_RESERVED_WORDS.remove("null")
+
+
+@pytest.mark.parametrize(
+    "word",
+    NON_BOOL_RESERVED_WORDS,
+)
+def test_reserved_word_keys(word: str) -> None:
+    """Test reserved word keys."""
+    with pytest.raises(ujson5.JSON5DecodeError):
+        ujson5.loads(f"{{{word}: 1}}", allow_reserved_words=False)
+
+    ujson5.loads(f"{{{word}: 1}}", allow_reserved_words=True)

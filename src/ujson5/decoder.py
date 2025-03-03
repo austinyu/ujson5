@@ -11,7 +11,7 @@ from .core import (
     Token,
     TOKEN_TYPE,
 )
-from .consts import ESCAPE_SEQUENCE
+from .consts import ESCAPE_SEQUENCE, RESERVED_WORDS
 from .err_msg import DecoderErr
 from .lexer import tokenize
 
@@ -65,6 +65,9 @@ class Json5Decoder:
         strict: control characters will be allowed inside strings if `strict` is False.
             Control characters in this context are those with character codes in the 0-31
             range, including `'\\t'` (tab), `'\\n'`, `'\\r'` and `'\\0'`.
+        allow_reserved_words: if `True`, reserved words can be used as identifiers. Reserved
+            words are defined here https://262.ecma-international.org/5.1/#sec-7.6.1.
+            Default is `True`.
         object_hook: an optional function that will be called with the result of any object
             literal decode (a `dict`). The return value of `object_hook` will be used instead
             of the `dict`. This feature can be used to implement custom decoders
@@ -86,6 +89,7 @@ class Json5Decoder:
         parse_int: Callable[[str], Any] | None = None,
         parse_constant: Callable[[str], Any] | None = None,
         strict: bool = True,
+        allow_reserved_words: bool = True,
         object_hook: ObjectHook | None = None,
         object_pairs_hook: ObjectPairsHook | None = None,
     ) -> None:
@@ -93,6 +97,7 @@ class Json5Decoder:
         self._parse_float: Callable[[str], Any] | None = parse_float
         self._parse_int: Callable[[str], Any] | None = parse_int
         self._parse_constant: Callable[[str], Any] | None = parse_constant
+        self._allow_reserved_words: bool = allow_reserved_words
         self._strict: bool = strict
         self._object_pairs_hook: ObjectPairsHook | None = object_pairs_hook
 
@@ -258,6 +263,10 @@ class Json5Decoder:
                     # identifier can only be used as a key in an object
                     raise JSON5DecodeError(
                         DecoderErr.unexpected_identifier(), json5_str, tk_start
+                    )
+                if not self._allow_reserved_words and tk_str in RESERVED_WORDS:
+                    raise JSON5DecodeError(
+                        DecoderErr.reserved_word(tk_str), json5_str, tk_start
                     )
                 update_last_key(self._parse_identifier(tk_str), idx)
             elif tk_typ == TOKEN_TYPE["STRING"]:
@@ -508,6 +517,7 @@ def loads(
     parse_int: Callable[[str], Any] | None = None,
     parse_constant: Callable[[str], Any] | None = None,
     strict: bool = True,
+    allow_reserved_words: bool = True,
     object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
@@ -541,6 +551,9 @@ def loads(
         strict: control characters will be allowed inside strings if `strict` is False.
             Control characters in this context are those with character codes in the 0-31
             range, including `'\\t'` (tab), `'\\n'`, `'\\r'` and `'\\0'`.
+        allow_reserved_words: if `True`, reserved words can be used as identifiers. Reserved
+            words are defined here https://262.ecma-international.org/5.1/#sec-7.6.1.
+            Default is `True`.
         object_hook: an optional function that will be called with the result of any object
             literal decode (a `dict`). The return value of `object_hook` will be used instead
             of the `dict`. This feature can be used to implement custom decoders
@@ -558,6 +571,7 @@ def loads(
             parse_int=parse_int,
             parse_constant=parse_constant,
             strict=strict,
+            allow_reserved_words=allow_reserved_words,
             object_pairs_hook=object_pairs_hook,
         )
     else:
@@ -567,6 +581,7 @@ def loads(
             parse_int=parse_int,
             parse_constant=parse_constant,
             strict=strict,
+            allow_reserved_words=allow_reserved_words,
             object_pairs_hook=object_pairs_hook,
         )
     return decoder.decode(json5_str)
@@ -580,6 +595,7 @@ def load(
     parse_int: Callable[[str], Any] | None = None,
     parse_constant: Callable[[str], Any] | None = None,
     strict: bool = True,
+    allow_reserved_words: bool = True,
     object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
@@ -612,6 +628,9 @@ def load(
         strict: control characters will be allowed inside strings if `strict` is False.
             Control characters in this context are those with character codes in the 0-31
             range, including `'\\t'` (tab), `'\\n'`, `'\\r'` and `'\\0'`.
+        allow_reserved_words: if `True`, reserved words can be used as identifiers. Reserved
+            words are defined here https://262.ecma-international.org/5.1/#sec-7.6.1.
+            Default is `True`.
         object_hook: an optional function that will be called with the result of any object
             literal decode (a `dict`). The return value of `object_hook` will be used instead
             of the `dict`. This feature can be used to implement custom decoders
@@ -630,5 +649,6 @@ def load(
         parse_int=parse_int,
         parse_constant=parse_constant,
         strict=strict,
+        allow_reserved_words=allow_reserved_words,
         object_pairs_hook=object_pairs_hook,
     )

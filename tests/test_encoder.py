@@ -235,3 +235,17 @@ def test_invalid_typed_dict_cls(tmp_path: Path) -> None:
     with pytest.raises(ujson5.JSON5EncodeError):
         with open(tmp_path / "dump.json5", "w", encoding="utf8") as file:
             ujson5.dump({}, file, typed_dict_cls=int)
+
+
+def test_quoted_key() -> None:
+    """Test quoted key."""
+    obj = {"key": "value", "key2": "value2"}
+    assert ujson5.dumps(obj, key_quotation="none") == '{key: "value", key2: "value2"}'
+    assert (
+        ujson5.dumps(obj, key_quotation="double")
+        == '{"key": "value", "key2": "value2"}'
+    )
+    assert (
+        ujson5.dumps(obj, key_quotation="single")
+        == "{'key': \"value\", 'key2': \"value2\"}"
+    )
