@@ -1,4 +1,4 @@
-# Decode
+# Decoder
 
 ::: ujson5.decoder
     options:

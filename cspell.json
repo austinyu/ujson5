@@ -4,7 +4,8 @@
     ".github/*",
     ".pre-commit-config.yaml",
     "tests/config.json5",
-    "ujson5.code-workspace"
+    "ujson5.code-workspace",
+    "mkdocs.yml"
   ],
   "dictionaryDefinitions": [],
   "dictionaries": [],
@@ -28,6 +29,7 @@
     "pycache",
     "pyjp",
     "pylint",
+    "pymdown",
     "pytest",
     "Pythonic",
     "snok",

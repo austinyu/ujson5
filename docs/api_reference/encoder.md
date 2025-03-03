@@ -1,4 +1,4 @@
-# Encode
+# Encoder
 
 ::: ujson5.encoder
     options:

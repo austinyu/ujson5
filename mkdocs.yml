@@ -64,14 +64,32 @@ plugins:
           - url: https://docs.python.org/3/objects.inv
             domains: [py, std]
 
+markdown_extensions:
+- tables
+- toc:
+    permalink: true
+    title: Page contents
+- admonition
+- pymdownx.details
+- pymdownx.superfences
+- pymdownx.highlight:
+    pygments_lang_class: true
+- pymdownx.extra
+- pymdownx.tabbed:
+    alternate_style: true
+
 nav:
-- Get Started:
+- Home:
   - Welcome to ujson5: index.md
   - Quick Start: quick_start.md
+- Getting Started:
+  - Overview: getting_started/overview.md
+  - Serializing / Encoding: getting_started/encoding.md
+  - Deserializing / Decoding: getting_started/decoding.md
 - API Reference:
   - Overview: api_reference/overview.md
   - Core: api_reference/core.md
-  - Decode: api_reference/decode.md
-  - Encode: api_reference/encode.md
+  - Decoder: api_reference/decoder.md
+  - Encoder: api_reference/encoder.md
 - About:
   - About ujson5: about.md

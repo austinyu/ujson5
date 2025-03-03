@@ -147,16 +147,43 @@ class JSON5Encoder:
     | False             | false         |
     | None              | null          |
 
-    To extend the encoder, subclass this class and override the `.default()` method, which
-    will try to encode the data structures that are not supported by default. The `.default()`
-    method should return a serializable object. If the `.default()` method is not overridden,
-    the encoder will raise a JSON5EncodeError when trying to encode an unsupported object.
-    The overridden `.default()` method should also call the parent class's `.default()`
-    method to handle the default encoding.
+    To extend the encoder, subclass this class and override the
+    [`.default()`][ujson5.JSON5Encoder.default] method, which will try to encode the
+    data structures that are not supported by default. The
+    [`.default()`][ujson5.JSON5Encoder.default] method should return a serializable object.
+    If the [`.default()`][ujson5.JSON5Encoder.default] method is not overridden, the encoder
+    will raise a JSON5EncodeError when trying to encode an unsupported object. The overridden
+    [`.default()`][ujson5.JSON5Encoder.default] method should also call the parent class's
+    [`.default()`][ujson5.JSON5Encoder.default] method to handle the default encoding.
 
     The constructor also takes in a `default` argument, which can be used to set a default
     function that will be called when trying to encode an unsupported object. This argument
-    will take precedence over the overridden `.default()` method.
+    will take precedence over the overridden
+    [`.default()`][ujson5.JSON5Encoder.default] method.
+
+    !!! warning
+        Comment extraction is currently only fully supported on Python 3.12+. On older
+        versions, the function will still work but will not extract all comments from the
+        parent TypedDicts.
+
+    Example:
+    ```python
+    import ujson5
+    class MyEncoder(ujson5.JSON5Encoder):
+        def default(self, obj):
+            if isinstance(obj, set):  # (1)!
+                return list(obj)
+            return super().default(obj)  # (2)!
+    user = {"name": "John", "age": "123", "hobbies": {"tennis", "reading"}}
+    print(ujson5.dumps(user, cls=MyEncoder))
+    # Output: '{"name": "John", "age": 123, "hobbies": ["tennis", "reading"]}'
+    ```
+
+    1. In this example, the encoder subclass `MyEncoder` overrides the
+    [`.default()`][ujson5.JSON5Encoder.default] method to handle the serialization of sets.
+    The method returns a list of the set elements.
+    2. It is recommended to call the parent class's [`.default()`][ujson5.JSON5Encoder.default]
+    method to handle the default encoding.
 
     All arguments are keyword-only arguments.
 
@@ -537,6 +564,15 @@ def dumps(
     trailing_comma: bool | None = None,
 ) -> str:
     """Serialize `obj` to a JSON5 formatted `str`.
+
+    Example:
+    ```python
+    import ujson5
+    user = {"name": "John", "age": 123, "hobbies": ["tennis", "reading"]}
+    print(ujson5.dumps(user))
+    # Output: '{"name": "John", "age": 123, "hobbies": ["tennis", "reading"]}'
+    ```
+
     All arguments except `obj` and `typed_dict_cls` are keyword-only arguments.
 
     Args:
@@ -624,6 +660,14 @@ def dump(
 ) -> None:
     """Serialize `obj` as a JSON formatted stream to `fp` (a `.write()`-supporting
     file-like object).
+
+    Example:
+    ```python
+    import ujson5
+    user = {"name": "John", "age": 123, "hobbies": ["tennis", "reading"]}
+    with open("user.json", "w") as f:
+        ujson5.dump(user, f)
+    ```
 
     Args:
         cls: The encoder class to be used. a custom [`JSON5Encoder`][ujson5.JSON5Encoder]

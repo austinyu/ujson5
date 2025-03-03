@@ -44,8 +44,15 @@ class Json5Decoder:
     It also understands `NaN`, `Infinity`, and `-Infinity` as
     their corresponding `float` values, which is outside the JSON spec.
 
-    Args:
+    Example:
+    ```python
+    import ujson5
+    json5_str = '{"key": "value"}'
+    obj = ujson5.Json5Decoder().decode(json5_str)
+    # obj == {'key': 'value'}
+    ```
 
+    Args:
         parse_float: if specified, will be called with the string of every JSON float to be
             decoded. By default this is equivalent to float(num_str). This can be used to use
             another datatype or parser for JSON floats (e.g. decimal.Decimal).
@@ -507,13 +514,21 @@ def loads(
     """Deserialize `json5_str` (a `str`, `bytes` or `bytearray` instance
     containing a JSON document) to a Python object.
 
+    Example:
+    ```python
+    import ujson5
+    json5_str = '{"key": "value"}'
+    obj = ujson5.loads(json5_str)
+    # obj == {'key': 'value'}
+    ```
+
     All arguments except `json5_str` are keyword-only.
 
     Args:
         json5_str: The JSON5 string to be deserialized.
-        cls: If specified, must be a `Json5Decoder` subclass. The `cls` will be used to
-            instantiate the decoder. If `cls` is not specified, the default `Json5Decoder`
-            will be used.
+        cls: If specified, must be a [`Json5Decoder`][ujson5.Json5Decoder] subclass. The `cls`
+            will be used to instantiate the decoder. If `cls` is not specified, the default
+            `Json5Decoder` will be used.
         parse_float: if specified, will be called with the string of every JSON float to be
             decoded. By default this is equivalent to float(num_str). This can be used to use
             another datatype or parser for JSON floats (e.g. decimal.Decimal).
@@ -521,7 +536,7 @@ def loads(
             decoded. By default this is equivalent to int(num_str). This can be used to
             use another datatype or parser for JSON integers (e.g. float).
         parse_constant: if specified, will be called with one of the following strings:
-            -Infinity, Infinity, NaN. This can be used to raise an exception if invalid
+            '-Infinity', 'Infinity', 'NaN'. This can be used to raise an exception if invalid
             JSON numbers are encountered.
         strict: control characters will be allowed inside strings if `strict` is False.
             Control characters in this context are those with character codes in the 0-31
@@ -571,13 +586,20 @@ def load(
     """Deserialize `fp` (a `.read()`-supporting file-like object containing
     a JSON document) to a Python object.
 
+    Example:
+    ```python
+    import ujson5
+    with open('file.json5', 'r') as f:
+        obj = ujson5.load(f)
+    ```
+
     All arguments except `file` are keyword-only.
 
     Args:
         file: A file-like object containing a JSON document.
-        cls: If specified, must be a `Json5Decoder` subclass. The `cls` will be used to
-            instantiate the decoder. If `cls` is not specified, the default `Json5Decoder`
-            will be used.
+        cls: If specified, must be a [`Json5Decoder`][ujson5.Json5Decoder] subclass. The `cls`
+            will be used to instantiate the decoder. If `cls` is not specified, the default
+            `Json5Decoder` will be used.
         parse_float: if specified, will be called with the string of every JSON float to be
             decoded. By default this is equivalent to float(num_str). This can be used to use
             another datatype or parser for JSON floats (e.g. decimal.Decimal).
