@@ -10,135 +10,38 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](http://mypy-lang.org/)
 
-[Website](https://austinyu.github.io/ujson5/)
+Documentation for version: v0.1.0
 
-## Setup development environment
+`ujson5` is a Python that encodes and decodes [JSON5](https://json5.org/), a superset of JSON that supports many human-friendly features such as comments, trailing commas, and more!
 
-- Install [poetry](https://python-poetry.org/docs/)
-- `poetry install --with dev`
-- `pre-commit install`
+## Why use JSON5?
 
-TODOs
+Direct quote from the [JSON5 website](https://json5.org/):
 
-- ruler implementation
-- CLI implementation
-- comments extraction
-- versioning docs using `mike`
-- add docstring examples
-- add optional arg to encode to cache comments in frozen or optimized mode
-- makefile automation
+JSON5 was started in 2012, and as of 2022, now gets **[>65M downloads/week](https://www.npmjs.com/package/json5)**,
+ranks in the **[top 0.1%](https://gist.github.com/anvaka/8e8fa57c7ee1350e3491)** of the most depended-upon packages on npm,
+and has been adopted by major projects like
+**[Chromium](https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/platform/runtime_enabled_features.json5;drc=5de823b36e68fd99009a29281b17bc3a1d6b329c),
+[Next.js](https://github.com/vercel/next.js/blob/b88f20c90bf4659b8ad5cb2a27956005eac2c7e8/packages/next/lib/find-config.ts#L43-L46),
+[Babel](https://babeljs.io/docs/en/config-files#supported-file-extensions),
+[Retool](https://community.retool.com/t/i-am-attempting-to-append-several-text-fields-to-a-google-sheet-but-receiving-a-json5-invalid-character-error/7626),
+[WebStorm](https://www.jetbrains.com/help/webstorm/json.html),
+and [more](https://github.com/json5/json5/wiki/In-the-Wild)**.
+It's also natively supported on **[Apple platforms](https://developer.apple.com/documentation/foundation/jsondecoder/3766916-allowsjson5)**
+like **macOS** and **iOS**.
 
-## Comment Extraction Examples
+## Why use ujson5?
 
-```python
+- **Gentle learning curve** - If you know how to use the `json` module in Python, you already know how to use `ujson5`. `ujson5` API is almost identical to the `json` module with some additional features.
+- **Robust test suite** - `ujson5` is tested against the [official JSON5 test suite](https://github.com/json5/json5-tests) to ensure compatibility.
+- **Speed** - `ujson5` tokenizer and parser implement DFA-based algorithms for fast parsing, which is only slightly slower than the built-in `json` module.
+- **Pythonic** - Comments in python are directly encoded into JSON5 comments. Magic!
+- **Quality code base** - `ujson5` is linted with `flake8`, formatted with `black`, and type-checked with `mypy`. What's more? 100% test coverage with `pytest` and `codecov`!
+- **Friendly Error Messages** - `ujson5` provides detailed error messages to help you debug your JSON5 files, including the exact location of the error.
+- **Type hints** - `ujson5` provides type hints for all public functions and classes.
 
-courses = {
-    # any comments before the dict entry belong to the entry
-    "CS101": 93,
-    # you can also add comments with multiple lines just like this one.
-    # In this case, the comments in JSON5 will also be multi-line
-    "ART101": 87,
-    "HIS101": 65,  # a comment can also be in-line
-}
+## Installation
 
-# encoded json5
-"""
-{
-    // any comments before the dict entry belong to the entry
-    "CS101": 93,
-    // you can also add comments with multiple lines just like this one.
-    // In this case, the comments in JSON5 will also be multi-line
-    "ART101": 87,
-    "HIS101": 65,  // a comment can also be in-line
-}
-"""
-
-class Courses(TypedDict, total=False):
-    # you can also add comments in the TypedDict
-    CS101: int
-    # Multi-line comments are also supported
-    # In this case, the comments in JSON5 will also be multi-line
-    # The entries of dictionaries that implement this TypedDict will be commented
-    ART101: int
-    HIS101: int  # a comment can also be in-line
-    # if a dictionary does not contain all the keys, only the keys that are
-    # present will be commented
-    LIT101: int
-
-tom_courses: Courses = {
-    "CS101": 93,
-    "ART101": 87,
-    # comments in dict will override the comments in TypedDict
-    "HIS101": 65,  # in this case, HIS101 comments will be overridden
-}
-
-judy_courses: Courses = {
-    "CS101": 93,
-    "ART101": 87,
-    "HIS101": 65,
-    "LIT101": 78,
-}
-
-
-# encoded json5 for tom_courses
-"""
-{
-    // you can also add comments in the TypedDict
-    "CS101": 93,
-    // Multi-line comments are also supported
-    // In this case, the comments in JSON5 will also be multi-line
-    // The entries of dictionaries that implement this TypedDict will be commented
-    "ART101": 87,
-    // comments in dict will override the comments in TypedDict
-    "HIS101": 65,  // in this case, HIS101 comments will be overridden
-}
-"""
-
-# encoded json5 for judy_courses
-"""
-{
-    // you can also add comments in the TypedDict
-    "CS101": 93,
-    // Multi-line comments are also supported
-    // In this case, the comments in JSON5 will also be multi-line
-    // The entries of dictionaries that implement this TypedDict will be commented
-    "ART101": 87,
-    "HIS101": 65,  // a comment can also be in-line
-    // if a dictionary does not contain all the keys, only the keys that are
-    // present will be commented
-    "LIT101": 78,
-}
-"""
-
+```bash
+pip install ujson5
 ```
-
-```python
-check_list = [
-    # list items can also be commented
-    "apple",
-    # indeed, multiple lines are allowed
-    # just like this
-    "banana",
-    # you can also use a combination of block and inline comments
-    "cherry",  # and inline comments are also supported
-]
-
-# encoded json5
-"""
-[
-    // list items can also be commented
-    "apple",
-    // indeed, multiple lines are allowed
-    // just like this
-    "banana",
-    // you can also use a combination of block and inline comments
-    "cherry",  // and inline comments are also supported
-]
-"""
-```
-
-## CLIs
-
-- `poetry install --with [group]`
-- `poetry add --group [group] [dep]`
-- `mkdocs server`

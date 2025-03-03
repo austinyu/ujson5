@@ -81,13 +81,10 @@ markdown_extensions:
 nav:
 - Home:
   - Welcome to ujson5: index.md
-  - Quick Start: quick_start.md
-- Getting Started:
-  - Overview: getting_started/overview.md
-  - Serializing / Encoding: getting_started/encoding.md
-  - Deserializing / Decoding: getting_started/decoding.md
+  - Quick Start Encoding: start_encoding.md
+  - Quick Start Decoding: start_decoding.md
+  - Contributing: contributing.md
 - API Reference:
-  - Overview: api_reference/overview.md
   - Core: api_reference/core.md
   - Decoder: api_reference/decoder.md
   - Encoder: api_reference/encoder.md

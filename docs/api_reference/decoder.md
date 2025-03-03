@@ -1,5 +1,8 @@
 # Decoder
 
+!!! Note
+    Checkout the [getting started guide](../start_decoding.md) for more details on encoding.
+
 ::: ujson5.decoder
     options:
         members:

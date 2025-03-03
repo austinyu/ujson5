@@ -303,7 +303,7 @@ class JSON5Encoder:
             JSON5EncodeError: If the TypedDict class is not a TypedDict subclass or if the
                 object cannot be serialized
         """
-        if is_typeddict(typed_dict_cls):
+        if is_typeddict(typed_dict_cls) and self._indent_str is not None:
             self._comments_cache = get_comments(typed_dict_cls)
         elif typed_dict_cls is not None:
             raise JSON5EncodeError(EncoderErrors.invalid_typed_dict(typed_dict_cls))
