@@ -63,6 +63,8 @@ plugins:
         inventories:
           - url: https://docs.python.org/3/objects.inv
             domains: [py, std]
+- search
+
 
 markdown_extensions:
 - tables
