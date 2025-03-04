@@ -19,6 +19,7 @@
     "crossrefs",
     "docstrings",
     "elif",
+    "fnames",
     "fstring",
     "htmlcov",
     "imag",
