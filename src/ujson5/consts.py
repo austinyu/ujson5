@@ -31,6 +31,13 @@ ESCAPE_SEQUENCE = {
     "t": "\u0009",  # Horizontal tab
     "v": "\u000b",  # Vertical tab
     "0": "\u0000",  # Null
+    # https://262.ecma-international.org/5.1/#sec-7.8.4
+    # even though Solidus is not included in the JSON spec
+    # it is valid in multiple JSON test suits I found... so I'm including it here
+    # Examples:
+    #   https://github.com/nst/JSONTestSuite
+    #   https://github.com/miloyip/nativejson-benchmark
+    "/": "\u002f",  # Solidus
 }
 
 
