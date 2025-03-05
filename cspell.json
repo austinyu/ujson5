@@ -4,6 +4,7 @@
     ".github/*",
     ".pre-commit-config.yaml",
     "tests/config.json5",
+    "tests/blns/*",
     "ujson5.code-workspace",
     "mkdocs.yml"
   ],
@@ -13,6 +14,7 @@
     "addopts",
     "austinyu",
     "bfnrtv",
+    "blns",
     "Characterbut",
     "Charactersopt",
     "citm",

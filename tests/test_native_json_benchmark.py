@@ -39,18 +39,21 @@ def test_round_trips(file_path: Path) -> None:
 def test_loading_canada_file(benchmark) -> None:
     """Test for loading large files."""
     with open(BASE_FOLDER / "canada.json", "r", encoding="utf8") as file:
-        benchmark(ujson5.load, file, strict=False)
+        content: str = file.read()
+    benchmark(ujson5.loads, content, strict=False)
 
 
 @pytest.mark.skipif(not os.getenv("CI_ENV"), reason="Run only in CI environment")
 def test_loading_citm_catalog_file(benchmark) -> None:
     """Test for loading large files."""
     with open(BASE_FOLDER / "citm_catalog.json", "r", encoding="utf8") as file:
-        benchmark(ujson5.load, file, strict=False)
+        content: str = file.read()
+    benchmark(ujson5.loads, content, strict=False)
 
 
 @pytest.mark.skipif(not os.getenv("CI_ENV"), reason="Run only in CI environment")
 def test_loading_citm_twitter_file(benchmark) -> None:
     """Test for loading large files."""
     with open(BASE_FOLDER / "twitter.json", "r", encoding="utf8") as file:
-        benchmark(ujson5.load, file, strict=False)
+        content: str = file.read()
+    benchmark(ujson5.loads, content, strict=False)
