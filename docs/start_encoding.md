@@ -8,16 +8,22 @@ When using [dump][ujson5.dump] or [dumps][ujson5.dumps] functions, you can eithe
 import ujson5
 from typing import Any
 
+
 def default(obj: Any) -> ujson5.Serializable:
     if isinstance(obj, complex):
         return {"__complex__": True, "real": obj.real, "imag": obj.imag}
     elif isinstance(obj, set):
         return list(obj)
-    raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serializable")
+    raise TypeError(
+        f"Object of type '{obj.__class__.__name__}' is not JSON serializable"
+    )
+
 
 data = {"complex": 1 + 2j}
 serialized = ujson5.dumps(data, default=default)
 print(serialized)
+# {"complex": {"__complex__": true, "real": 1.0, "imag": 2.0}}
+
 ```
 
 ## Comments Extraction
@@ -48,6 +54,7 @@ Here is an example to show how it works.
 
 ```python
 from typing import TypedDict
+import ujson5
 
 class Courses(TypedDict, total=False):
     # you can also add comments in the TypedDict
@@ -61,17 +68,18 @@ class Courses(TypedDict, total=False):
     # present will be commented
     LIT101: int
 
+
 my_courses = Courses(CS101=1, ART101=2, HIS101=3)
 serialized = ujson5.dumps(my_courses, typed_dict_cls=Courses, indent=4)
-assert serialized == '''{
-    // you can also add comments in the TypedDict
-    "CS101": 1,
-    // Multi-line comments are also supported
-    // In this case, the comments in JSON5 will also be multi-line
-    "ART101": 2,
-    // You can also add comments to the TypedDict attributes
-    "HIS101": 3,  // a comment can also be in-line
-}'''
+print(serialized)
+# {
+#     // you can also add comments in the TypedDict
+#     "CS101": 1,  // Multi-line comments are also supported
+#     // In this case, the comments in JSON5 will also be multi-line
+#     "ART101": 2,  // You can also add comments to the TypedDict attributes
+#     "HIS101": 3,  // a comment can also be in-line
+# }
+
 ```
 
 As mentioned in the [official JSON5 website](https://json5.org/):
@@ -86,6 +94,7 @@ Here is a more complex example involving composite and inherited TypedDicts:
 from typing import TypedDict
 import ujson5
 
+
 class Courses(TypedDict, total=False):
     # you can also add comments in the TypedDict
     CS101: int
@@ -98,11 +107,13 @@ class Courses(TypedDict, total=False):
     # present will be commented
     LIT101: int
 
+
 class Creature(TypedDict):
     height: int  # height of the creature
     # weight of the creature
     # weight cannot be too high!
     weight: int
+
 
 class Human(Creature):  # (1)
     # age of the human
@@ -122,7 +133,7 @@ Let's define some dictionaries that implement the `Human` TypedDict:
 
 ```python
 
-Austin: Human = {
+bob: Human = {
     "height": 180,
     "weight": 70,
     "age": 30,
@@ -135,41 +146,35 @@ Austin: Human = {
     "hobbies": ["reading", "swimming", "coding"],
 }
 
-assert ujson5.dumps(Austin, typed_dict_cls=Human, indent=4) == '''{
-    // height of the creature
-    "height": 180,
-    // weight of the creature
-    // weight cannot be too high!
-    "weight": 70,
-    // age of the human
-    // human can be very old!
-    "age": 30,
-    // name of the human
-    "name": "Austin",
-    // human can be very intelligent
-    // hard-working human
-    "courses": {
-        // you can also add comments in the TypedDict
-        "CS101": 90,
-        // Multi-line comments are also supported
-        // In this case, the comments in JSON5 will also be multi-line
-        // The entries of dictionaries that implement this TypedDict will be commented
-        "ART101": 80,
-        // You can also add comments to the TypedDict attributes
-        "HIS101": 70,  // a comment can also be in-line
-        // if a dictionary does not contain all the keys, only the keys that are
-        // present will be commented
-        "LIT101": null,
-    },
-    // hobbies takes a lot of time...
-    "hobbies": [
-        "reading",
-        "swimming",
-        "coding",
-    ],
-}'''
+bob_str: str = ujson5.dumps(bob, typed_dict_cls=Human, indent=4)
+print(bob_str)
+# {
+#     "height": 180,  // height of the creature
+#     // weight of the creature
+#     // weight cannot be too high!
+#     "weight": 70,
+#     // (1)
+#     // age of the human
+#     "age": 30,  // human can be very old!
+#     // name of the human
+#     "name": "Austin",  // human can be very intelligent
+#     "courses": {
+#         // you can also add comments in the TypedDict
+#         "CS101": 90,  // Multi-line comments are also supported
+#         // In this case, the comments in JSON5 will also be multi-line
+#         // The entries of dictionaries that implement this TypedDict will be commented
+#         "ART101": 80,
+#         "HIS101": 70,  // a comment can also be in-line
+#     },  // hard-working human  (2)
+#     "hobbies": [
+#         "reading",
+#         "swimming",
+#         "coding",
+#     ],  // hobbies takes a lot of time...
+# }
 
-Jack: Human = {
+
+jack: Human = {
     "height": 170,
     "weight": 80,
     "age": 25,
@@ -182,39 +187,34 @@ Jack: Human = {
     "hobbies": ["tennis", "writing", "coding"],
 }
 
-assert ujson5.dumps(Jack, typed_dict_cls=Human, indent=4) == '''{
-    // height of the creature
-    "height": 170,
-    // weight of the creature
-    // weight cannot be too high!
-    "weight": 80,
-    // age of the human
-    // human can be very old!
-    "age": 25,
-    // name of the human
-    "name": "Jack",
-    // human can be very intelligent
-    // hard-working human
-    "courses": {
-        // you can also add comments in the TypedDict
-        "CS101": 23,
-        // Multi-line comments are also supported
-        // In this case, the comments in JSON5 will also be multi-line
-        // The entries of dictionaries that implement this TypedDict will be commented
-        "ART101": 67,
-        // if a dictionary does not contain all the keys, only the keys that are
-        // present will be commented
-        "HIS101": null,
-        // You can also add comments to the TypedDict attributes
-        "LIT101": 12,
-    },
-    // hobbies takes a lot of time...
-    "hobbies": [
-        "tennis",
-        "writing",
-        "coding",
-    ],
-}'''
+jack_str: str = ujson5.dumps(jack, typed_dict_cls=Human, indent=4)
+print(jack_str)
+# {
+#     "height": 170,  // height of the creature
+#     // weight of the creature
+#     // weight cannot be too high!
+#     "weight": 80,
+#     // (1)
+#     // age of the human
+#     "age": 25,  // human can be very old!
+#     // name of the human
+#     "name": "Jack",  // human can be very intelligent
+#     "courses": {
+#         // you can also add comments in the TypedDict
+#         "CS101": 23,  // Multi-line comments are also supported
+#         // In this case, the comments in JSON5 will also be multi-line
+#         // The entries of dictionaries that implement this TypedDict will be commented
+#         "ART101": 67,
+#         // if a dictionary does not contain all the keys, only the keys that are
+#         // present will be commented
+#         "LIT101": 12,
+#     },  // hard-working human  (2)
+#     "hobbies": [
+#         "tennis",
+#         "writing",
+#         "coding",
+#     ],  // hobbies takes a lot of time...
+# }
 ```
 
 !!! View full API

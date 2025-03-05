@@ -2,10 +2,11 @@
 
 from os.path import dirname, join
 from os import listdir
+from pathlib import Path
 
-EXAMPLE_ROOT = join(dirname(__file__), "json5_examples")
+EXAMPLE_ROOT: Path = Path(dirname(__file__)) / "json5_examples"
 
-CATEGORIES = [
+CATEGORIES: list[str] = [
     "arrays",
     "comments",
     "misc",
@@ -16,15 +17,15 @@ CATEGORIES = [
     "todo",
 ]
 
-VALID_EXAMPLES = [
-    join(EXAMPLE_ROOT, cat, f)
+VALID_EXAMPLES: list[Path] = [
+    EXAMPLE_ROOT / cat / f
     for cat in CATEGORIES
     for f in listdir(join(EXAMPLE_ROOT, cat))
     if f.endswith(".json5") or f.endswith(".json")
 ]
 
-INVALID_EXAMPLES = [
-    join(EXAMPLE_ROOT, cat, f)
+INVALID_EXAMPLES: list[Path] = [
+    EXAMPLE_ROOT / cat / f
     for cat in CATEGORIES
     for f in listdir(join(EXAMPLE_ROOT, cat))
     if f.endswith(".js") or f.endswith(".txt")

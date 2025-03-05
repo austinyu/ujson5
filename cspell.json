@@ -34,6 +34,7 @@
     "mypy",
     "NOINT",
     "nosetests",
+    "pipx",
     "pycache",
     "pyjp",
     "pylint",

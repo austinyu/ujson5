@@ -6,7 +6,7 @@ VERSION = "0.0.1a"
 """The version of ujson5."""
 
 
-def version_short() -> str:
+def version_short() -> str:  # pragma: no cover
     """Return the `major.minor` part of ujson5 version.
 
     It returns '2.1' if ujson5 version is '2.1.1'.
@@ -24,6 +24,4 @@ def version_info() -> str:
         "python version": sys.version,
         "platform": platform.platform(),
     }
-    return "\n".join(
-        "{:>30} {}".format(k + ":", str(v).replace("\n", " ")) for k, v in info.items()
-    )
+    return "\n".join(f"{k + ":"} {str(v).replace("\n", " ")}" for k, v in info.items())

@@ -9,13 +9,16 @@ When using [load][ujson5.load] or [loads][ujson5.loads] functions, you can eithe
 ```python
 import ujson5
 
+
 def my_obj_hook(dct: ujson5.ObjectHookArg) -> dict:
     dct["count"] = len(dct)
     return dct
 
+
 data = '{"key": "value", "key2": "value2"}'
 deserialized = ujson5.loads(data, object_hook=my_obj_hook)
 assert deserialized == {"key": "value", "key2": "value2", "count": 2}
+
 ```
 
 Similarly, you also have the type variable for object pairs hook. Here is an example:
@@ -23,14 +26,17 @@ Similarly, you also have the type variable for object pairs hook. Here is an exa
 ```python
 import ujson5
 
-def my_pairs_hook(pairs: ujson5.PairsHookArg) -> dict:
+
+def my_pairs_hook(pairs: ujson5.ObjectPairsHookArg) -> dict:
     dct_pairs = dict(pairs)
     dct_pairs["count"] = len(dct_pairs)
     return dct_pairs
 
+
 data = '{"key": "value", "key2": "value2"}'
-deserialized = ujson5.loads(data, pairs_hook=my_pairs_hook)
+deserialized = ujson5.loads(data, object_pairs_hook=my_pairs_hook)
 assert deserialized == {"key": "value", "key2": "value2", "count": 2}
+
 ```
 
 !!! View full API

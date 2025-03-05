@@ -22,9 +22,7 @@ def test_json_checker_file(file_path: Path) -> None:
 
 
 ROUND_TRIP_FOLDER = BASE_FOLDER / "roundtrip"
-ROUND_TRIP_PATHS: list[Path] = [
-    f for f in ROUND_TRIP_FOLDER.iterdir() if f.is_file() if f.name.startswith("pass")
-]
+ROUND_TRIP_PATHS: list[Path] = list(ROUND_TRIP_FOLDER.iterdir())
 
 
 @pytest.mark.parametrize("file_path", ROUND_TRIP_PATHS)
@@ -36,7 +34,7 @@ def test_round_trips(file_path: Path) -> None:
 
 
 @pytest.mark.skipif(not os.getenv("CI_ENV"), reason="Run only in CI environment")
-def test_loading_canada_file(benchmark) -> None:
+def test_loading_canada_file(benchmark) -> None:  # pragma: no cover
     """Test for loading large files."""
     with open(BASE_FOLDER / "canada.json", "r", encoding="utf8") as file:
         content: str = file.read()
@@ -44,7 +42,7 @@ def test_loading_canada_file(benchmark) -> None:
 
 
 @pytest.mark.skipif(not os.getenv("CI_ENV"), reason="Run only in CI environment")
-def test_loading_citm_catalog_file(benchmark) -> None:
+def test_loading_citm_catalog_file(benchmark) -> None:  # pragma: no cover
     """Test for loading large files."""
     with open(BASE_FOLDER / "citm_catalog.json", "r", encoding="utf8") as file:
         content: str = file.read()
@@ -52,7 +50,7 @@ def test_loading_citm_catalog_file(benchmark) -> None:
 
 
 @pytest.mark.skipif(not os.getenv("CI_ENV"), reason="Run only in CI environment")
-def test_loading_citm_twitter_file(benchmark) -> None:
+def test_loading_citm_twitter_file(benchmark) -> None:  # pragma: no cover
     """Test for loading large files."""
     with open(BASE_FOLDER / "twitter.json", "r", encoding="utf8") as file:
         content: str = file.read()

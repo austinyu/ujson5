@@ -16,6 +16,9 @@ dynamic = ["version"]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
 build-backend = "poetry_dynamic_versioning.backend"
 
+[project.scripts]
+ujson5 = "ujson5.cli:main"
+
 [tool.poetry]
 version = "0.0.0"
 [tool.poetry.requires-plugins]
@@ -67,7 +70,7 @@ exclude_also = [
 
 [tool.coverage.run]
 omit = [
-    "tests/generate_snapshots.py",
+    "tests/test_snapshots/generate_snapshots.py",
     "tests/test_benchmark.py",
 ]
 

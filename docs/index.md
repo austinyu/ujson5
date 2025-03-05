@@ -47,3 +47,67 @@ like **macOS** and **iOS**.
 ```bash
 pip install ujson5
 ```
+
+## Quick Start
+
+You can use `ujson5` just like the built-in `json` module. Here is a quick example:
+
+```python
+from typing import TypedDict
+import ujson5
+
+# Decode JSON5
+json5_str = """
+{
+  // comments
+  key: 'value', // trailing comma
+}
+"""
+
+data = ujson5.loads(json5_str)
+print(data)  # {'key': 'value'}
+
+
+# Encode JSON5
+class Data(TypedDict):
+    # multiple long comments
+    # are supported
+    key: str  # inline comment
+
+
+data = {"key": "value"}
+json5_str = ujson5.dumps(data, Data, indent=2)
+print(json5_str)
+# {
+#   // multiple long comments
+#   // are supported
+#   "key": "value",  // inline comment
+# }
+
+```
+
+## CLI Usage
+
+After installing `ujson5`, you can use the `ujson5` command-line interface to convert JSON5 files to JSON files or simply validate JSON5 files. The CLI interface is the same as the [official JSON5 CLI](https://json5.org/).
+
+### Installation
+
+Make sure you have installed the package in these three ways to use the CLI:
+
+- Install using pipx (recommended): `pipx install ujson5`
+- Install to the global interpreter: `pip install ujson5`
+- Install to a virtual env and activate it.
+
+### Usage
+
+```bash
+ujson5 [options] <file>
+```
+
+Options:
+
+- `-s`, `--space`: The number of spaces to indent or t for tabs
+- `-o [file]`, `--out-file [file]`: Output to the specified file, otherwise STDOUT
+- `-v`, `--validate`: Validate JSON5 but do not output JSON
+- `-V`, `--version`: Output the version number
+- `-h`, `--help`: Output usage information

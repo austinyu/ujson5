@@ -22,6 +22,7 @@ DefaultInterface = (
     | Callable[[Any], str]
     | Callable[[Any], None]
     | Callable[[Any], bool]
+    | Callable[[Any], Serializable]
 )
 """A callable that takes in an object that is not
 serializable and returns a serializable object"""
@@ -169,14 +170,18 @@ class JSON5Encoder:
     Example:
     ```python
     import ujson5
+
+
     class MyEncoder(ujson5.JSON5Encoder):
         def default(self, obj):
             if isinstance(obj, set):  # (1)!
                 return list(obj)
             return super().default(obj)  # (2)!
+
+
     user = {"name": "John", "age": "123", "hobbies": {"tennis", "reading"}}
     print(ujson5.dumps(user, cls=MyEncoder))
-    # Output: '{"name": "John", "age": 123, "hobbies": ["tennis", "reading"]}'
+    # {"name": "John", "age": "123", "hobbies": ["reading", "tennis"]}
     ```
 
     1. In this example, the encoder subclass `MyEncoder` overrides the
