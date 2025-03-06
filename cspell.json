@@ -33,6 +33,7 @@
     "mkdocs",
     "mkdocstrings",
     "mypy",
+    "nativejson",
     "NOINT",
     "nosetests",
     "pipx",
