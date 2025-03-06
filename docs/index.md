@@ -100,14 +100,29 @@ Make sure you have installed the package in these three ways to use the CLI:
 
 ### Usage
 
+`ujson5` module can be used as a console script. The basic usage is:
+
 ```bash
-ujson5 [options] <file>
+ujson5 <infile> <outfile> [options]
+```
+
+If the optional `infile` and `outfile` arguments are not specified, `sys.stdin` and `sys.stdout` will be used respectively:
+
+```bash
+echo '{"json": "obj"}' | ujson5
+{
+    "json": "obj"
+}
 ```
 
 Options:
 
-- `-s`, `--space`: The number of spaces to indent or t for tabs
-- `-o [file]`, `--out-file [file]`: Output to the specified file, otherwise STDOUT
-- `-v`, `--validate`: Validate JSON5 but do not output JSON
-- `-V`, `--version`: Output the version number
+- `infile`: The JSON5 file to be validated or converted to JSON. If not specified, read from `sys.stdin`.
+- `outfile`: The JSON file to output the converted JSON. If not specified, output to `sys.stdout`.
+- `-v`, `--version`: Print the version number.
+- `-i`, `--info`: Print the version number and system information.
+- `--sort-keys`: Sort the output of dictionaries alphabetically by key.
+- `--no-ensure-ascii`: Disable escaping of non-ascii characters, see [ujson5.dumps()][ujson5.dumps] for more information.
+- `--indent`, `--no-indent`, `--compact`: Mutually exclusive options for whitespace control.
+
 - `-h`, `--help`: Output usage information

@@ -26,6 +26,7 @@
     "fstring",
     "htmlcov",
     "imag",
+    "infile",
     "isinstance",
     "isspace",
     "jsonchecker",

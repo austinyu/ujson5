@@ -12,7 +12,7 @@ from ujson5 import cli
 from . import example_consts
 
 
-@pytest.mark.parametrize("arg", ["--version", "-V"])
+@pytest.mark.parametrize("arg", ["--version", "-v"])
 def test_cli_version(arg: str) -> None:
     """Test version output."""
     with redirect_stdout(io.StringIO()) as f:
@@ -42,27 +42,27 @@ def test_cli_stdout_incorrect() -> None:
     assert cli.DECODING_ERROR in f.getvalue().strip()
 
 
-@pytest.mark.parametrize("arg", ["--validate", "-v"])
-def test_cli_validate_correct(arg: str) -> None:
-    """Test validate option."""
-    with redirect_stdout(io.StringIO()) as f:
-        cli.main([str(choice(example_consts.VALID_EXAMPLES)), arg])
-    assert cli.VALID_JSON5 in f.getvalue().strip()
-
-
-@pytest.mark.parametrize("arg", ["--validate", "-v"])
-def test_cli_validate_incorrect(arg: str) -> None:
-    """Test validate option."""
-    with redirect_stdout(io.StringIO()) as f:
-        cli.main([str(choice(example_consts.INVALID_EXAMPLES)), arg])
-    assert cli.DECODING_ERROR in f.getvalue().strip()
-
-
-def test_cli_no_target() -> None:
+def test_cli_no_target(monkeypatch) -> None:
     """Test no target."""
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
     with redirect_stdout(io.StringIO()) as f:
         cli.main([])
     assert cli.ERR_NO_TARGET in f.getvalue().strip()
+
+
+def test_cli_stdin(monkeypatch) -> None:
+    """Test reading from stdin with options."""
+    monkeypatch.setattr("sys.stdin", io.StringIO('{"json": "obj"}'))
+    with redirect_stdout(io.StringIO()) as f:
+        cli.main(["--no-indent"])
+    assert '{"json": "obj"}' in f.getvalue().strip()
+    assert cli.JSON_CONVERTED in f.getvalue().strip()
+
+    monkeypatch.setattr("sys.stdin", io.StringIO('{"json": "obj"}'))
+    with redirect_stdout(io.StringIO()) as f:
+        cli.main(["--compact"])
+    assert '{"json":"obj"}' in f.getvalue().strip()
+    assert cli.JSON_CONVERTED in f.getvalue().strip()
 
 
 def test_cli_invalid_path() -> None:
@@ -72,11 +72,10 @@ def test_cli_invalid_path() -> None:
     assert cli.ERR_TARGET_NOT_EXIST in f.getvalue().strip()
 
 
-@pytest.mark.parametrize("arg", ["--out-file", "-o"])
-def test_cli_output(arg: str, tmp_path: Path) -> None:
+def test_cli_output(tmp_path: Path) -> None:
     """Test output file."""
     target: Path = choice(example_consts.VALID_EXAMPLES)
     output: Path = tmp_path / "output.json5"
     assert not output.exists()
-    cli.main([str(target), arg, str(output)])
+    cli.main([str(target), str(output)])
     assert output.exists()
