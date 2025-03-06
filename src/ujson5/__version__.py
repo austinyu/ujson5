@@ -24,4 +24,5 @@ def version_info() -> str:
         "python version": sys.version,
         "platform": platform.platform(),
     }
-    return "\n".join(f'{k + ":"} {str(v).replace("\n", " ")}' for k, v in info.items())
+    info = {k: str(v).replace("\n", " ") for k, v in info.items()}
+    return "\n".join(f"{k}: {v}" for k, v in info.items())
