@@ -2,7 +2,7 @@
 
 __all__ = ["VERSION"]
 
-VERSION = "0.0.1a"
+VERSION = "1.0.0"
 """The version of ujson5."""
 
 
