@@ -9,14 +9,12 @@ If you find any issues or have any suggestions, please open an issue on the [Git
 
 ### Setup development environment
 
-- Install [poetry](https://python-poetry.org/docs/)
-- `poetry install --with dev`
+- Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- `uv sync  --group all`
 - `pre-commit install`
 
 ### CLIs
 
-- `poetry install --with [group]`
-- `poetry add --group [group] [dep]`
 - `mkdocs server`
 
 ## Future work

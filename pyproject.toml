@@ -1,62 +1,84 @@
+[build-system]
+requires = ['hatchling', "hatch-vcs", 'hatch-fancy-pypi-readme>=22.5.0']
+build-backend = 'hatchling.build'
+
+
 [project]
 name = "ujson5"
 description = "A fast JSON5 encoder/decoder for Python"
-authors = [
-    {name = "Austin Yu",email = "yuxm.austin1023@gmail.com"}
-]
-license = {text = "MIT"}
-readme = "README.md"
+authors = [{ name = "Austin Yu", email = "yuxm.austin1023@gmail.com" }]
+license = { text = "MIT" }
 requires-python = ">=3.10"
-dependencies = [
-]
-dynamic = ["version"]
+dependencies = []
+dynamic = ['version', 'readme']
 
-
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
 
 [project.scripts]
 ujson5 = "ujson5.cli:main"
 
-[tool.poetry]
-version = "0.0.0"
-[tool.poetry.requires-plugins]
-poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-metadata = true
-dirty = true
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-benchmark",
+    "pytest-codspeed",
+    "pytest-test-groups",
+]
 
-[tool.poetry.group.dev]
-optional = true
+pylint = ["pylint"]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-pytest-cov = "^6.0.0"
-pytest-codspeed = "^3.2.0"
-black = "^25.1.0"
-flake8 = "^7.1.1"
-pylint = "^3.3.4"
-mypy = "^1.15.0"
-flake8-simplify = "^0.21.0"
-flake8-mutable = "^1.2.0"
-flake8-print = "^5.0.0"
-flake8-use-fstring = "^1.4"
-flake8-builtins = "^2.5.0"
-flake8-functions-names = "^0.4.0"
-flake8-variables-names = "^0.0.6"
-flake8-no-implicit-concat = "^0.3.7"
-pytest-test-groups = "^1.1.0"
-pymdown-extensions = "^10.14.3"
+flake8 = [
+    "flake8",
+    "flake8-simplify",
+    "flake8-mutable",
+    "flake8-print",
+    "flake8-use-fstring",
+    "flake8-builtins",
+    "flake8-functions-names",
+    "flake8-variables-names",
+    "flake8-no-implicit-concat",
+]
 
+mypy = ["mypy"]
 
-[tool.poetry.group.docs.dependencies]
-mkdocs = "^1.6.1"
-mkdocs-material = "^9.6.5"
-mkdocstrings-python = "^1.16.2"
+black = ["black"]
+
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings-python",
+    "pymdown-extensions",
+]
+
+all = [
+    { include-group = "dev" },
+    { include-group = "pylint" },
+    { include-group = "flake8" },
+    { include-group = "mypy" },
+    { include-group = "black" },
+    { include-group = "docs" },
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = 'text/markdown'
+# construct the PyPI readme from README.md and CHANGELOG.md
+fragments = [
+    {path = 'README.md'},
+    {text = "\n## Changelog\n\n"},
+    {path = 'CHANGELOG.md', pattern = '(.+?)<!-- PyPI README description limit -->'},
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    '/README.md',
+    '/CHANGELOG.md',
+    '/src',
+    '/tests',
+]
 
 [tool.bandit]
 skips = ["B101", "B311"]
@@ -69,13 +91,7 @@ addopts = """
 """
 
 [tool.coverage.report]
-exclude_also = [
-    'pytest.skip',
-    'if sys.version_info < (3, 12): ',
-]
+exclude_also = ['pytest.skip', 'if sys.version_info < (3, 12): ']
 
 [tool.coverage.run]
-omit = [
-    "tests/test_snapshots/generate_snapshots.py",
-    "tests/test_benchmark.py",
-]
+omit = ["tests/test_snapshots/generate_snapshots.py", "tests/test_benchmark.py"]
