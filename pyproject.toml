@@ -83,6 +83,9 @@ all = [
     { include-group = "docs" },
 ]
 
+[tool.uv]
+default-groups = ['all']
+
 [tool.hatch.version]
 source = "vcs"
 

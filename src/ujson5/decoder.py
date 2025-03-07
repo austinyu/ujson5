@@ -464,7 +464,7 @@ class Json5Decoder:
         return int(num_str) if self._parse_int is None else self._parse_int(num_str)
 
     def _parse_string(self, str_str: str, json5_str: str, str_start_idx: int) -> str:
-        def replace_escape_sequences_and_continuations(match):
+        def replace_escape_sequences_continuations(match):
             """Unescape escape sequences, unicode escape sequence
                 and line continuations in a string.
             escape sequences replaced: `\'`, `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t`,
@@ -489,7 +489,7 @@ class Json5Decoder:
         # group 3: line continuations
         return re.sub(
             r"\\([\'\"\\bfnrtv0])|\\u([0-9a-fA-F]{4})|\\\s*\n",
-            replace_escape_sequences_and_continuations,
+            replace_escape_sequences_continuations,
             str_str,
         )
 
@@ -588,7 +588,7 @@ def loads(
 
 
 def load(
-    file: TextIO,
+    input_file: TextIO,
     *,
     cls: type[Json5Decoder] | None = None,
     parse_float: Callable[[str], Any] | None = None,
@@ -642,7 +642,7 @@ def load(
             takes priority.
     """
     return loads(
-        file.read(),
+        input_file.read(),
         cls=cls,
         object_hook=object_hook,
         parse_float=parse_float,

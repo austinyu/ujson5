@@ -26,7 +26,7 @@ unicode_connectors = copy(UNICODE_CONNECTORS)
 VALID_HEX_DIGITS = "0123456789abcdefABCDEF"
 RANDOM_UNICODE_ESCAPE = (
     f"\\u{choice(VALID_HEX_DIGITS)}{choice(VALID_HEX_DIGITS)}"
-    f"{choice(VALID_HEX_DIGITS)}{choice(VALID_HEX_DIGITS)}"
+    + f"{choice(VALID_HEX_DIGITS)}{choice(VALID_HEX_DIGITS)}"
 )
 
 

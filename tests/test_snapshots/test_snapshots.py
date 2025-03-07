@@ -12,7 +12,7 @@ import ujson5
 from . import snapshots
 
 
-def test_load_alpha_snapshots():
+def test_load_json5_from_alpha_snapshots():
     """Test loading alpha snapshots."""
     for snapshot_name in snapshots.SNAPSHOT_NAMES.values():
         if snapshot_name == "alpha_special_separators.json5":

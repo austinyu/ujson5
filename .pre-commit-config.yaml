@@ -22,26 +22,31 @@ repos:
     hooks:
       - id: black
 
-  - repo: https://github.com/pycqa/flake8
-    rev: "7.1.1" # pick a git hash / tag to point to
-    hooks:
-      - id: flake8
-
   - repo: local
     hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [python]
-        require_serial: true
-        args: [
-            "src",
-            "tests",
-            "-rn", # Only display messages
-            "-sn", # Don't display the score
-            "--rcfile=.pylintrc",
-          ]
+    - id: flake8
+      name: flake8
+      entry: uv run flake8
+      types: [python]
+      language: system
+      pass_filenames: false
+      args: [
+        "src",
+        "tests",
+      ]
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      require_serial: true
+      args: [
+          "src",
+          "tests",
+          "-rn", # Only display messages
+          "-sn", # Don't display the score
+          "--rcfile=.pylintrc",
+        ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v1.15.0" # Use the sha / tag you want to point at
