@@ -86,6 +86,7 @@ jobs:
           python-version-file: "pyproject.toml"
       - name: Install dependencies
         run: |
+          uv venv
           uv pip install --upgrade pip
           uv sync --group docs
       - name: Build docs
