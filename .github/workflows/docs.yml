@@ -1,5 +1,5 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Docs Build & Deploy
+name: build docs
 
 on:
   push:
@@ -35,6 +35,7 @@ jobs:
           python-version-file: "pyproject.toml"
       - name: Install dependencies
         run: |
+          uv venv
           uv pip install --upgrade pip
           uv sync --group docs
       - name: Build docs
