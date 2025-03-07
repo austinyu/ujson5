@@ -1,13 +1,11 @@
 # ujson5
 
-|                 |  |
-|------------------------|--------|
-| CI/CD  | [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml) <br> [![build docs](https://github.com/austinyu/ujson5/actions/workflows/docs.yml/badge.svg)](https://github.com/austinyu/ujson5/actions/workflows/docs.yml)   |
-| Coverage / Codspeed      | [![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5) <br>[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/austinyu/ujson5)     |
-| Package | ![PyPI - Version](https://img.shields.io/pypi/v/ujson5) <br> ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ujson5) <br> ![PyPI - License](https://img.shields.io/pypi/l/ujson5)  <br> ![PyPI - Downloads](https://img.shields.io/pypi/dm/ujson5)     |
-| Meta  | [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) <br> [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) <br> [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](http://mypy-lang.org/) |
-
-Documentation for version: v0.1.0
+|                     |                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI/CD               | [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml) `<br>` [![build docs](https://github.com/austinyu/ujson5/actions/workflows/docs.yml/badge.svg)](https://github.com/austinyu/ujson5/actions/workflows/docs.yml)                                                            |
+| Coverage / Codspeed | [![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5) `<br>`[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/austinyu/ujson5)                                                                                                                    |
+| Package             | ![PyPI - Version](https://img.shields.io/pypi/v/ujson5) `<br>` ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ujson5) `<br>` ![PyPI - License](https://img.shields.io/pypi/l/ujson5)  `<br>` ![PyPI - Downloads](https://img.shields.io/pypi/dm/ujson5)                                                                                                    |
+| Meta                | [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) `<br>` [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) `<br>` [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](http://mypy-lang.org/) |
 
 `ujson5` is a Python that encodes and decodes [JSON5](https://json5.org/), a superset of JSON that supports many human-friendly features such as comments, trailing commas, and more!
 
@@ -15,7 +13,7 @@ Documentation for version: v0.1.0
 
 Direct quote from the [JSON5 website](https://json5.org/):
 
-JSON5 was started in 2012, and as of 2022, now gets **[>65M downloads/week](https://www.npmjs.com/package/json5)**,
+JSON5 was started in 2012, and as of 2022, now gets **[&gt;65M downloads/week](https://www.npmjs.com/package/json5)**,
 ranks in the **[top 0.1%](https://gist.github.com/anvaka/8e8fa57c7ee1350e3491)** of the most depended-upon packages on npm,
 and has been adopted by major projects like
 **[Chromium](https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/platform/runtime_enabled_features.json5;drc=5de823b36e68fd99009a29281b17bc3a1d6b329c),
@@ -119,5 +117,4 @@ Options:
 - `--sort-keys`: Sort the output of dictionaries alphabetically by key.
 - `--no-ensure-ascii`: Disable escaping of non-ascii characters, see [ujson5.dumps()][ujson5.dumps] for more information.
 - `--indent`, `--no-indent`, `--compact`: Mutually exclusive options for whitespace control.
-
 - `-h`, `--help`: Output usage information

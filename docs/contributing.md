@@ -7,20 +7,13 @@ If you find any issues or have any suggestions, please open an issue on the [Git
 
 ## Contributing code
 
-### Setup development environment
+### Prerequisites
 
-- Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- `uv sync  --group all`
-- `pre-commit install`
+- Any Python version above Python 3.10
+- [uv](https://docs.astral.sh/uv/) or other virtual environment tool
+- git
+- make
 
 ### CLIs
 
 - `mkdocs server`
-
-## Future work
-
-- CLI implementation
-- versioning docs using `mike`
-- add optional arg to encode to cache comments in frozen or optimized mode
-- makefile automation
-- doc-test
