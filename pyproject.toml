@@ -24,6 +24,12 @@ version = "0.0.0"
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+metadata = true
+dirty = true
+
 [tool.poetry.group.dev]
 optional = true
 
@@ -73,6 +79,3 @@ omit = [
     "tests/test_snapshots/generate_snapshots.py",
     "tests/test_benchmark.py",
 ]
-
-[tool.poetry-dynamic-versioning]
-enable = true
