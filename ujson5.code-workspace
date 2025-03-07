@@ -31,6 +31,30 @@
 		"mypy-type-checker.importStrategy": "fromEnvironment",
 		"mypy-type-checker.interpreter": [
 			"${workspaceFolder}/.venv/Scripts/python.exe"
+		],
+	},
+	"extensions": {
+		"recommendations": [
+			// pre-commit
+			"elagil.pre-commit-helper",
+			// markdown
+			"yzhang.markdown-all-in-one",
+			// json5
+			"blueglassblock.better-json5",
+			// toml
+			"tamasfe.even-better-toml",
+			// python
+			"ms-python.python",
+			"ms-python.black-formatter",
+			"ms-python.mypy-type-checker",
+			"ryanluker.vscode-coverage-gutters",
+			"ms-python.vscode-pylance",
+			"ms-python.pylint",
+			// git & github
+			"github.vscode-github-actions",
+			"eamodio.gitlens",
+			// spell checker
+			"streetsidesoftware.code-spell-checker",
 		]
 	}
 }
