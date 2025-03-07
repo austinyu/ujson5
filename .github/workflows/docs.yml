@@ -24,9 +24,6 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -58,15 +55,10 @@ jobs:
         run: |
           poetry run mkdocs build
       #----------------------------------------------
-      #  -----  deploy to GitHub Pages  -----
+      #  -----  upload docs  -----
       #----------------------------------------------
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload docs to artifact
+        uses: actions/upload-artifact@v4
         with:
-          # Upload entire repository
-          path: 'site'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          name: docs
+          path: site/
