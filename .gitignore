@@ -24,6 +24,6 @@ dist/*
 
 site/*
 
-.venv-3.10/*
+.venv/*
 .benchmarks/*
 .codspeed/*

@@ -24,9 +24,6 @@ jobs:
         shell: bash
     runs-on: ${{ matrix.os }}
     steps:
-      #----------------------------------------------
-      #       check-out repo and set-up python
-      #----------------------------------------------
       - name: Check out repository
         uses: actions/checkout@v4
         with:
@@ -36,42 +33,30 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-      #----------------------------------------------
-      #  -----  install & configure poetry  -----
-      #----------------------------------------------
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          plugins: |
-            poetry-dynamic-versioning
-      - name: Check Poetry version
-        run: |
-          poetry --version
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          poetry install --with dev --no-interaction
-      #----------------------------------------------
-      #       run test suite & publish coverage
-      #----------------------------------------------
+          uv venv
+          uv pip install --upgrade pip
+          uv sync --group dev
+
       - name: Run pytest with coverage
         run: |
-          poetry run pytest
+          uv run pytest
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./tests/.coverage/cov.xml
           flags: pytest
-      #----------------------------------------------
-      #       Build package & upload artifact
-      #----------------------------------------------
       - name: Build package
         run: |
-          python -m pip install build
-          python -m build
+          uv build
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
