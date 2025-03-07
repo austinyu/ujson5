@@ -10,8 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
