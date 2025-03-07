@@ -2,16 +2,15 @@
 
 [Documentation](https://austinyu.github.io/ujson5/)
 
-[![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5)
-[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/austinyu/ujson5)
+## Feature Comparison
 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ujson5)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+|                 |  |
+|------------------------|--------|
+| CI/CD  | [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml) <br> [![build docs](https://github.com/austinyu/ujson5/actions/workflows/docs.yml/badge.svg)](https://github.com/austinyu/ujson5/actions/workflows/docs.yml)   |
+| Coverage / Codspeed      | [![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5) <br>[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/austinyu/ujson5)     |
+| Package | ![PyPI - Version](https://img.shields.io/pypi/v/ujson5) <br> ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ujson5) <br> ![PyPI - License](https://img.shields.io/pypi/l/ujson5)  <br> ![PyPI - Downloads](https://img.shields.io/pypi/dm/ujson5)     |
+| Meta  | [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) <br> [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) <br> [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](http://mypy-lang.org/) |
 
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](http://mypy-lang.org/)
 
 `ujson5` is a Python that encodes and decodes [JSON5](https://json5.org/), a superset of JSON that supports many human-friendly features such as comments, trailing commas, and more!
 

@@ -10,8 +10,31 @@ authors = [{ name = "Austin Yu", email = "yuxm.austin1023@gmail.com" }]
 license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = []
+classifiers = [
+    'Development Status :: 2 - Pre-Alpha',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Programming Language :: Python :: Implementation :: PyPy',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Information Technology',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Internet',
+]
 dynamic = ['version', 'readme']
 
+[project.urls]
+Homepage = 'https://github.com/austinyu/ujson5'
+Documentation = 'https://austinyu.github.io/ujson5/'
+Source = 'https://github.com/austinyu/ujson5'
+# Changelog = TBD
 
 [project.scripts]
 ujson5 = "ujson5.cli:main"
