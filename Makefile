@@ -45,34 +45,6 @@ test: .uv
 .PHONY: all  ## Run the standard set of checks performed in CI
 all: format lint typecheck cspell test
 
-.PHONY: clean  ## Clear local caches and build artifacts
-clean:
-	rm -rf `find . -name __pycache__`
-	rm -f `find . -type f -name '*.py[co]'`
-	rm -f `find . -type f -name '*~'`
-	rm -f `find . -type f -name '.*~'`
-	rm -rf .cache
-	rm -rf .pytest_cache
-	rm -rf .ruff_cache
-	rm -rf htmlcov
-	rm -rf *.egg-info
-	rm -f .coverage
-	rm -f .coverage.*
-	rm -rf build
-	rm -rf dist
-	rm -rf site
-	rm -rf docs/_build
-	rm -rf docs/.changelog.md docs/.version.md docs/.tmp_schema_mappings.html
-	rm -rf fastapi/test.db
-	rm -rf coverage.xml
-
 .PHONY: docs  ## Generate the docs
 docs:
 	uv run mkdocs build --strict
-
-# .PHONY: help  ## Display this message
-# help:
-# 	@grep -E \
-# 		'^.PHONY: .*?## .*$$' $(MAKEFILE_LIST) | \
-# 		sort | \
-# 		awk 'BEGIN {FS = ".PHONY: |## "}; {printf "\033[36m%-19s\033[0m %s\n", $$2, $$3}'
