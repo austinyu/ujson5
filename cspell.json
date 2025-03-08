@@ -6,7 +6,8 @@
     "tests/config.json5",
     "tests/blns/*",
     "ujson5.code-workspace",
-    "mkdocs.yml"
+    "mkdocs.yml",
+    "Makefile",
   ],
   "dictionaryDefinitions": [],
   "dictionaries": [],

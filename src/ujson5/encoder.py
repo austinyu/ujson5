@@ -44,7 +44,7 @@ for i in range(0x20):
 
 COMMENTS_PATTERN = re.compile(
     r"(?P<block_comment>(?: *# *.+? *\n)*)"
-    r" *(?P<name>\w+): *(?P<type>[^ ]+) *(?:# *(?P<inline_comment>.+))?\n"
+    + r" *(?P<name>\w+): *(?P<type>[^ ]+) *(?:# *(?P<inline_comment>.+))?\n"
 )
 
 
@@ -357,17 +357,17 @@ class JSON5Encoder:
             return ESCAPE_DCT[match.group(0)]
 
         def replace_ascii(match: re.Match) -> str:
-            s = match.group(0)
+            matched_str = match.group(0)
             try:
-                return ESCAPE_DCT[s]
+                return ESCAPE_DCT[matched_str]
             except KeyError:
-                n = ord(s)
-                if n < 0x10000:
-                    return f"\\u{n:04x}"
+                key: int = ord(matched_str)
+                if key < 0x10000:
+                    return f"\\u{key:04x}"
                 # surrogate pair
-                n -= 0x10000
-                s1 = 0xD800 | ((n >> 10) & 0x3FF)
-                s2 = 0xDC00 | (n & 0x3FF)
+                key -= 0x10000
+                s1 = 0xD800 | ((key >> 10) & 0x3FF)
+                s2 = 0xDC00 | (key & 0x3FF)
                 return f"\\u{s1:04x}\\u{s2:04x}"
 
         if self._ensure_ascii:
@@ -527,9 +527,7 @@ class JSON5Encoder:
                 chunks = self._iterencode(value, indent_level, specific_key_path)
             yield from chunks
 
-            if idx != total_items - 1:
-                yield self._item_separator
-            elif self._trailing_comma:
+            if idx != total_items - 1 or self._trailing_comma:
                 yield self._item_separator
             if inline_comment and newline_indent is not None:
                 yield "  // " + inline_comment

@@ -102,7 +102,7 @@ class DecoderErr:
     def expecting_property_value(tk_type: int | None = None) -> str:
         return (
             "Expecting property value that can be one of "
-            "{string, number, bool, null, list, object}"
+            + "{string, number, bool, null, list, object}"
             + f", got {TOKEN_TYPE_MAP[tk_type]}"
             if tk_type is not None
             else ""
@@ -120,7 +120,7 @@ class DecoderErr:
     def missing_key_with_colon() -> str:
         return (
             "Object entry should have a key of type string or "
-            "identifier followed by a colon"
+            + "identifier followed by a colon"
         )
 
     @staticmethod
@@ -152,8 +152,8 @@ class DecoderErr:
         return "Object pairs hook must takes in a list of tuples with two elements"
 
     @staticmethod
-    def reserved_word(word: str) -> str:
-        return f"Reserved word cannot be used as identifier: <{word}>"
+    def reserved_word(word_str: str) -> str:
+        return f"Reserved word cannot be used as identifier: <{word_str}>"
 
 
 class EncoderErrors:

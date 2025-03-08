@@ -1,4 +1,18 @@
 [flake8]
-ignore = E203, W503, E501, ANN101
+ignore =
+    # whitespace before ':'
+    E203,
+    # line break before binary operator
+    W503,
+    # line too long (82 > 79 characters)
+    E501,
+    # Missing type annotation for self in method
+    ANN101,
+    # Name of the function uses load, but not uses from
+    FNE004
 
 exclude = .venv
+
+per-file-ignores =
+    #  print() is used in the code
+    src/ujson5/cli.py: T201

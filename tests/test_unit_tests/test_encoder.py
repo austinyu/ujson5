@@ -40,9 +40,9 @@ import ujson5
             },
             (
                 '{"string": "string", "int": 123, "float": 123.456, "true": true, '
-                '"false": false, "null": null, "array": [1, 2, 3, [1, 2]], '
-                '"heterogeneous": [1, 1.323, "string", true, null, {"key": "value"}], '
-                '"object": {"key": "value"}}'
+                + '"false": false, "null": null, "array": [1, 2, 3, [1, 2]], '
+                + '"heterogeneous": [1, 1.323, "string", true, null, {"key": "value"}], '
+                + '"object": {"key": "value"}}'
             ),
         ),
         (
@@ -55,7 +55,7 @@ import ujson5
             },
             (
                 '{"12": "int key", "12.34": "float key", "true": "bool key", '
-                '"false": "false key", "null": "null key"}'
+                + '"false": "false key", "null": "null key"}'
             ),
         ),
     ],
@@ -152,8 +152,7 @@ def test_circular_ref() -> None:
     with pytest.raises(ujson5.JSON5EncodeError):
         ujson5.dumps(lst)
 
-    obj = {}
-    obj["list"] = []
+    obj = {"list": []}
     obj["list"].append(obj)
     with pytest.raises(ujson5.JSON5EncodeError):
         ujson5.dumps(obj)
@@ -232,9 +231,11 @@ def test_invalid_typed_dict_cls(tmp_path: Path) -> None:
     with pytest.raises(ujson5.JSON5EncodeError):
         ujson5.dumps({}, typed_dict_cls=int)
 
-    with pytest.raises(ujson5.JSON5EncodeError):
-        with open(tmp_path / "dump.json5", "w", encoding="utf8") as file:
-            ujson5.dump({}, file, typed_dict_cls=int)
+    with (
+        pytest.raises(ujson5.JSON5EncodeError),
+        open(tmp_path / "dump.json5", "w", encoding="utf8") as file,
+    ):
+        ujson5.dump({}, file, typed_dict_cls=int)
 
 
 def test_quoted_key() -> None:

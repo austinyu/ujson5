@@ -30,16 +30,18 @@ def test_valid_examples(path: str) -> None:
 )
 def test_invalid_examples(path: str) -> None:
     """Test invalid JSON5 examples."""
-    with open(path, "r", encoding="utf8") as file:
-        with pytest.raises(ujson5.JSON5DecodeError):
-            ujson5.load(file)
+    with (
+        open(path, "r", encoding="utf8") as file,
+        pytest.raises(ujson5.JSON5DecodeError),
+    ):
+        ujson5.load(file)
 
 
 @pytest.mark.parametrize(
     "path",
     example_consts.VALID_EXAMPLES,
 )
-def test_dump_load_examples(path: str, tmp_path: Path) -> None:
+def test_dump_load_from_examples(path: str, tmp_path: Path) -> None:
     """Test valid JSON5 examples."""
     with open(path, "r", encoding="utf8") as file:
         py_obj = ujson5.load(file)

@@ -2,8 +2,6 @@
 
 [Documentation](https://austinyu.github.io/ujson5/)
 
-## Feature Comparison
-
 |                 |  |
 |------------------------|--------|
 | CI/CD  | [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml) <br> [![build docs](https://github.com/austinyu/ujson5/actions/workflows/docs.yml/badge.svg)](https://github.com/austinyu/ujson5/actions/workflows/docs.yml)   |

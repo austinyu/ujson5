@@ -47,8 +47,8 @@ class JSON5DecodeError(ValueError):
         # Format the error message
         return (
             f"{self.msg}: line {self.lineno} column {self.colno} (char {self.pos})\n"
-            f"{error_line}\n"
-            f"{pointer}"
+            + f"{error_line}\n"
+            + f"{pointer}"
         )
 
 
