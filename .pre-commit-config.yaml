@@ -54,14 +54,14 @@ repos:
       - id: mypy
 
   - repo: https://github.com/PyCQA/bandit
-    rev: "1.8.2" # Update me!
+    rev: "1.8.3" # Update me!
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
         additional_dependencies: ["bandit[toml]"]
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.17.2
+    rev: v8.17.3
     hooks:
       - id: cspell # Spell check changed files
       - id: cspell # Spell check the commit message
