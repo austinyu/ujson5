@@ -66,14 +66,14 @@ Library | Language | Version | Notes
 [Boost.JSON](https://github.com/boostorg/json) | C++ | 1.80.0
 [CAJUN](https://github.com/cajun-jsonapi/cajun-jsonapi) | C++ | 2.0.3
 [C++ REST SDK](https://github.com/Microsoft/cpprestsdk) | C++11 | v2.8.0 | Need Boost on non-Windows platform. DOM strings must be UTF16 on Windows and UTF8 on non-Windows platform.
-[ccan/json](https://github.com/rustyrussell/ccan/) | C | 
+[ccan/json](https://github.com/rustyrussell/ccan/) | C |
 [cJSON](https://github.com/DaveGamble/cJSON) | C | 1.5.0 |
 [Configuru](https://github.com/emilk/Configuru) | C++ | 2015-12-18 | gcc/clang only |
-[dropbox/json11](https://github.com/dropbox/json11) | C++11 | 
-[Facil.io](https://github.com/boazsegev/facil.io) | C | 0.5.3 | 
+[dropbox/json11](https://github.com/dropbox/json11) | C++11 |
+[Facil.io](https://github.com/boazsegev/facil.io) | C | 0.5.3 |
 [FastJson](https://github.com/mikeando/fastjson) | C++ | | Not parsing number per se, so do it as post-process.
 [folly](https://github.com/facebook/folly) | C++11 | 2016.08.29.00 | Need installation |
-[gason](https://github.com/vivkin/gason) | C++11 | 
+[gason](https://github.com/vivkin/gason) | C++11 |
 [jansson](https://github.com/akheron/jansson) | C | v2.7
 [jeayeson](https://github.com/jeaye/jeayeson) | C++14
 [json-c](https://github.com/json-c/json-c) | C | 0.12.1
@@ -82,27 +82,27 @@ Library | Language | Version | Notes
 [json spirit](http://www.codeproject.com/Articles/20027/JSON-Spirit-A-C-JSON-Parser-Generator-Implemented) | C++ | 4.08 | Need Boost
 [Json Box](https://github.com/anhero/JsonBox) | C++ | 0.6.2
 [JsonCpp](https://github.com/open-source-parsers/jsoncpp) | C++ | 1.0.0
-[hjiang/JSON++](https://github.com/hjiang/jsonxx) | C++ | 
+[hjiang/JSON++](https://github.com/hjiang/jsonxx) | C++ |
 [jsmn](https://github.com/zserge/jsmn) | C | | Not parsing number per se, so do it as post-process.
 [jvar](https://github.com/YasserAsmi/jvar) | C++ | v1.0.0 | gcc/clang only |
 [Jzon](https://github.com/Zguy/Jzon) | C++ | v2-1
 [nbsdx/SimpleJSON](https://github.com/nbsdx/SimpleJSON) | C++11 |
 [Nlohmann/json](https://github.com/nlohmann/json) | C++11 | v2.0.3
-[parson](https://github.com/kgabis/parson) | C | 
+[parson](https://github.com/kgabis/parson) | C |
 [picojson](https://github.com/kazuho/picojson) | C++ | 1.3.0
 [pjson](https://github.com/ony/pjson) | C | | No numbers parsing, no DOM interface
 [POCO](https://github.com/pocoproject/poco) | C++ | 1.7.5 | Need installation |
 [qajson4c](https://github.com/USESystemEngineeringBV/qajson4c) | C | 1.0.0 | gcc/clang only |
 [Qt](http://www.qt.io/) | C++ | 5.6.1-1 | Need installation |
 [RapidJSON](https://github.com/miloyip/rapidjson) | C++ | v1.1.0 | There are four configurations: RapidJSON (default), RapidJSON_AutoUTF (transcoding any UTF JSON), RapidJSON_Insitu (*insitu* parsing) & RapidJSON_FullPrec (full precision number parsing)
-[sajson](https://github.com/chadaustin/sajson) | C++ | 
-[SimpleJSON](https://github.com/MJPA/SimpleJSON) | C++ | 
+[sajson](https://github.com/chadaustin/sajson) | C++ |
+[SimpleJSON](https://github.com/MJPA/SimpleJSON) | C++ |
 [sheredom/json.h](https://github.com/sheredom/json.h) | C | | Not parsing number per se, so do it as post-process.
 udp/json | C | 1.1.0 | Actually 2 libraries: [udp/json-parser](https://github.com/udp/json-parser) & [udp/json-builder](https://github.com/udp/json-builder).
 [taocpp/json](https://github.com/taocpp/json) | C++11 | 1.0.0-beta.7 | Uses [PEGTL](https://github.com/taocpp/PEGTL) for parsing
 [tunnuz/JSON++](https://github.com/tunnuz/json) | C++ |
 [ujson](https://bitbucket.org/awangk/ujson/) | C++ | 2015-04-12 |
-[ujson4c](https://github.com/esnme/ujson4c) | C | 
+[ujson4c](https://github.com/esnme/ujson4c) | C |
 [V8](https://github.com/v8/v8) | C++ | 5.1.281.47 | Need installation |
 [vincenthz/libjson](https://github.com/vincenthz/libjson) | C | 0.8
 [YAJL](https://github.com/lloyd/yajl) | C | 2.1.0
@@ -119,7 +119,7 @@ Besides, some libraries was tried to integrated in this benchmark but failed:
 Library   | Issue
 ----------|------------------------------
 [libjson](http://sourceforge.net/projects/libjson/) | Unable to parse UTF-8 string
-[lastjson](https://github.com/lastfm/last.json) | 
+[lastjson](https://github.com/lastfm/last.json) |
 [StiX Json](https://bitbucket.org/StiX/stix-json) |
 [boost property_tree](http://www.boost.org/doc/libs/1_60_0/doc/html/property_tree.html) | number, true, false, null types are converted into string.
 
@@ -237,7 +237,7 @@ The is the size of executable program, which parses a JSON from `stdin` to a DOM
  * [libjson](http://sourceforge.net/projects/libjson/)
  * [rapidjson](https://github.com/miloyip/rapidjson/)
  * [QJsonDocument](http://qt-project.org/doc/qt-5.0/qtcore/qjsondocument.html)
- 
+
 * [JSON Parser Benchmarking](http://chadaustin.me/2013/01/json-parser-benchmarking/) by Chad Austin (Jan 2013)
  * [sajson](https://github.com/chadaustin/sajson)
  * [RapidJSON](https://github.com/miloyip/rapidjson/)
