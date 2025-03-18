@@ -2,9 +2,10 @@
 Snapshot tests are used to test the consistency of the dump and load functions.
 """
 
-import ujson5
+import snapshots
 
-from . import snapshots
+
+import ujson5
 
 
 def dump_alpha() -> None:
@@ -85,3 +86,4 @@ def dump_alpha() -> None:
 
 if __name__ == "__main__":
     dump_alpha()
+    print("Snapshots generated successfully. 🎉")

@@ -2,7 +2,7 @@
 
 from os.path import dirname
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, Literal
 
 
 SNAPSHOTS_ROOT = Path(dirname(__file__)) / "snapshots"
@@ -24,6 +24,29 @@ class Courses(TypedDict, total=False):
     LIT101: int
 
 
+class ProjectConfig(TypedDict):
+    """A configuration for a python project."""
+
+    project_name: str
+    pkg_license: Literal["MIT", "GPL", "Apache", "BSD", "Proprietary"]
+    # build backends are used to build and distribute your project as a package
+    build_backend: (
+        Literal["Poetry-core", "Setuptools", "Hatchling", "PDM-backend", "Flit-core"]
+        | None
+    )  # This is a comment
+    # dependency managers are used to manage your project's dependencies
+    dependency_manager: Literal["poetry", "uv", "pipenv", "hatch"]
+    # static code checkers are used to check your code for errors
+    static_code_checkers: list[Literal["flake8", "mypy", "pyright", "pylint"]]
+    formatter: list[Literal["black", "ruff", "isort"]]
+    spell_checker: Literal["cspell", "codespell"] | None  # spell checkers!
+    docs: Literal["mkdocs", "sphinx"] | None
+    code_editor: Literal["vs_code"] | None  # code editors are used to edit your code
+    # pre-commit is used to run checks before committing code
+    pre_commit: bool  # a comment can also be in-line
+    cloud_code_base: Literal["github"] | None
+
+
 class Creature(TypedDict):
     """Creature"""
 
@@ -43,6 +66,7 @@ class Human(Creature):
     # human can be very intelligent
     courses: Courses  # hard-working human
     hobbies: list[str]  # hobbies takes a lot of time...
+    project: ProjectConfig
 
 
 ALPHA: Human = {
@@ -56,6 +80,19 @@ ALPHA: Human = {
         "HIS101": 70,
     },
     "hobbies": ["reading", "swimming", "coding"],
+    "project": {
+        "project_name": "Alpha's Project",
+        "pkg_license": "MIT",
+        "build_backend": "Poetry-core",
+        "dependency_manager": "poetry",
+        "static_code_checkers": ["flake8", "mypy"],
+        "formatter": ["black", "isort"],
+        "spell_checker": "cspell",
+        "docs": "mkdocs",
+        "code_editor": "vs_code",
+        "pre_commit": True,
+        "cloud_code_base": "github",
+    },
 }
 
 
