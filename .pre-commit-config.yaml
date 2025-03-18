@@ -21,12 +21,12 @@ repos:
 
   - repo: local
     hooks:
-    - id: isort
-      name: isort
-      entry: uv run isort
-      types: [python]
-      language: system
-      pass_filenames: false
+      - id: isort
+        name: isort
+        entry: uv run isort
+        types: [python]
+        language: system
+        pass_filenames: false
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
@@ -34,35 +34,32 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff
-        args: [ --fix ]
+        args: [--fix]
       # Run the formatter.
       - id: ruff-format
 
   - repo: local
     hooks:
-    - id: flake8
-      name: flake8
-      entry: uv run flake8
-      types: [python]
-      language: system
-      pass_filenames: false
-      args: [
-        src,
-        tests,
-      ]
-    - id: pylint
-      name: pylint
-      entry: pylint
-      language: system
-      types: [python]
-      require_serial: true
-      args: [
-        src,
-        tests,
-        -rn, # Only display messages
-        -sn, # Don't display the score
-        --rcfile=.pylintrc,
-      ]
+      - id: flake8
+        name: flake8
+        entry: uv run flake8
+        types: [python]
+        language: system
+        pass_filenames: false
+        args: [src, tests]
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        require_serial: true
+        args: [
+            src,
+            tests,
+            -rn, # Only display messages
+            -sn, # Don't display the score
+            --rcfile=.pylintrc,
+          ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.15.0

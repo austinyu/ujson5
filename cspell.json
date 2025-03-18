@@ -9,7 +9,7 @@
     "tests/json5_examples/*",
     "ujson5.code-workspace",
     "mkdocs.yml",
-    "Makefile",
+    "Makefile"
   ],
   "dictionaryDefinitions": [],
   "dictionaries": [],

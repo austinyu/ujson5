@@ -11,22 +11,22 @@ license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = []
 classifiers = [
-    'Development Status :: 2 - Pre-Alpha',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: Implementation :: CPython',
-    'Programming Language :: Python :: Implementation :: PyPy',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Programming Language :: Python :: 3.13',
-    'Intended Audience :: Developers',
-    'Intended Audience :: Information Technology',
-    'License :: OSI Approved :: MIT License',
-    'Operating System :: OS Independent',
-    'Topic :: Software Development :: Libraries :: Python Modules',
-    'Topic :: Internet',
+  'Development Status :: 2 - Pre-Alpha',
+  'Programming Language :: Python',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'Programming Language :: Python :: Implementation :: PyPy',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3 :: Only',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
+  'Intended Audience :: Developers',
+  'Intended Audience :: Information Technology',
+  'License :: OSI Approved :: MIT License',
+  'Operating System :: OS Independent',
+  'Topic :: Software Development :: Libraries :: Python Modules',
+  'Topic :: Internet',
 ]
 dynamic = ['version', 'readme']
 
@@ -42,41 +42,41 @@ ujson5 = "ujson5.cli:main"
 
 [dependency-groups]
 tests = [
-    "pytest",
-    "pytest-cov",
-    "pytest-benchmark",
-    "pytest-codspeed",
-    "pytest-test-groups",
+  "pytest",
+  "pytest-cov",
+  "pytest-benchmark",
+  "pytest-codspeed",
+  "pytest-test-groups",
 ]
 
 static_checkers = [
-    "pylint",
-    "mypy",
-    "flake8",
-    "flake8-simplify",
-    "flake8-mutable",
-    "flake8-print",
-    "flake8-use-fstring",
-    "flake8-builtins",
-    "flake8-functions-names",
-    "flake8-variables-names",
-    "flake8-no-implicit-concat",
+  "pylint",
+  "mypy",
+  "flake8",
+  "flake8-simplify",
+  "flake8-mutable",
+  "flake8-print",
+  "flake8-use-fstring",
+  "flake8-builtins",
+  "flake8-functions-names",
+  "flake8-variables-names",
+  "flake8-no-implicit-concat",
 ]
 
 formatters = ["ruff", "isort"]
 
 docs = [
-    "mkdocs",
-    "mkdocs-material",
-    "mkdocstrings-python",
-    "pymdown-extensions",
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings-python",
+  "pymdown-extensions",
 ]
 
 all = [
-    { include-group = "tests" },
-    { include-group = "static_checkers" },
-    { include-group = "formatters" },
-    { include-group = "docs" },
+  { include-group = "tests" },
+  { include-group = "static_checkers" },
+  { include-group = "formatters" },
+  { include-group = "docs" },
 ]
 
 [tool.uv]
@@ -89,18 +89,13 @@ source = "vcs"
 content-type = 'text/markdown'
 # construct the PyPI readme from README.md and CHANGELOG.md
 fragments = [
-    {path = 'README.md'},
-    {text = "\n## Changelog\n\n"},
-    {path = 'CHANGELOG.md', pattern = '(.+?)<!-- PyPI README description limit -->'},
+  { path = 'README.md' },
+  { text = "\n## Changelog\n\n" },
+  { path = 'CHANGELOG.md', pattern = '(.+?)<!-- PyPI README description limit -->' },
 ]
 
 [tool.hatch.build.targets.sdist]
-include = [
-    '/README.md',
-    '/CHANGELOG.md',
-    '/src',
-    '/tests',
-]
+include = ['/README.md', '/CHANGELOG.md', '/src', '/tests']
 
 [tool.bandit]
 skips = ["B101", "B311"]
