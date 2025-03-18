@@ -13,4 +13,23 @@
               "swimming",
               "coding",
        ],
+       "project": {
+              "project_name": "Alpha's Project",
+              "pkg_license": "MIT",
+              "build_backend": "Poetry-core",
+              "dependency_manager": "poetry",
+              "static_code_checkers": [
+                     "flake8",
+                     "mypy",
+              ],
+              "formatter": [
+                     "black",
+                     "isort",
+              ],
+              "spell_checker": "cspell",
+              "docs": "mkdocs",
+              "code_editor": "vs_code",
+              "pre_commit": true,
+              "cloud_code_base": "github",
+       },
 }

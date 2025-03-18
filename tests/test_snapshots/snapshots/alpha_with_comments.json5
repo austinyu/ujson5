@@ -6,10 +6,12 @@
   // age of the human
   "age": 30,  // human can be very old!
   // name of the human
-  "name": "Alpha",  // human can be very intelligent
+  "name": "Alpha",
+  // human can be very intelligent
   "courses": {
     // you can also add comments in the TypedDict
-    "CS101": 90,  // Multi-line comments are also supported
+    "CS101": 90,
+    // Multi-line comments are also supported
     // In this case, the comments in JSON5 will also be multi-line
     // The entries of dictionaries that implement this TypedDict will be commented
     "ART101": 80,
@@ -20,4 +22,27 @@
     "swimming",
     "coding",
   ],  // hobbies takes a lot of time...
+  "project": {
+    "project_name": "Alpha's Project",
+    "pkg_license": "MIT",
+    // build backends are used to build and distribute your project as a package
+    "build_backend": "Poetry-core",  // This is a comment
+    // dependency managers are used to manage your project's dependencies
+    "dependency_manager": "poetry",
+    // static code checkers are used to check your code for errors
+    "static_code_checkers": [
+      "flake8",
+      "mypy",
+    ],
+    "formatter": [
+      "black",
+      "isort",
+    ],
+    "spell_checker": "cspell",  // spell checkers!
+    "docs": "mkdocs",
+    "code_editor": "vs_code",  // code editors are used to edit your code
+    // pre-commit is used to run checks before committing code
+    "pre_commit": true,  // a comment can also be in-line
+    "cloud_code_base": "github",
+  },
 }
