@@ -1,4 +1,3 @@
-# trunk-ignore-all(checkov/CKV2_GHA_1)
 name: CI
 
 on:
@@ -8,6 +7,9 @@ on:
     branches: [main]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   develop:
@@ -40,7 +42,7 @@ jobs:
         run: |
           uv venv
           uv pip install --upgrade pip
-          uv sync --group dev
+          uv sync
 
       - name: Run pytest with coverage
         run: |
