@@ -1,17 +1,11 @@
 """Implementation of the JSON5 decoder."""
 
-from collections.abc import Callable
 import re
+from collections.abc import Callable
 from typing import Any, Literal, TextIO
 
-from .core import (
-    JsonValue,
-    JsonValuePairs,
-    JSON5DecodeError,
-    Token,
-    TOKEN_TYPE,
-)
 from .consts import ESCAPE_SEQUENCE, RESERVED_WORDS
+from .core import TOKEN_TYPE, JSON5DecodeError, JsonValue, JsonValuePairs, Token
 from .err_msg import DecoderErr
 from .lexer import tokenize
 

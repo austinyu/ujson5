@@ -2,18 +2,11 @@
 
 from random import choice, choices, randint
 
-
 import pytest
 
-from ujson5.core import JSON5DecodeError, TOKEN_TYPE
-from ujson5.lexer import (
-    tokenize_string,
-    simplify_escapes,
-)
-from ujson5.consts import (
-    ESCAPE_SEQUENCE,
-    LINE_TERMINATOR_SEQUENCE,
-)
+from ujson5.consts import ESCAPE_SEQUENCE, LINE_TERMINATOR_SEQUENCE
+from ujson5.core import TOKEN_TYPE, JSON5DecodeError
+from ujson5.lexer import simplify_escapes, tokenize_string
 
 ESCAPE_SEQUENCE_NO_NL = ESCAPE_SEQUENCE.copy()
 del ESCAPE_SEQUENCE_NO_NL["n"]

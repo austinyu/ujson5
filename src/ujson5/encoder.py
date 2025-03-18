@@ -1,16 +1,16 @@
 """Implements the JSON5Encoder class and the dumps and dump functions."""
 
-import sys
-from collections.abc import Callable, Iterable
-from typing import Any, TextIO, TypedDict, is_typeddict, Literal
-import re
 import inspect
-from warnings import warn
+import re
+import sys
 import tokenize
+from collections.abc import Callable, Iterable
 from io import StringIO
+from typing import Any, Literal, TextIO, TypedDict, is_typeddict
+from warnings import warn
 
-from .core import JSON5EncodeError
-from .err_msg import EncoderErrors
+from ujson5.core import JSON5EncodeError
+from ujson5.err_msg import EncoderErrors
 
 Serializable = dict | list | tuple | int | float | str | None | bool
 """Python objects that can be serialized to JSON5"""

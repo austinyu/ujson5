@@ -3,8 +3,10 @@
   "ignorePaths": [
     ".github/*",
     ".pre-commit-config.yaml",
-    "tests/config.json5",
+    "tests/native_json_benchmark/*",
+    "tests/json_test_suite/*",
     "tests/blns/*",
+    "tests/json5_examples/*",
     "ujson5.code-workspace",
     "mkdocs.yml",
     "Makefile",

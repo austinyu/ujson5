@@ -1,6 +1,6 @@
 """Test lexer module"""
 
-from ujson5.lexer import tokenize, TOKEN_TYPE
+from ujson5.lexer import TOKEN_TYPE, tokenize
 
 JSON5_TEXT = """{
   // comments

@@ -3,6 +3,7 @@
 # pylint: disable=C0116
 
 from typing import Any, Literal
+
 from .core import TOKEN_TYPE_MAP
 
 

@@ -4,17 +4,17 @@ and transitions. The lexer is used to tokenize JSON5 documents into tokens. The
 tokens are used by the parser to build the abstract syntax tree (AST).
 """
 
-from typing import Literal
 import re
+from typing import Literal
 
-from .core import JSON5DecodeError, Token, TokenResult, TOKEN_TYPE
+from . import consts
+from .core import TOKEN_TYPE, JSON5DecodeError, Token, TokenResult
 from .err_msg import (
     DecoderErr,
+    IdentifierDecoderErr,
     NumberDecoderErr,
     StringDecoderErr,
-    IdentifierDecoderErr,
 )
-from . import consts
 
 
 def simplify_escapes(text: str) -> str:

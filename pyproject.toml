@@ -41,7 +41,7 @@ ujson5 = "ujson5.cli:main"
 
 
 [dependency-groups]
-dev = [
+tests = [
     "pytest",
     "pytest-cov",
     "pytest-benchmark",
@@ -49,9 +49,9 @@ dev = [
     "pytest-test-groups",
 ]
 
-pylint = ["pylint"]
-
-flake8 = [
+static_checkers = [
+    "pylint",
+    "mypy",
     "flake8",
     "flake8-simplify",
     "flake8-mutable",
@@ -63,9 +63,7 @@ flake8 = [
     "flake8-no-implicit-concat",
 ]
 
-mypy = ["mypy"]
-
-black = ["black"]
+formatters = ["ruff", "isort"]
 
 docs = [
     "mkdocs",
@@ -75,11 +73,9 @@ docs = [
 ]
 
 all = [
-    { include-group = "dev" },
-    { include-group = "pylint" },
-    { include-group = "flake8" },
-    { include-group = "mypy" },
-    { include-group = "black" },
+    { include-group = "tests" },
+    { include-group = "static_checkers" },
+    { include-group = "formatters" },
     { include-group = "docs" },
 ]
 

@@ -2,21 +2,20 @@
 
 from copy import copy
 from random import choice, randint, sample
+
 import pytest
 
-from ujson5.core import JSON5DecodeError, TOKEN_TYPE
-from ujson5.lexer import (
-    tokenize_identifier,
-)
 from ujson5.consts import (
-    UNICODE_LETTERS,
+    PUNCTUATORS,
     UNICODE_COMBINING_MARKS,
-    UNICODE_DIGITS,
     UNICODE_CONNECTORS,
+    UNICODE_DIGITS,
+    UNICODE_LETTERS,
     ZWJ,
     ZWNJ,
-    PUNCTUATORS,
 )
+from ujson5.core import TOKEN_TYPE, JSON5DecodeError
+from ujson5.lexer import tokenize_identifier
 
 unicode_letters = copy(UNICODE_LETTERS)
 unicode_combining_marks = copy(UNICODE_COMBINING_MARKS)
