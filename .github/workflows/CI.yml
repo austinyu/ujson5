@@ -61,6 +61,11 @@ jobs:
           token: ${{ secrets.TRUNK_API_TOKEN }}
         continue-on-error: true
 
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@v1
+        with:
+          post-annotations: true
+
       - name: Build package
         run: |
           uv build
