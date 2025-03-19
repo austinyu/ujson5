@@ -4,6 +4,7 @@
 
 |                 |  |
 |------------------------|--------|
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/31607adec5e9461ca41f6659920803f0)](https://app.codacy.com/gh/austinyu/ujson5?utm_source=github.com&utm_medium=referral&utm_content=austinyu/ujson5&utm_campaign=Badge_Grade)
 | CI/CD  | [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml) <br> [![build docs](https://github.com/austinyu/ujson5/actions/workflows/docs.yml/badge.svg)](https://github.com/austinyu/ujson5/actions/workflows/docs.yml)   |
 | Coverage / Codspeed      | [![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5) <br>[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/austinyu/ujson5)     |
 | Package | ![PyPI - Version](https://img.shields.io/pypi/v/ujson5) <br> ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ujson5) <br> ![PyPI - License](https://img.shields.io/pypi/l/ujson5)  <br> ![PyPI - Downloads](https://img.shields.io/pypi/dm/ujson5)     |
