@@ -2,8 +2,7 @@
 
 from os.path import dirname
 from pathlib import Path
-from typing import TypedDict, Literal
-
+from typing import Literal, TypedDict
 
 SNAPSHOTS_ROOT = Path(dirname(__file__)) / "snapshots"
 DEFAULT_INDENT = 2

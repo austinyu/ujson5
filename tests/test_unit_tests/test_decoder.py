@@ -1,16 +1,15 @@
 """Tests for JSON5 parser."""
 
+from collections.abc import Callable
+from copy import copy
 from math import isnan
 from random import randint
 from typing import Any
-from collections.abc import Callable
-from copy import copy
 
 import pytest
 
 import ujson5
 from ujson5.consts import RESERVED_WORDS
-
 
 BASIC_LOADS: list[tuple[str, Any]] = [
     ("null", None),

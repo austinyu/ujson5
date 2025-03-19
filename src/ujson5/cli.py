@@ -1,13 +1,13 @@
 """CLI supports"""
 
 import argparse
-from collections.abc import Sequence
 import json
 import sys
+from collections.abc import Sequence
 
-from .__version__ import version_info, VERSION
-from .decoder import loads
+from .__version__ import VERSION, version_info
 from .core import JSON5DecodeError
+from .decoder import loads
 
 ERR_NO_TARGET: str = "No target file specified."
 ERR_TARGET_NOT_EXIST: str = "Target is not a file or does not exist."
@@ -105,7 +105,6 @@ def main(test_args: Sequence[str] | None = None) -> None:
     if args.outfile:
         print("output to", args.outfile)
         with open(args.outfile, "w", encoding="utf8") as file:
-
             json.dump(
                 json5_obj,
                 file,

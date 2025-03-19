@@ -4,7 +4,6 @@ Snapshot tests are used to test the consistency of the dump and load functions.
 
 import snapshots  # type: ignore
 
-
 import ujson5
 
 

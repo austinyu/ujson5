@@ -4,7 +4,7 @@ from random import randint
 
 import pytest
 
-from ujson5.core import JSON5DecodeError, TOKEN_TYPE
+from ujson5.core import TOKEN_TYPE, JSON5DecodeError
 from ujson5.lexer import tokenize_number
 
 number_valid_examples = [

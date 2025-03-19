@@ -7,6 +7,7 @@ re-generating the snapshots.
 import sys
 
 import pytest
+
 import ujson5
 
 from . import snapshots

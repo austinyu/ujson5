@@ -6,6 +6,7 @@ from pathlib import Path
 from random import choice
 
 import pytest
+
 import ujson5
 from ujson5 import cli
 

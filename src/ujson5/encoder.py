@@ -1,16 +1,16 @@
 """Implements the JSON5Encoder class and the dumps and dump functions."""
 
-import sys
-from collections.abc import Callable, Iterable
-from typing import Any, TextIO, TypedDict, is_typeddict, Literal
-import re
 import inspect
-from warnings import warn
+import re
+import sys
 import tokenize
+from collections.abc import Callable, Iterable
 from io import StringIO
+from typing import Any, Literal, TextIO, TypedDict, is_typeddict
+from warnings import warn
 
-from .core import JSON5EncodeError
-from .err_msg import EncoderErrors
+from ujson5.core import JSON5EncodeError
+from ujson5.err_msg import EncoderErrors
 
 Serializable = dict | list | tuple | int | float | str | None | bool
 """Python objects that can be serialized to JSON5"""
@@ -111,7 +111,8 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
 
         if sys.version_info < (3, 12):
             warn(  # pragma: no cover
-                "Comments extraction is currently only fully supported on Python 3.12+"
+                "Comments extraction is currently only fully supported on Python 3.12+",
+                stacklevel=2,
             )
         else:
             # get comments from all inherit fields from parent TypedDict
@@ -284,8 +285,7 @@ class JSON5Encoder:
         if separators is not None:
             self._item_separator, self._key_separator = separators
 
-        if default is not None:
-            setattr(self, "default", default)
+        self._default: DefaultInterface | None = default
 
         if check_circular:
             self._markers: dict[int, Any] | None = {}
@@ -364,6 +364,8 @@ class JSON5Encoder:
         Raises:
             JSON5EncodeError: If the object cannot be serialized
         """
+        if self._default is not None:
+            return self._default(obj)
         raise JSON5EncodeError(EncoderErrors.unable_to_encode(obj))
 
     def _encode_int(self, obj: int) -> str:
