@@ -1,3 +1,4 @@
+# pylint: disable=R0401
 """Test the string lexer."""
 
 from random import choice, choices, randint
