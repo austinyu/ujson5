@@ -11,8 +11,9 @@ ignore =
     # Name of the function uses load, but not uses from
     FNE004
 
-exclude = .venv
+exclude = .venv | .trunk
 
 per-file-ignores =
     #  print() is used in the code
     src/ujson5/cli.py: T201
+    tests/test_snapshots/generate_snapshots.py: T201

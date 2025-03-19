@@ -4,17 +4,17 @@ and transitions. The lexer is used to tokenize JSON5 documents into tokens. The
 tokens are used by the parser to build the abstract syntax tree (AST).
 """
 
-from typing import Literal
 import re
+from typing import Literal
 
-from .core import JSON5DecodeError, Token, TokenResult, TOKEN_TYPE
-from .err_msg import (
+from ujson5 import consts
+from ujson5.core import TOKEN_TYPE, JSON5DecodeError, Token, TokenResult
+from ujson5.err_msg import (
     DecoderErr,
+    IdentifierDecoderErr,
     NumberDecoderErr,
     StringDecoderErr,
-    IdentifierDecoderErr,
 )
-from . import consts
 
 
 def simplify_escapes(text: str) -> str:
@@ -273,7 +273,7 @@ StringState = Literal[
 
 
 def _escape_handler(buffer: str, idx: int) -> int:
-    """Handle escape sequences. There are a few case to consider:
+    r"""Handle escape sequences. There are a few case to consider:
     - Line continuation: `\\` followed by a newline character
     - Single character escape sequence: `\\` followed by a character in
       consts.ESCAPE_SEQUENCE

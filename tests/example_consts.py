@@ -1,7 +1,7 @@
 """constants related to examples from the official JSON5 test suite."""
 
-from os.path import dirname, join
 from os import listdir
+from os.path import dirname, join
 from pathlib import Path
 
 EXAMPLE_ROOT: Path = Path(dirname(__file__)) / "json5_examples"

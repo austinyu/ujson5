@@ -1,14 +1,16 @@
 """Implements the JSON5Encoder class and the dumps and dump functions."""
 
-import sys
-from collections.abc import Callable, Iterable
-from typing import Any, TextIO, TypedDict, is_typeddict, Literal
-import re
 import inspect
+import re
+import sys
+import tokenize
+from collections.abc import Callable, Iterable
+from io import StringIO
+from typing import Any, Literal, TextIO, TypedDict, is_typeddict
 from warnings import warn
 
-from .core import JSON5EncodeError
-from .err_msg import EncoderErrors
+from ujson5.core import JSON5EncodeError
+from ujson5.err_msg import EncoderErrors
 
 Serializable = dict | list | tuple | int | float | str | None | bool
 """Python objects that can be serialized to JSON5"""
@@ -86,46 +88,80 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
     Returns:
         CommentsCache: A dictionary containing comments related to each TypedDict entry
     """
-    assert is_typeddict(typed_dict_cls)
 
-    comments: CommentsCache = {}
+    def _get_comments(
+        typed_dict_cls: Any, key_path: str, comments: CommentsCache
+    ) -> CommentsCache:
+        def update_comments():
+            nonlocal comments, block_comments, inline_comment, field_name
+            comments[extend_key_path(key_path, field_name)] = {
+                "block_comments": block_comments,
+                "inline_comment": inline_comment,
+            }
+            block_comments = []
+            inline_comment = ""
+            field_name = ""
 
-    def _get_comments(typed_dict_cls: Any, key_path: str) -> None:
-        nonlocal comments
+        def is_prev_not_block_comment(idx: int) -> bool:
+            return (
+                idx > 2
+                and tokens[idx - 2].type != tokenize.COMMENT
+                or tokens[idx - 3].string != "\n"
+            )
 
         if sys.version_info < (3, 12):
             warn(  # pragma: no cover
-                "Comments extraction is currently only fully supported on Python 3.12+"
+                "Comments extraction is currently only fully supported on Python 3.12+",
+                stacklevel=2,
             )
         else:
             # get comments from all inherit fields from parent TypedDict
             for base in typed_dict_cls.__orig_bases__:
                 if is_typeddict(base):
-                    _get_comments(base, key_path)
+                    comments.update(_get_comments(base, key_path, comments))
 
         # get comments from current TypedDict
         source: str = inspect.getsource(typed_dict_cls)
-        matches: Iterable[re.Match[str]] = COMMENTS_PATTERN.finditer(source)
-        for match in matches:
-            block_comment: str = match.group("block_comment").strip()
-            name = match.group("name")
-            inline_comment: str = match.group("inline_comment") or ""
-            block_comments: list[str] = [
-                comment.strip()[1:].strip()
-                for comment in block_comment.split("\n")
-                if comment.strip()
-            ]
-            comments[extend_key_path(key_path, name)] = {
-                "block_comments": block_comments,
-                "inline_comment": inline_comment,
-            }
+        # Wrap the code in a StringIO so `tokenize` can treat it like a file
+        tokens = list(tokenize.generate_tokens(StringIO(source).readline))
+        block_comments: list[str] = []
+        inline_comment, field_name = "", ""
+        for idx, tk in enumerate(tokens):
+            if (
+                tk.type == tokenize.NAME
+                and 0 < idx < len(tokens) - 1
+                and tokens[idx - 1].string != "class"
+                and tokens[idx + 1].string == ":"
+            ):
+                if is_prev_not_block_comment(idx) and (
+                    inline_comment or block_comments
+                ):
+                    update_comments()
+                field_name = tk.string
+            if tk.type == tokenize.COMMENT:
+                if idx != 0 and tokens[idx - 1].string == "\n":  # block comment
+                    if is_prev_not_block_comment(idx) and (
+                        inline_comment or block_comments
+                    ):
+                        # first block comment
+                        update_comments()
+                    block_comments.append(tk.string.strip()[1:].strip())
+                else:  # inline comment
+                    assert not inline_comment, "Multiple inline comments found"
+                    inline_comment = tk.string.strip()[1:].strip()
         # get comments from nested TypedDict
-        for key, type_def in typed_dict_cls.__annotations__.items():
+        for name, type_def in typed_dict_cls.__annotations__.items():
             if is_typeddict(type_def):
-                _get_comments(type_def, extend_key_path(key_path, key))
+                comments.update(
+                    _get_comments(type_def, extend_key_path(key_path, name), comments)
+                )
 
-    _get_comments(typed_dict_cls, key_path="")
-    return comments
+        if block_comments or inline_comment:
+            update_comments()
+
+        return comments
+
+    return _get_comments(typed_dict_cls, key_path="", comments={})
 
 
 KeyQuotation = Literal["single", "double", "none"]
@@ -249,8 +285,7 @@ class JSON5Encoder:
         if separators is not None:
             self._item_separator, self._key_separator = separators
 
-        if default is not None:
-            setattr(self, "default", default)
+        self._default: DefaultInterface | None = default
 
         if check_circular:
             self._markers: dict[int, Any] | None = {}
@@ -310,7 +345,7 @@ class JSON5Encoder:
         """
         if is_typeddict(typed_dict_cls) and self._indent_str is not None:
             self._comments_cache = get_comments(typed_dict_cls)
-        elif typed_dict_cls is not None:
+        if typed_dict_cls is not None and not is_typeddict(typed_dict_cls):
             raise JSON5EncodeError(EncoderErrors.invalid_typed_dict(typed_dict_cls))
         return self._iterencode(obj, indent_level=0, key_path="")
 
@@ -329,6 +364,8 @@ class JSON5Encoder:
         Raises:
             JSON5EncodeError: If the object cannot be serialized
         """
+        if self._default is not None:
+            return self._default(obj)
         raise JSON5EncodeError(EncoderErrors.unable_to_encode(obj))
 
     def _encode_int(self, obj: int) -> str:

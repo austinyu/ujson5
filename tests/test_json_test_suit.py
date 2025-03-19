@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 import pytest
+
 import ujson5
 
 BASE_FOLDER = Path(os.path.dirname(__file__)) / "json_test_suite"

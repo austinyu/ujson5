@@ -1,19 +1,13 @@
 """Implementation of the JSON5 decoder."""
 
-from collections.abc import Callable
 import re
+from collections.abc import Callable
 from typing import Any, Literal, TextIO
 
-from .core import (
-    JsonValue,
-    JsonValuePairs,
-    JSON5DecodeError,
-    Token,
-    TOKEN_TYPE,
-)
-from .consts import ESCAPE_SEQUENCE, RESERVED_WORDS
-from .err_msg import DecoderErr
-from .lexer import tokenize
+from ujson5.consts import ESCAPE_SEQUENCE, RESERVED_WORDS
+from ujson5.core import TOKEN_TYPE, JSON5DecodeError, JsonValue, JsonValuePairs, Token
+from ujson5.err_msg import DecoderErr
+from ujson5.lexer import tokenize
 
 ObjectHookArg = dict[str, JsonValue]
 """Type hint for the argument of the `object_hook` function."""
@@ -26,7 +20,7 @@ ObjectPairsHook = Callable[[ObjectPairsHookArg], Any]
 
 
 class Json5Decoder:
-    """JSON5 decoder
+    r"""JSON5 decoder
 
     Performs the following translations in decoding by default:
 
@@ -465,7 +459,7 @@ class Json5Decoder:
 
     def _parse_string(self, str_str: str, json5_str: str, str_start_idx: int) -> str:
         def replace_escape_sequences_continuations(match):
-            """Unescape escape sequences, unicode escape sequence
+            r"""Unescape escape sequences, unicode escape sequence
                 and line continuations in a string.
             escape sequences replaced: `\'`, `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t`,
                 `\v`, `\0`
@@ -495,7 +489,7 @@ class Json5Decoder:
 
     def _parse_identifier(self, id_str: str) -> str:
         def replace_unicode_escape_sequences(match):
-            """Unescape unicode escape sequences in an identifier.
+            r"""Unescape unicode escape sequences in an identifier.
             unicode escape sequences replaced: `\\u` followed by 4 hexadecimal digits
             """
             return chr(int(match.group(1), 16))
@@ -521,7 +515,7 @@ def loads(
     object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
-    """Deserialize `json5_str` (a `str`, `bytes` or `bytearray` instance
+    r"""Deserialize `json5_str` (a `str`, `bytes` or `bytearray` instance
     containing a JSON document) to a Python object.
 
     Example:
@@ -599,7 +593,7 @@ def load(
     object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
 ) -> Any:
-    """Deserialize `fp` (a `.read()`-supporting file-like object containing
+    r"""Deserialize `fp` (a `.read()`-supporting file-like object containing
     a JSON document) to a Python object.
 
     Example:
