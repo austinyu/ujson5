@@ -4,28 +4,24 @@ import argparse
 import json
 import re
 import sys
-import warnings
 from datetime import date
 from pathlib import Path
 
 import requests
-
-from release.shared import (
-    REPO,
+from shared import (
+    CHANGELOG_PATH,
     GITHUB_TOKEN,
-    HISTORY_FILE,
-    PACKAGE_VERSION_FILE,
+    PACKAGE_VERSION_PATH,
+    REPO,
     run_command,
 )
-
 
 ROOT_DIR = Path(__file__).parent.parent
 
 
-def update_version(new_version: str, dry_run: bool) -> None:
+def update_version(new_version: str) -> None:
     """Update the version in the giving py version file."""
-    version_file_path = ROOT_DIR / PACKAGE_VERSION_FILE
-    with open(version_file_path, encoding="utf8") as f:
+    with open(PACKAGE_VERSION_PATH, encoding="utf8") as f:
         content = f.read()
 
     # Regex to match the VERSION assignment
@@ -34,29 +30,17 @@ def update_version(new_version: str, dry_run: bool) -> None:
     if not version_stm:
         print(
             "Could not find the version assignment in the version file."
-            'Please make sure the version file has a line like `VERSION = "1.2.3"`.'
+            'Please make sure the version file has a line like `VERSION = "v1.2.3"`.'
         )
         sys.exit(1)
     old_version = version_stm.group(3)
-    if old_version == new_version:
-        warnings.warn(
-            "The new version is the same as the old version. The script might not have any effect."
-        )
+
     old_version_stm = "".join(version_stm.groups())
     new_version_stm = old_version_stm.replace(old_version, new_version)
 
-    if dry_run:
-        print(f'Updating version in version file at "{PACKAGE_VERSION_FILE}"')
-        print("--- Before ---")
-        print(old_version_stm)
-        print("--- After ---")
-        print(new_version_stm)
-        print("Running in dry mode, lock file is not updated.")
-        return
-    with open(version_file_path, "w", encoding="utf8") as f:
+    with open(PACKAGE_VERSION_PATH, "w", encoding="utf8") as f:
         new_content = content.replace(old_version_stm, new_version_stm)
         f.write(new_content)
-    run_command("uv", "lock", "-P", "pydantic")
 
 
 def get_notes(new_version: str) -> str:
@@ -67,7 +51,7 @@ def get_notes(new_version: str) -> str:
     data = {
         "target_committish": "main",
         "previous_tag_name": last_tag,
-        "tag_name": f"v{new_version}",
+        "tag_name": new_version,
     }
     response = requests.post(
         f"https://api.github.com/repos/{REPO}/releases/generate-notes",
@@ -82,8 +66,10 @@ def get_notes(new_version: str) -> str:
     response.raise_for_status()
 
     body = response.json()["body"]
+
     body = body.replace(
-        "<!-- Release notes generated using configuration in .github/release.yml at main -->\n\n",
+        "<!-- Release notes generated using configuration "
+        + "in .github/release.yml at main -->\n\n",
         "",
     )
 
@@ -110,89 +96,41 @@ def get_notes(new_version: str) -> str:
     return body.strip()
 
 
-def update_history(new_version: str, dry_run: bool, force_update: bool) -> None:
+def update_history(new_version: str) -> None:
     """Generate release notes and prepend them to HISTORY.md."""
-    history_path = ROOT_DIR / HISTORY_FILE
-    history_content = history_path.read_text(encoding="utf8")
-
-    # use ( to avoid matching beta versions
-    if f"## v{new_version} (" in history_content and not force_update:
-        warnings.warn(
-            f"WARNING: v{new_version} already in history, {HISTORY_FILE} not updated. \n"
-            "Use --force or -f to update the history file anyway."
-        )
-        return
+    changelog_content = CHANGELOG_PATH.read_text(encoding="utf8")
 
     date_today_str = f"{date.today():%Y-%m-%d}"
-    title = f"v{new_version} ({date_today_str})"
+    title = f"{new_version} ({date_today_str})"
     notes = get_notes(new_version)
     new_chunk = (
         f"## {title}\n\n"
-        f"[GitHub release](https://github.com/{REPO}/releases/tag/v{new_version})\n\n"
+        f"[GitHub release](https://github.com/{REPO}/releases/tag/{new_version})\n\n"
         f"{notes}\n\n"
     )
-    if dry_run:
-        print(f"Would add the following to {history_path}:\n{new_chunk}")
-    history = new_chunk + history_content
+    changelog_content = new_chunk + changelog_content
 
-    if not dry_run:
-        history_path.write_text(history)
-        print(
-            f'\nSUCCESS: added "{title}" section to {history_path.relative_to(ROOT_DIR)}'
-        )
-
-    citation_path = ROOT_DIR / "CITATION.cff"
-    citation_text = citation_path.read_text()
-
-    is_release_version = not ("a" in new_version or "b" in new_version)
-    if not is_release_version:
-        version_typ = "alpha" if "a" in new_version else "beta"
-        warnings.warn(
-            f"WARNING: not updating CITATION.cff because version is {version_typ} version {new_version}"
-        )
-        return
-    else:
-        citation_text = re.sub(r"(?<=\nversion: ).*", f"v{new_version}", citation_text)
-        citation_text = re.sub(r"(?<=date-released: ).*", date_today_str, citation_text)
-    if dry_run:
-        print(
-            f"Would update version=v{new_version} and date-released={date_today_str} in "
-            f"{citation_path.relative_to(ROOT_DIR)}"
-        )
-        print(f"Updated content:\n{citation_text}")
-
-    else:
-        citation_path.write_text(citation_text)
-        print(
-            f"SUCCESS: updated version=v{new_version} and date-released={date_today_str} "
-            f"in {citation_path.relative_to(ROOT_DIR)}"
-        )
+    CHANGELOG_PATH.write_text(changelog_content)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # For easier iteration, can generate the release notes without saving
     parser.add_argument("version", help="New version number to release.")
-    parser.add_argument(
-        "-d",
-        "--dry-run",
-        help="print changes to terminal without saving to version file and the history document.",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-f",
-        "--force",
-        help="Force the update of the version and history file.",
-        action="store_true",
-    )
     args = parser.parse_args()
 
     version = args.version
-    _dry_run = args.dry_run
-    _force_update = args.force
 
-    update_version(version, _dry_run)
-    if not _dry_run:
-        print(f"Updated version to v{version} in the python version file.")
+    if not re.match(r"^v\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$", version):
+        print(
+            'Version number should be in the format "vX.Y.Z" or "vX.Y.Z-alpha".'
+            + f" New version: {version}.\n"
+        )
+        sys.exit(1)
 
-    update_history(version, _dry_run, _force_update)
+    update_version(version)
+    print(f"📄 Version file updated to {version}.")
+    run_command("uv", "lock", "-P", "ujson5")
+    print("🔒 Dependencies locked.")
+    update_history(version)
+    print(f"📜 Changelog updated with release notes for {version}.")

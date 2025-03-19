@@ -1,6 +1,7 @@
 """This module contains shared variables and functions for the release scripts."""
 
 import subprocess
+from pathlib import Path
 
 
 def run_command(*args: str) -> str:
@@ -9,7 +10,9 @@ def run_command(*args: str) -> str:
     return p.stdout.strip()
 
 
-REPO = "pydantic/pydantic"
-HISTORY_FILE = "HISTORY.md"
-PACKAGE_VERSION_FILE = "pydantic/version.py"
+REPO = "austinyu/ujson5"
+CHANGELOG_PATH = Path(__file__).parent.parent / "CHANGELOG.md"
+PACKAGE_VERSION_PATH = (
+    Path(__file__).parent.parent / "src" / "ujson5" / "__version__.py"
+)
 GITHUB_TOKEN = run_command("gh", "auth", "token")

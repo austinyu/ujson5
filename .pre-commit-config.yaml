@@ -23,7 +23,7 @@ repos:
     hooks:
       - id: isort
         name: isort
-        entry: uv run isort
+        entry: uv run isort .
         types: [python]
         language: system
         pass_filenames: false
@@ -60,17 +60,19 @@ repos:
             -sn, # Don't display the score
             --rcfile=.pylintrc,
           ]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
-    hooks:
       - id: mypy
+        name: Run mypy with uv
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+        args: [src, tests]
 
   - repo: https://github.com/PyCQA/bandit
     rev: 1.8.2
     hooks:
       - id: bandit
-        args: [-c, pyproject.toml]
+        args: [-c, bandit.yaml]
         additional_dependencies: ["bandit[toml]"]
 
   - repo: https://github.com/streetsidesoftware/cspell-cli

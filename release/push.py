@@ -1,25 +1,22 @@
 """Automate the release draft + PR creation process."""
 
 import re
-from pathlib import Path
 from subprocess import CalledProcessError
 
 import requests
-
-from release.shared import (
-    REPO,
+from shared import (
+    CHANGELOG_PATH,
     GITHUB_TOKEN,
-    HISTORY_FILE,
+    REPO,
     run_command,
 )
 
-ROOT_DIR = Path(__file__).parent.parent
 HISTORY_RELEASE_HEAD_REGEX = r"^## v(\d+\.\d+\.\d+[a-zA-Z0-9]*)\s"
 
 
 def get_latest_version_from_changelog() -> str:
     """Get the most recently listed version from the changelog."""
-    with open(ROOT_DIR / HISTORY_FILE, encoding="utf8") as f:
+    with open(CHANGELOG_PATH, encoding="utf8") as f:
         for line in f:
             match = re.match(HISTORY_RELEASE_HEAD_REGEX, line)
             if match:
@@ -29,7 +26,7 @@ def get_latest_version_from_changelog() -> str:
 
 def get_latest_release_notes_from_changelog() -> str:
     """Get the release notes for the latest version from the changelog."""
-    with open(ROOT_DIR / HISTORY_FILE, encoding="utf8") as f:
+    with open(CHANGELOG_PATH, encoding="utf8") as f:
         for line in f:
             match = re.match(HISTORY_RELEASE_HEAD_REGEX, line)
             if match:
@@ -140,14 +137,14 @@ def create_github_release_draft(rl_version: str, rl_release_notes: str):
 
 if __name__ == "__main__":
     version = get_latest_version_from_changelog()
-    release_notes = get_latest_release_notes_from_changelog()
+    RELEASE_NOTES = get_latest_release_notes_from_changelog()
 
     commit_and_push_changes(version)
     pr_url = open_pull_request(version)
     print(f"Opened PR: {pr_url}")
 
     create_version_tag(version)
-    draft_url = create_github_release_draft(version, release_notes)
+    draft_url = create_github_release_draft(version, RELEASE_NOTES)
     print(f"Release draft created: {draft_url}")
 
     print(f"SUCCESS: Completed release process for v{version}")

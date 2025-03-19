@@ -1,0 +1,3 @@
+exclude_dirs: ['release']
+
+skips: ['B101', 'B311']
