@@ -1,5 +1,18 @@
 <!-- markdownlint-disable MD024 -->
 
+## v1.0.1 (2025-03-19)
+
+[GitHub release](https://github.com/austinyu/ujson5/releases/tag/v1.0.1)
+
+### What's Changed
+
+- Makefile automation by @austinyu in [#13](https://github.com/austinyu/ujson5/pull/13)
+- Fixed incorrect comments extraction by @austinyu in [#18](https://github.com/austinyu/ujson5/pull/18)
+- Trunk quality compliance by @austinyu in [#19](https://github.com/austinyu/ujson5/pull/19)
+- Release pipeline done by @austinyu in [#21](https://github.com/austinyu/ujson5/pull/21)
+
+[**Full Changelog**](https://github.com/austinyu/ujson5/compare/v1.0.0b...v1.0.1)
+
 ## v1.0.0a (2025-03-07)
 
 [GitHub release](https://github.com/austinyu/ujson5/releases/tag/v1.0.0a)
