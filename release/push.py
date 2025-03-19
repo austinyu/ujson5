@@ -50,7 +50,9 @@ def commit_and_push_changes(rl_version: str) -> None:
     run_command("git", "checkout", "-b", branch_name)
     run_command("git", "add", "-A")
     try:
-        run_command("git", "commit", "-m", f"Bump version to v{rl_version}")
+        run_command(
+            "git", "commit", "-m", f"Bump version to v{rl_version}", "--no-verify"
+        )
     except CalledProcessError as e:
         print(
             "No changes related to version bump. Are you sure that you have run prepare.py?"
