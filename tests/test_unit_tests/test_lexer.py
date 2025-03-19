@@ -83,7 +83,7 @@ def test_lexer() -> None:
     """Test lexer"""
     results = tokenize(JSON5_TEXT)
     assert len(results) == len(tokens)
-    for result, tok in zip(results, tokens):
+    for result, tok in zip(results, tokens, strict=False):
         assert result.tk_type == tok[0]
         r_text = JSON5_TEXT[result.value[0] : result.value[1]]
         assert r_text == tok[1]
