@@ -41,6 +41,8 @@ ujson5 = "ujson5.cli:main"
 
 
 [dependency-groups]
+dev = ["requests", "types-requests"]
+
 tests = [
   "pytest",
   "pytest-cov",
@@ -73,6 +75,7 @@ docs = [
 ]
 
 all = [
+  { include-group = "dev" },
   { include-group = "tests" },
   { include-group = "static_checkers" },
   { include-group = "formatters" },
@@ -96,9 +99,6 @@ fragments = [
 
 [tool.hatch.build.targets.sdist]
 include = ['/README.md', '/CHANGELOG.md', '/src', '/tests']
-
-[tool.bandit]
-skips = ["B101", "B311"]
 
 [tool.pytest.ini_options]
 addopts = """

@@ -23,10 +23,14 @@ repos:
     hooks:
       - id: isort
         name: isort
-        entry: uv run isort
+        entry: uv run isort .
         types: [python]
         language: system
         pass_filenames: false
+      - id: trunk-fmt
+        name: trunk fmt
+        entry: trunk fmt
+        language: system
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
@@ -60,18 +64,17 @@ repos:
             -sn, # Don't display the score
             --rcfile=.pylintrc,
           ]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
-    hooks:
       - id: mypy
-
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.2
-    hooks:
-      - id: bandit
-        args: [-c, pyproject.toml]
-        additional_dependencies: ["bandit[toml]"]
+        name: Run mypy with uv
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+        args: [src, tests]
+      - id: trunk
+        name: Run trunk checks
+        entry: trunk check
+        language: system
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v8.17.2
