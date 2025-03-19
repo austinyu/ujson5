@@ -1,5 +1,7 @@
 """Automate the release draft + PR creation process."""
 
+# mypy: disable-error-code="import-untyped"
+
 import re
 from subprocess import CalledProcessError
 

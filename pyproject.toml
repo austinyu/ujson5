@@ -41,10 +41,7 @@ ujson5 = "ujson5.cli:main"
 
 
 [dependency-groups]
-dev = [
-  "requests",
-  "types-requests",
-]
+dev = ["requests", "types-requests"]
 
 tests = [
   "pytest",

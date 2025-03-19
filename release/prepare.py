@@ -1,5 +1,7 @@
 """Automate the version bump and changelog update process."""
 
+# mypy: disable-error-code="import-untyped"
+
 import argparse
 import json
 import re
