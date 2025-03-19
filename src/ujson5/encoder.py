@@ -285,8 +285,7 @@ class JSON5Encoder:
         if separators is not None:
             self._item_separator, self._key_separator = separators
 
-        if default is not None:
-            self._default: DefaultInterface | None = default
+        self._default: DefaultInterface | None = default
 
         if check_circular:
             self._markers: dict[int, Any] | None = {}
