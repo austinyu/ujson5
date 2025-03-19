@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD024 -->
+
 ## v1.0.0a (2025-03-07)
 
 [GitHub release](https://github.com/austinyu/ujson5/releases/tag/v1.0.0a)
@@ -12,6 +14,6 @@
 
 - @austinyu made their first contribution in https://github.com/austinyu/ujson5/pull/7
 
-**Full Changelog**: https://github.com/austinyu/ujson5/compare/v1.0.0...v1.0.0a
+[**Full Changelog**](https://github.com/austinyu/ujson5/compare/v1.0.0...v1.0.0a)
 
 <!-- PyPI README description limit -->

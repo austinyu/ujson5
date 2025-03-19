@@ -15,12 +15,13 @@
 2. Curate the changes in CHANGELOG.md:
    - mark any breaking changes with `**Breaking Change:**`
    - deduplicate the `packaging` entries to include only the most recent version bumps for each package
-3. Run `uv run release/push.py` from the root of the repository. This will:
+3. Run `trunk fmt` to format CHANGELOG.md.
+4. Run `uv run release/push.py` from the root of the repository. This will:
    - Create a PR with the changes you made in the previous steps.
    - Add a label to the PR to indicate that it's a release PR.
    - Open a draft release on GitHub with the changes you made in the previous steps.
-4. Review the PR and merge it.
-5. Publish the release and wait for the CI to finish building and publishing the new version.
+5. Review the PR and merge it.
+6. Publish the release and wait for the CI to finish building and publishing the new version.
 
 ## Manual Release Process
 

@@ -21,13 +21,22 @@ from shared import (
 ROOT_DIR = Path(__file__).parent.parent
 
 
-def update_version(new_version: str) -> None:
-    """Update the version in the giving py version file."""
+def update_version(new_version: str) -> str:
+    """Update the version in the giving py version file.
+    Note that both the arg `new_version` and the version in the file should be in the format
+    "X.Y.Z" without the leading "v". The leading "v" will be added automatically.
+
+    Args:
+        new_version (str): The new version to set.
+
+    Returns:
+        str: The old version.
+    """
     with open(PACKAGE_VERSION_PATH, encoding="utf8") as f:
         content = f.read()
 
     # Regex to match the VERSION assignment
-    pattern = r"(VERSION\s*=\s*)([\'\"])([^\"^\']+)([\'\"])"
+    pattern = r"(VERSION\s*=\s*)([\'\"])(v[^\"^\']+)([\'\"])"
     version_stm = re.search(pattern, content)
     if not version_stm:
         print(
@@ -36,17 +45,24 @@ def update_version(new_version: str) -> None:
         )
         sys.exit(1)
     old_version = version_stm.group(3)
-
     old_version_stm = "".join(version_stm.groups())
-    new_version_stm = old_version_stm.replace(old_version, new_version)
-
+    new_version_stm = old_version_stm.replace(old_version, f"v{new_version}")
     with open(PACKAGE_VERSION_PATH, "w", encoding="utf8") as f:
         new_content = content.replace(old_version_stm, new_version_stm)
         f.write(new_content)
+    return old_version[1:]  # Remove the leading "v" from the version string
 
 
 def get_notes(new_version: str) -> str:
-    """Fetch auto-generated release notes from github."""
+    """Fetch auto-generated release notes from github.
+
+    Args:
+        new_version (str): The new version to set. Version without the leading "v".
+
+    Returns:
+        str: The release notes.
+    """
+    new_version = f"v{new_version}"
     last_tag = run_command("git", "describe", "--tags", "--abbrev=0")
     auth_token = GITHUB_TOKEN
 
@@ -98,21 +114,33 @@ def get_notes(new_version: str) -> str:
     return body.strip()
 
 
-def update_history(new_version: str) -> None:
-    """Generate release notes and prepend them to HISTORY.md."""
+def update_changelog(old_version: str, new_version: str) -> None:
+    """Generate release notes and prepend them to HISTORY.md.
+    Both versions should be in the format "X.Y.Z" without the leading "v".
+
+    Args:
+        old_version (str): The old version.
+        new_version (str): The new version to set.
+    """
     changelog_content = CHANGELOG_PATH.read_text(encoding="utf8")
 
     date_today_str = f"{date.today():%Y-%m-%d}"
-    title = f"{new_version} ({date_today_str})"
+    title = f"v{new_version} ({date_today_str})"
     notes = get_notes(new_version)
     new_chunk = (
+        "<!-- markdownlint-disable MD024 -->\n\n"
         f"## {title}\n\n"
-        f"[GitHub release](https://github.com/{REPO}/releases/tag/{new_version})\n\n"
+        f"[GitHub release](https://github.com/{REPO}/releases/tag/v{new_version})\n\n"
         f"{notes}\n\n"
+        "[**Full Changelog**](https://github.com/austinyu/ujson5/compare"
+        f"/v{old_version}...v{new_version})\n\n"
     )
-    changelog_content = new_chunk + changelog_content
 
+    fst_new_line = changelog_content.find("\n")
+    changelog_content = new_chunk + changelog_content[fst_new_line + 1 :]
     CHANGELOG_PATH.write_text(changelog_content)
+
+    run_command("pre-commit", "run", "trunk-fmt")
 
 
 if __name__ == "__main__":
@@ -123,16 +151,16 @@ if __name__ == "__main__":
 
     version = args.version
 
-    if not re.match(r"^v\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$", version):
+    if not re.match(r"^\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$", version):
         print(
             'Version number should be in the format "vX.Y.Z" or "vX.Y.Z-alpha".'
             + f" New version: {version}.\n"
         )
         sys.exit(1)
 
-    update_version(version)
-    print(f"📄 Version file updated to {version}.")
+    old_v = update_version(version)
+    print(f"📄 Version file updated to v{version}.")
     run_command("uv", "lock", "-P", "ujson5")
     print("🔒 Dependencies locked.")
-    update_history(version)
-    print(f"📜 Changelog updated with release notes for {version}.")
+    update_changelog(old_v, version)
+    print(f"📜 Changelog updated with release notes for v{version}.")
