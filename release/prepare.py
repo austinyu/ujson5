@@ -21,6 +21,15 @@ from shared import (
 ROOT_DIR = Path(__file__).parent.parent
 
 
+def get_previous_version() -> str:
+    """Get the latest git tag from the repository."""
+    tags = run_command("git", "tag").splitlines()
+    if not tags:
+        print("No git tags found. Please ensure the repository has tags.")
+        sys.exit(1)
+    return tags[-1].lstrip("v")  # Remove the leading "v" if present
+
+
 def update_version(new_version: str) -> str:
     """Update the version in the giving py version file.
     Note that both the arg `new_version` and the version in the file should be in the format
@@ -153,12 +162,12 @@ if __name__ == "__main__":
 
     if not re.match(r"^\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$", version):
         print(
-            'Version number should be in the format "vX.Y.Z" or "vX.Y.Z-alpha".'
+            'Version number should be in the format "X.Y.Z" or "X.Y.Z-alpha".'
             + f" New version: {version}.\n"
         )
         sys.exit(1)
 
-    old_v = update_version(version)
+    old_v = get_previous_version()
     print(f"📄 Version file updated to v{version}.")
     run_command("uv", "lock", "-P", "ujson5")
     print("🔒 Dependencies locked.")

@@ -2,6 +2,23 @@
 
 from typing import Literal, NamedTuple
 
+from ._version import __version__
+
+
+def version_info() -> str:
+    """Return complete version information for ujson5 and its dependencies."""
+    import platform  # pylint: disable=C0415
+    import sys  # pylint: disable=C0415
+
+    info = {
+        "ujson5 version": __version__,
+        "python version": sys.version,
+        "platform": platform.platform(),
+    }
+    info = {k: str(v).replace("\n", " ") for k, v in info.items()}
+    return "\n".join(f"{k}: {v}" for k, v in info.items())
+
+
 JsonValue = dict | list | int | float | str | None | bool
 """Type hint for JSON5 values."""
 JsonValuePairs = list[tuple[str, JsonValue]]
