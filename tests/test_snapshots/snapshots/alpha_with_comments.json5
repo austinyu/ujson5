@@ -45,4 +45,10 @@
     "pre_commit": true,  // a comment can also be in-line
     "cloud_code_base": "github",
   },
+  "prop": {
+    // Property of the house
+    "house": "Alpha's House",  // house name
+    // Property of the car
+    "car": "Alpha's Car",  // car name, can be None
+  },  // property of the human
 }

@@ -31,5 +31,9 @@
     "code_editor": "vs_code",
     "pre_commit": true,
     "cloud_code_base": "github"
+  },
+  "prop": {
+    "house": "Alpha's House",
+    "car": "Alpha's Car"
   }
 }
