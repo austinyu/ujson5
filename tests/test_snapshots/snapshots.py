@@ -55,6 +55,13 @@ class Creature(TypedDict):
     weight: int
 
 
+class Property(TypedDict):  # pylint: disable=C0115
+    # Property of the house
+    house: str  # house name
+    # Property of the car
+    car: str | None  # car name, can be None
+
+
 class Human(Creature):
     """Human"""
 
@@ -66,6 +73,7 @@ class Human(Creature):
     courses: Courses  # hard-working human
     hobbies: list[str]  # hobbies takes a lot of time...
     project: ProjectConfig
+    prop: Property  # property of the human
 
 
 ALPHA: Human = {
@@ -91,6 +99,10 @@ ALPHA: Human = {
         "code_editor": "vs_code",
         "pre_commit": True,
         "cloud_code_base": "github",
+    },
+    "prop": {
+        "house": "Alpha's House",
+        "car": "Alpha's Car",
     },
 }
 

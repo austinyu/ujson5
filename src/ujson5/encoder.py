@@ -46,7 +46,7 @@ for i in range(0x20):
 
 COMMENTS_PATTERN = re.compile(
     r"(?P<block_comment>(?: *# *.+? *\n)*)"
-    + r" *(?P<name>\w+): *(?P<type>[^ ]+) *(?:# *(?P<inline_comment>.+))?\n"
+    + r" *(?P<name>\w+): *(?P<type>[^#^\n]+) *(?:# *(?P<inline_comment>.+))?\n"
 )
 
 
@@ -103,6 +103,15 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
             field_name = ""
 
         def is_prev_not_block_comment(idx: int) -> bool:
+            # for first indented line in a block, INDENT is a token, but for all the following
+            # lines, indent is not tokenized.
+            if idx > 1 and tokens[idx - 1].type == tokenize.INDENT:
+                # first indented line in a block
+                return (
+                    idx > 3
+                    and tokens[idx - 3].type != tokenize.COMMENT
+                    or tokens[idx - 4].string != "\n"
+                )
             return (
                 idx > 2
                 and tokens[idx - 2].type != tokenize.COMMENT

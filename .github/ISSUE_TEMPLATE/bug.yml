@@ -5,7 +5,7 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value:  Thank you for contributing to ujson5!
+      value: Thank you for contributing to ujson5!
 
   - type: textarea
     id: description
@@ -43,7 +43,7 @@ body:
         Please run the following command and copy the output below:
 
         ```bash
-        python -c "import ujson5.__version__; print(ujson5.__version__.version_info())"
+        python -c "import ujson5; print(ujson5.version_info())"
         ```
       render: Text
     validations:
