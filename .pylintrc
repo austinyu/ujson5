@@ -8,6 +8,9 @@ source-roots=
     src/ujson5
     tests
 
+ignore=
+    _version.py,  # version file
+
 [MESSAGES CONTROL]
 # Disable the following messages:
 disable=

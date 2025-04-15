@@ -18,7 +18,7 @@ def test_cli_version(arg: str) -> None:
     """Test version output."""
     with redirect_stdout(io.StringIO()) as f:
         cli.main([arg])
-    assert f.getvalue().strip() == ujson5.version
+    assert f.getvalue().strip() == ujson5.__version__
 
 
 @pytest.mark.parametrize("arg", ["--info", "-i"])

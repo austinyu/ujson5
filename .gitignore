@@ -27,3 +27,5 @@ site/*
 .venv/*
 .benchmarks/*
 .codspeed/*
+
+_version.py

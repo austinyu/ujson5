@@ -100,6 +100,9 @@ fragments = [
 [tool.hatch.build.targets.sdist]
 include = ['/README.md', '/CHANGELOG.md', '/src', '/tests']
 
+[tool.hatch.build.hooks.vcs]
+version-file = "src/ujson5/_version.py"
+
 [tool.pytest.ini_options]
 addopts = """
     --cov .

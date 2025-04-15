@@ -5,8 +5,8 @@ import json
 import sys
 from collections.abc import Sequence
 
-from .__version__ import VERSION, version_info
-from .core import JSON5DecodeError
+from ._version import __version__
+from .core import JSON5DecodeError, version_info
 from .decoder import loads
 
 ERR_NO_TARGET: str = "No target file specified."
@@ -74,7 +74,7 @@ def main(test_args: Sequence[str] | None = None) -> None:
         print(version_info())
         return
     if args.version:
-        print(VERSION)
+        print(__version__)
         return
     if args.infile is None and sys.stdin.isatty():
         print(ERR_NO_TARGET)
