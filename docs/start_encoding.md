@@ -29,22 +29,22 @@ print(serialized)
 ## Comments Extraction
 
 !!! warning
-    Comment extraction is currently only fully supported on Python 3.12+. On older
-    versions, the function will still work but will not extract all comments from the
-    parent TypedDicts.
+Comment extraction is currently only fully supported on Python 3.12+. On older
+versions, the function will still work but will not extract all comments from the
+parent TypedDicts.
 
 !!! Note
-    Comments will only be extracted and added when `indent` argument to [dumps][ujson5.dumps], [dump][ujson5.dump] or [JSON5Encoder][ujson5.encoder.JSON5Encoder] is set to a non-`None` value. Because if `indent` is `None`, the output will be a single line string and comments will not be added.
+Comments will only be extracted and added when `indent` argument to [dumps][ujson5.dumps], [dump][ujson5.dump] or [JSON5Encoder][ujson5.encoder.JSON5Encoder] is set to a non-`None` value. Because if `indent` is `None`, the output will be a single line string and comments will not be added.
 
 JSON5 supports adding comments to the data using the `//` and `/* */` syntax. These comments are ignored during the parsing process. Here is an example:
 
 ```json
 {
-    // Single line comment
-    "key": "value",
-    /* Multi-line
+  // Single line comment
+  "key": "value",
+  /* Multi-line
     comment */
-    "key2": "value2"
+  "key2": "value2"
 }
 ```
 
@@ -70,7 +70,7 @@ class Courses(TypedDict, total=False):
 
 
 my_courses = Courses(CS101=1, ART101=2, HIS101=3)
-serialized = ujson5.dumps(my_courses, typed_dict_cls=Courses, indent=4)
+serialized = ujson5.dumps(my_courses, Courses, indent=4)
 print(serialized)
 # {
 #     // you can also add comments in the TypedDict
@@ -146,7 +146,7 @@ bob: Human = {
     "hobbies": ["reading", "swimming", "coding"],
 }
 
-bob_str: str = ujson5.dumps(bob, typed_dict_cls=Human, indent=4)
+bob_str: str = ujson5.dumps(bob, Human, indent=4)
 print(bob_str)
 # {
 #     "height": 180,  // height of the creature
@@ -187,7 +187,7 @@ jack: Human = {
     "hobbies": ["tennis", "writing", "coding"],
 }
 
-jack_str: str = ujson5.dumps(jack, typed_dict_cls=Human, indent=4)
+jack_str: str = ujson5.dumps(jack, Human, indent=4)
 print(jack_str)
 # {
 #     "height": 170,  // height of the creature
@@ -218,4 +218,4 @@ print(jack_str)
 ```
 
 !!! View full API
-    Checkout the [API Reference](api_reference/encoder.md) for more details on decoding.
+Checkout the [API Reference](api_reference/encoder.md) for more details on decoding.

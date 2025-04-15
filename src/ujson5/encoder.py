@@ -74,23 +74,23 @@ def extend_key_path(base_path: str, key: str) -> str:
     return f"{base_path}/{key}"
 
 
-def get_comments(typed_dict_cls: Any) -> CommentsCache:
-    """Extract comments from a TypedDict class
+def get_comments(data_model: Any) -> CommentsCache:
+    """Extract comments from a data model class
 
     Warning:
         Comments extraction is currently only fully supported on Python 3.12+. On older
         versions, the function will still work but will not extract all comments from the
-        parent TypedDicts.
+        parent data models.
 
     Args:
-        typed_dict_cls: The TypedDict class
+        data_model: Class based data model (e.g. TypedDict, dataclass, etc.)
 
     Returns:
-        CommentsCache: A dictionary containing comments related to each TypedDict entry
+        CommentsCache: A dictionary containing comments related to each data model entry
     """
 
     def _get_comments(
-        typed_dict_cls: Any, key_path: str, comments: CommentsCache
+        data_model: Any, key_path: str, comments: CommentsCache
     ) -> CommentsCache:
         def update_comments():
             nonlocal comments, block_comments, inline_comment, field_name
@@ -124,13 +124,14 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
                 stacklevel=2,
             )
         else:
-            # get comments from all inherit fields from parent TypedDict
-            for base in typed_dict_cls.__orig_bases__:
-                if is_typeddict(base):
-                    comments.update(_get_comments(base, key_path, comments))
+            # get comments from all inherit fields from parent data model
+            if is_typeddict(data_model):
+                for base in data_model.__orig_bases__:
+                    if is_typeddict(base):
+                        comments.update(_get_comments(base, key_path, comments))
 
-        # get comments from current TypedDict
-        source: str = inspect.getsource(typed_dict_cls)
+        # get comments from current data model
+        source: str = inspect.getsource(data_model)
         # Wrap the code in a StringIO so `tokenize` can treat it like a file
         tokens = list(tokenize.generate_tokens(StringIO(source).readline))
         block_comments: list[str] = []
@@ -158,9 +159,9 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
                 else:  # inline comment
                     assert not inline_comment, "Multiple inline comments found"
                     inline_comment = tk.string.strip()[1:].strip()
-        # get comments from nested TypedDict
-        for name, type_def in typed_dict_cls.__annotations__.items():
-            if is_typeddict(type_def):
+        # get comments from nested class based data models
+        for name, type_def in data_model.__annotations__.items():
+            if inspect.isclass(type_def) and type_def.__module__ != "builtins":
                 comments.update(
                     _get_comments(type_def, extend_key_path(key_path, name), comments)
                 )
@@ -170,7 +171,7 @@ def get_comments(typed_dict_cls: Any) -> CommentsCache:
 
         return comments
 
-    return _get_comments(typed_dict_cls, key_path="", comments={})
+    return _get_comments(data_model, key_path="", comments={})
 
 
 KeyQuotation = Literal["single", "double", "none"]
@@ -210,7 +211,7 @@ class JSON5Encoder:
     !!! warning
         Comment extraction is currently only fully supported on Python 3.12+. On older
         versions, the function will still work but will not extract all comments from the
-        parent TypedDicts.
+        parent data model.
 
     Example:
     ```python
@@ -303,23 +304,36 @@ class JSON5Encoder:
 
         self._comments_cache: CommentsCache = {}
 
-    def encode(self, obj: Any, typed_dict_cls: Any | None = None) -> str:
+    def _is_valid_data_model(self, data_model: Any) -> bool:
+        """Check if the data model is a user defined class
+
+        Args:
+            data_model: A class based data model (e.g. TypedDict, dataclass, etc.)
+
+        Returns:
+            bool: True if the data model is a user defined class, False otherwise
+        """
+        if data_model is None:
+            return True
+        return inspect.isclass(data_model) and data_model.__module__ != "builtins"
+
+    def encode(self, obj: Any, data_model: Any | None = None) -> str:
         """Return a JSON5 string representation of a Python object.
 
         Args:
             obj: The Python object to be serialized
-            typed_dict_cls: A TypedDict class that will be used to extract comments from
-                the TypedDict entries. Defaults to None.
+            data_model: A class based data model (e.g. TypedDict, dataclass, etc.) that
+                will be used to extract comments. Defaults to None.
 
         Returns:
             str: The JSON5 string representation of the Python object
 
         Raises:
-            JSON5EncodeError: If the TypedDict class is not a TypedDict subclass or if the
+            JSON5EncodeError: If the data model class is not a user defined class or if the
                 object cannot be serialized
         """
-        if typed_dict_cls is not None and not is_typeddict(typed_dict_cls):
-            raise JSON5EncodeError(EncoderErrors.invalid_typed_dict(typed_dict_cls))
+        if not self._is_valid_data_model(data_model):
+            raise JSON5EncodeError(EncoderErrors.invalid_data_model(data_model))
         if isinstance(obj, str):
             return self._encode_str(obj)
         if isinstance(obj, bool):
@@ -331,31 +345,32 @@ class JSON5Encoder:
         if obj is None:
             return "null"
 
-        chunks = self.iterencode(obj, typed_dict_cls)
+        chunks = self.iterencode(obj, data_model)
         if not isinstance(chunks, (list, tuple)):
             chunks = list(chunks)
         return "".join(chunks)
 
-    def iterencode(self, obj: Any, typed_dict_cls: Any | None = None) -> Iterable[str]:
+    def iterencode(self, obj: Any, data_model: Any | None = None) -> Iterable[str]:
         """Encode the given object and yield each part of the JSON5 string representation
 
         Args:
             obj: The Python object to be serialized
-            typed_dict_cls: A TypedDict class that will be used to extract comments from
-                the TypedDict entries. Defaults to None.
+            data_model: A class based data model (e.g. TypedDict, dataclass, etc.) that
+                will be used to extract comments. Defaults to None.
 
         Returns:
             Iterable[str]: An iterable of strings representing the JSON5 serialization of the
                 Python object
 
         Raises:
-            JSON5EncodeError: If the TypedDict class is not a TypedDict subclass or if the
+            JSON5EncodeError: If the data model class is not a user defined class or if the
                 object cannot be serialized
         """
-        if is_typeddict(typed_dict_cls) and self._indent_str is not None:
-            self._comments_cache = get_comments(typed_dict_cls)
-        if typed_dict_cls is not None and not is_typeddict(typed_dict_cls):
-            raise JSON5EncodeError(EncoderErrors.invalid_typed_dict(typed_dict_cls))
+        if not self._is_valid_data_model(data_model):
+            raise JSON5EncodeError(EncoderErrors.invalid_data_model(data_model))
+        if data_model is not None and self._indent_str is not None:
+            self._comments_cache = get_comments(data_model)
+
         return self._iterencode(obj, indent_level=0, key_path="")
 
     def default(self, obj: Any) -> Serializable:
@@ -600,7 +615,7 @@ _default_encoder = JSON5Encoder(
 
 def dumps(
     obj: Any,
-    typed_dict_cls: Any | None = None,
+    data_model: Any | None = None,
     *,
     cls: type[JSON5Encoder] | None = None,
     default: DefaultInterface | None = None,
@@ -624,7 +639,7 @@ def dumps(
     # Output: '{"name": "John", "age": 123, "hobbies": ["tennis", "reading"]}'
     ```
 
-    All arguments except `obj` and `typed_dict_cls` are keyword-only arguments.
+    All arguments except `obj` and `data_model` are keyword-only arguments.
 
     Args:
         cls: The encoder class to be used. a custom [`JSON5Encoder`][ujson5.JSON5Encoder]
@@ -675,7 +690,7 @@ def dumps(
         and key_quotation == "double"
         and trailing_comma is None
     ):
-        return _default_encoder.encode(obj, typed_dict_cls)
+        return _default_encoder.encode(obj, data_model)
     if cls is None:
         cls = JSON5Encoder
     return cls(
@@ -689,13 +704,13 @@ def dumps(
         sort_keys=sort_keys,
         key_quotation=key_quotation,
         trailing_comma=trailing_comma,
-    ).encode(obj, typed_dict_cls)
+    ).encode(obj, data_model)
 
 
 def dump(
     obj: Any,
     fp: TextIO,
-    typed_dict_cls: Any | None = None,
+    data_model: Any | None = None,
     *,
     skip_keys: bool = False,
     ensure_ascii: bool = True,
@@ -769,7 +784,7 @@ def dump(
         and key_quotation == "double"
         and trailing_comma is None
     ):
-        iterable = _default_encoder.iterencode(obj, typed_dict_cls)
+        iterable = _default_encoder.iterencode(obj, data_model)
     else:
         if cls is None:
             cls = JSON5Encoder
@@ -784,7 +799,7 @@ def dump(
             sort_keys=sort_keys,
             key_quotation=key_quotation,
             trailing_comma=trailing_comma,
-        ).iterencode(obj, typed_dict_cls)
+        ).iterencode(obj, data_model)
     for chunk in iterable:
         fp.write(chunk)
     fp.write("\n")

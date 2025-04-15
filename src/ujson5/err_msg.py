@@ -179,5 +179,5 @@ class EncoderErrors:
         return f"Object of type {obj.__class__.__name__} is not JSON serializable"
 
     @staticmethod
-    def invalid_typed_dict(obj: Any) -> str:
-        return f"Object of type {obj.__class__.__name__} is not a TypedDict"
+    def invalid_data_model(obj: Any) -> str:
+        return f"Object of type {obj.__class__.__name__} is not a valid data model"

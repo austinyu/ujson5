@@ -226,16 +226,16 @@ def test_replace_ascii(py_obj: str, json5_str: str) -> None:
     assert ujson5.dumps(py_obj, ensure_ascii=True) == json5_str
 
 
-def test_invalid_typed_dict_cls(tmp_path: Path) -> None:
+def test_invalid_data_models(tmp_path: Path) -> None:
     """Test raise when TypedDict class is not valid."""
     with pytest.raises(ujson5.JSON5EncodeError):
-        ujson5.dumps({}, typed_dict_cls=int)
+        ujson5.dumps({}, int)
 
     with (
         pytest.raises(ujson5.JSON5EncodeError),
         open(tmp_path / "dump.json5", "w", encoding="utf8") as file,
     ):
-        ujson5.dump({}, file, typed_dict_cls=int)
+        ujson5.dump({}, file, int)
 
 
 def test_quoted_key() -> None:
