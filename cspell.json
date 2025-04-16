@@ -9,7 +9,8 @@
     "tests/json5_examples/*",
     "ujson5.code-workspace",
     "mkdocs.yml",
-    "Makefile"
+    "Makefile",
+    ".coveragerc"
   ],
   "dictionaryDefinitions": [],
   "dictionaries": [],
@@ -24,6 +25,7 @@
     "citm",
     "codespell",
     "codspeed",
+    "coveragerc",
     "crossrefs",
     "docstrings",
     "elif",
@@ -44,6 +46,7 @@
     "nosetests",
     "pipx",
     "pycache",
+    "pydantic",
     "pyjp",
     "pylint",
     "pymdown",

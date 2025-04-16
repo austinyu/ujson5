@@ -49,6 +49,7 @@ tests = [
   "pytest-benchmark",
   "pytest-codspeed",
   "pytest-test-groups",
+  "pydantic>=2.11.3",
 ]
 
 static_checkers = [
@@ -102,16 +103,3 @@ include = ['/README.md', '/CHANGELOG.md', '/src', '/tests']
 
 [tool.hatch.build.hooks.vcs]
 version-file = "src/ujson5/_version.py"
-
-[tool.pytest.ini_options]
-addopts = """
-    --cov .
-    --cov-report xml:tests/.coverage/cov.xml
-    --cov-report html:tests/.coverage/html
-"""
-
-[tool.coverage.report]
-exclude_also = ['pytest.skip', 'if sys.version_info < (3, 12): ']
-
-[tool.coverage.run]
-omit = ["tests/test_snapshots/generate_snapshots.py", "tests/test_benchmark.py"]

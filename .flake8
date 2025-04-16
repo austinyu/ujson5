@@ -9,7 +9,9 @@ ignore =
     # Missing type annotation for self in method
     ANN101,
     # Name of the function uses load, but not uses from
-    FNE004
+    FNE004,
+    # Name of functions ends with it's first argument name
+    FNE008
 
 exclude = .venv | .trunk
 

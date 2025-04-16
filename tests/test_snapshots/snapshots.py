@@ -2,7 +2,10 @@
 
 from os.path import dirname
 from pathlib import Path
-from typing import Literal, TypedDict
+from typing import Annotated, Literal, TypedDict
+
+from annotated_types import Ge, Gt
+from pydantic import BaseModel
 
 SNAPSHOTS_ROOT = Path(dirname(__file__)) / "snapshots"
 DEFAULT_INDENT = 2
@@ -76,7 +79,7 @@ class Human(Creature):
     prop: Property  # property of the human
 
 
-ALPHA: Human = {
+COMPOSITE_EXAMPLE: Human = {
     "height": 180,
     "weight": 70,
     "age": 30,
@@ -107,13 +110,49 @@ ALPHA: Human = {
 }
 
 
+class CameraSlice(BaseModel):
+    """CameraSlice"""
+
+    # name of the current camera, `camera_obj.device_info.name`
+    name: str
+    # id of the current camera, `camera_obj.device_info.id`
+    camera_id: str
+    # exposure time in seconds
+    exposure_in_s: Annotated[float, Gt(0)]
+    # gain without normalization
+    gain: float
+    # binning value, (horizontal, vertical)
+    binning: tuple[Annotated[float, Gt(0)], Annotated[float, Gt(0)]]
+    trigger_mode: int
+    number_of_frames_per_burst: int
+    # bit depth of the captured image (8, 12, 14, 16)
+    bit_depth: Annotated[float, Gt(0)]
+    # offset without normalization
+    offset: Annotated[float, Ge(0)]
+    readout_speed: int  # readout speed is not supported by all cameras
+
+
+PYDANTIC_EXAMPLE = CameraSlice(
+    name="Point Camera",
+    camera_id="Point Camera ID",
+    exposure_in_s=0.1,
+    gain=1.0,
+    binning=(2, 2),
+    trigger_mode=1,
+    number_of_frames_per_burst=10,
+    bit_depth=16,
+    offset=0.0,
+    readout_speed=1000,
+)
+
 SNAPSHOT_NAMES: dict[str, str] = {
-    "alpha_default": "alpha_default.json5",
-    "alpha_with_comments": "alpha_with_comments.json5",
-    "alpha_no_comments": "alpha_no_comments.json5",
-    "alpha_no_indent": "alpha_no_indent.json5",
-    "alpha_7_indent": "alpha_7_indent.json5",
-    "alpha_special_separators": "alpha_special_separators.json5",
-    "alpha_with_trailing_comma": "alpha_with_trailing_comma.json5",
-    "alpha_no_trailing_comma": "alpha_no_trailing_comma.json5",
+    "composite_example_default": "composite_example_default.json5",
+    "composite_example_with_comments": "composite_example_with_comments.json5",
+    "composite_example_no_comments": "composite_example_no_comments.json5",
+    "composite_example_no_indent": "composite_example_no_indent.json5",
+    "composite_example_7_indent": "composite_example_7_indent.json5",
+    "composite_example_special_separators": "composite_example_special_separators.json5",
+    "composite_example_with_trailing_comma": "composite_example_with_trailing_comma.json5",
+    "composite_example_no_trailing_comma": "composite_example_no_trailing_comma.json5",
+    "pydantic_example": "pydantic_example.json5",
 }

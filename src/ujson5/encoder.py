@@ -74,6 +74,23 @@ def extend_key_path(base_path: str, key: str) -> str:
     return f"{base_path}/{key}"
 
 
+def is_valid_data_model(data_model: Any) -> bool:
+    """Check if the data model is a user defined class
+
+    Args:
+        data_model: A class based data model (e.g. TypedDict, dataclass, etc.)
+
+    Returns:
+        bool: True if the data model is a user defined class, False otherwise
+    """
+    if data_model is None:
+        return True
+    try:
+        return bool(data_model.__annotations__)
+    except AttributeError:
+        return False
+
+
 def get_comments(data_model: Any) -> CommentsCache:
     """Extract comments from a data model class
 
@@ -161,7 +178,7 @@ def get_comments(data_model: Any) -> CommentsCache:
                     inline_comment = tk.string.strip()[1:].strip()
         # get comments from nested class based data models
         for name, type_def in data_model.__annotations__.items():
-            if inspect.isclass(type_def) and type_def.__module__ != "builtins":
+            if is_valid_data_model(type_def):
                 comments.update(
                     _get_comments(type_def, extend_key_path(key_path, name), comments)
                 )
@@ -304,19 +321,6 @@ class JSON5Encoder:
 
         self._comments_cache: CommentsCache = {}
 
-    def _is_valid_data_model(self, data_model: Any) -> bool:
-        """Check if the data model is a user defined class
-
-        Args:
-            data_model: A class based data model (e.g. TypedDict, dataclass, etc.)
-
-        Returns:
-            bool: True if the data model is a user defined class, False otherwise
-        """
-        if data_model is None:
-            return True
-        return inspect.isclass(data_model) and data_model.__module__ != "builtins"
-
     def encode(self, obj: Any, data_model: Any | None = None) -> str:
         """Return a JSON5 string representation of a Python object.
 
@@ -332,7 +336,7 @@ class JSON5Encoder:
             JSON5EncodeError: If the data model class is not a user defined class or if the
                 object cannot be serialized
         """
-        if not self._is_valid_data_model(data_model):
+        if not is_valid_data_model(data_model):
             raise JSON5EncodeError(EncoderErrors.invalid_data_model(data_model))
         if isinstance(obj, str):
             return self._encode_str(obj)
@@ -346,8 +350,6 @@ class JSON5Encoder:
             return "null"
 
         chunks = self.iterencode(obj, data_model)
-        if not isinstance(chunks, (list, tuple)):
-            chunks = list(chunks)
         return "".join(chunks)
 
     def iterencode(self, obj: Any, data_model: Any | None = None) -> Iterable[str]:
@@ -366,7 +368,7 @@ class JSON5Encoder:
             JSON5EncodeError: If the data model class is not a user defined class or if the
                 object cannot be serialized
         """
-        if not self._is_valid_data_model(data_model):
+        if not is_valid_data_model(data_model):
             raise JSON5EncodeError(EncoderErrors.invalid_data_model(data_model))
         if data_model is not None and self._indent_str is not None:
             self._comments_cache = get_comments(data_model)

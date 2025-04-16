@@ -1,0 +1,22 @@
+{
+  // name of the current camera, `camera_obj.device_info.name`
+  "name": "Point Camera",
+  // id of the current camera, `camera_obj.device_info.id`
+  "camera_id": "Point Camera ID",
+  // exposure time in seconds
+  "exposure_in_s": 0.1,
+  // gain without normalization
+  "gain": 1.0,
+  // binning value, (horizontal, vertical)
+  "binning": [
+    2.0,
+    2.0,
+  ],
+  "trigger_mode": 1,
+  "number_of_frames_per_burst": 10,
+  // bit depth of the captured image (8, 12, 14, 16)
+  "bit_depth": 16.0,
+  // offset without normalization
+  "offset": 0.0,
+  "readout_speed": 1000,  // readout speed is not supported by all cameras
+}
