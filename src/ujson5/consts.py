@@ -2,6 +2,10 @@
 
 import unicodedata
 
+Serializable = dict | list | tuple | int | float | str | None | bool
+"""Python objects that can be serialized to JSON5"""
+
+
 PUNCTUATORS = {
     "{",
     "}",

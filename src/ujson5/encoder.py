@@ -9,11 +9,9 @@ from io import StringIO
 from typing import Any, Literal, TextIO, TypedDict, is_typeddict
 from warnings import warn
 
+from ujson5.consts import Serializable
 from ujson5.core import JSON5EncodeError
 from ujson5.err_msg import EncoderErrors
-
-Serializable = dict | list | tuple | int | float | str | None | bool
-"""Python objects that can be serialized to JSON5"""
 
 DefaultInterface = (
     Callable[[Any], dict]
@@ -321,7 +319,7 @@ class JSON5Encoder:
 
         self._comments_cache: CommentsCache = {}
 
-    def encode(self, obj: Any, data_model: Any | None = None) -> str:
+    def encode(self, obj: Serializable, data_model: Any | None = None) -> str:
         """Return a JSON5 string representation of a Python object.
 
         Args:
@@ -352,7 +350,9 @@ class JSON5Encoder:
         chunks = self.iterencode(obj, data_model)
         return "".join(chunks)
 
-    def iterencode(self, obj: Any, data_model: Any | None = None) -> Iterable[str]:
+    def iterencode(
+        self, obj: Serializable, data_model: Any | None = None
+    ) -> Iterable[str]:
         """Encode the given object and yield each part of the JSON5 string representation
 
         Args:
@@ -616,7 +616,7 @@ _default_encoder = JSON5Encoder(
 
 
 def dumps(
-    obj: Any,
+    obj: Serializable,
     data_model: Any | None = None,
     *,
     cls: type[JSON5Encoder] | None = None,
@@ -644,6 +644,10 @@ def dumps(
     All arguments except `obj` and `data_model` are keyword-only arguments.
 
     Args:
+        obj: The Python object to be serialized. Supported types are dict, list, tuple,
+                int, float, str, None, and bool.
+        data_model: A class based data model (e.g. TypedDict, dataclass, etc.) that will be
+            used for comments extraction. Defaults to None.
         cls: The encoder class to be used. a custom [`JSON5Encoder`][ujson5.JSON5Encoder]
             subclass (e.g. one that overrides the [`.default()`][ujson5.JSON5Encoder.default]
             method to serialize additional types) can be provided. If None, the default
@@ -710,7 +714,7 @@ def dumps(
 
 
 def dump(
-    obj: Any,
+    obj: Serializable,
     fp: TextIO,
     data_model: Any | None = None,
     *,
@@ -738,6 +742,10 @@ def dump(
     ```
 
     Args:
+        obj: The Python object to be serialized. Supported types are dict, list, tuple,
+                int, float, str, None, and bool.
+        data_model: A class based data model (e.g. TypedDict, dataclass, etc.) that will be
+            used for comments extraction. Defaults to None.
         cls: The encoder class to be used. a custom [`JSON5Encoder`][ujson5.JSON5Encoder]
             subclass (e.g. one that overrides the [`.default()`][ujson5.JSON5Encoder.default]
             method to serialize additional types) can be provided. If None, the default

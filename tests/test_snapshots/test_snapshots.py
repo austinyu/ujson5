@@ -5,6 +5,7 @@ re-generating the snapshots.
 """
 
 import sys
+from dataclasses import asdict
 
 import pytest
 
@@ -34,7 +35,7 @@ def test_composite_default():
         "r",
         encoding="utf8",
     ) as file:
-        assert ujson5.dumps(snapshots.COMPOSITE_EXAMPLE) == file.read().strip()
+        assert ujson5.dumps(dict(snapshots.COMPOSITE_EXAMPLE)) == file.read().strip()
 
 
 def test_composite_with_comments():
@@ -51,7 +52,7 @@ def test_composite_with_comments():
     ) as file:
         assert (
             ujson5.dumps(
-                snapshots.COMPOSITE_EXAMPLE,
+                dict(snapshots.COMPOSITE_EXAMPLE),
                 snapshots.Human,
                 indent=snapshots.DEFAULT_INDENT,
             )
@@ -68,7 +69,9 @@ def test_composite_no_comments():
         encoding="utf8",
     ) as file:
         assert (
-            ujson5.dumps(snapshots.COMPOSITE_EXAMPLE, indent=snapshots.DEFAULT_INDENT)
+            ujson5.dumps(
+                dict(snapshots.COMPOSITE_EXAMPLE), indent=snapshots.DEFAULT_INDENT
+            )
             == file.read().strip()
         )
 
@@ -81,7 +84,7 @@ def test_composite_no_indent():
         "r",
         encoding="utf8",
     ) as file:
-        assert ujson5.dumps(snapshots.COMPOSITE_EXAMPLE) == file.read().strip()
+        assert ujson5.dumps(dict(snapshots.COMPOSITE_EXAMPLE)) == file.read().strip()
 
 
 def test_composite_7_indent():
@@ -93,7 +96,8 @@ def test_composite_7_indent():
         encoding="utf8",
     ) as file:
         assert (
-            ujson5.dumps(snapshots.COMPOSITE_EXAMPLE, indent=7) == file.read().strip()
+            ujson5.dumps(dict(snapshots.COMPOSITE_EXAMPLE), indent=7)
+            == file.read().strip()
         )
 
 
@@ -107,7 +111,7 @@ def test_composite_special_separators():
     ) as file:
         assert (
             ujson5.dumps(
-                snapshots.COMPOSITE_EXAMPLE,
+                dict(snapshots.COMPOSITE_EXAMPLE),
                 indent=snapshots.DEFAULT_INDENT,
                 separators=("|", "->"),
             )
@@ -125,7 +129,7 @@ def test_composite_with_trailing_comma():
     ) as file:
         assert (
             ujson5.dumps(
-                snapshots.COMPOSITE_EXAMPLE,
+                dict(snapshots.COMPOSITE_EXAMPLE),
                 indent=snapshots.DEFAULT_INDENT,
                 trailing_comma=True,
             )
@@ -143,7 +147,7 @@ def test_composite_no_trailing_comma():
     ) as file:
         assert (
             ujson5.dumps(
-                snapshots.COMPOSITE_EXAMPLE,
+                dict(snapshots.COMPOSITE_EXAMPLE),
                 indent=snapshots.DEFAULT_INDENT,
                 trailing_comma=False,
             )
@@ -162,6 +166,23 @@ def test_pydantic_example():
             ujson5.dumps(
                 snapshots.PYDANTIC_EXAMPLE.model_dump(),
                 snapshots.CameraSlice,
+                indent=snapshots.DEFAULT_INDENT,
+            )
+            == file.read().strip()
+        )
+
+
+def test_dataclass_example():
+    """Test dumping data class example."""
+    with open(
+        snapshots.SNAPSHOTS_ROOT / snapshots.SNAPSHOT_NAMES["dataclass_example"],
+        "r",
+        encoding="utf8",
+    ) as file:
+        assert (
+            ujson5.dumps(
+                asdict(snapshots.DATA_CLASS_EXAMPLE),
+                snapshots.Snapshot,
                 indent=snapshots.DEFAULT_INDENT,
             )
             == file.read().strip()

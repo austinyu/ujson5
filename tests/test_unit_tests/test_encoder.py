@@ -166,10 +166,10 @@ def test_circular_ref() -> None:
     subset = Custom(1)
     subset.value = subset
     with pytest.raises(ujson5.JSON5EncodeError):
-        ujson5.dumps(subset, default=lambda v: v.value)
+        ujson5.dumps(subset, default=lambda v: v.value)  # type: ignore
 
     subset = Custom(1)
-    ujson5.dumps(subset, default=lambda v: v.value, check_circular=False)
+    ujson5.dumps(subset, default=lambda v: v.value, check_circular=False)  # type: ignore
 
 
 def test_sort_keys() -> None:
@@ -182,7 +182,7 @@ def test_sort_keys() -> None:
 def test_default_set() -> None:
     """Test default set."""
     py_set = set([1, 2, 3])
-    ujson5.dumps(py_set, default=list)
+    ujson5.dumps(py_set, default=list)  # type: ignore
 
     py_lst = [1, 2, 3, set([1, 2, 3])]
     ujson5.dumps(py_lst, default=list)

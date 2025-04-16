@@ -2,6 +2,8 @@
 Snapshot tests are used to test the consistency of the dump and load functions.
 """
 
+from dataclasses import asdict
+
 import snapshots  # type: ignore
 
 import ujson5
@@ -15,7 +17,7 @@ def dump_composite_examples() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        ujson5.dump(snapshots.COMPOSITE_EXAMPLE, file)
+        ujson5.dump(dict(snapshots.COMPOSITE_EXAMPLE), file)
 
     with open(
         snapshots.SNAPSHOTS_ROOT
@@ -24,7 +26,7 @@ def dump_composite_examples() -> None:
         encoding="utf8",
     ) as file:
         ujson5.dump(
-            snapshots.COMPOSITE_EXAMPLE,
+            dict(snapshots.COMPOSITE_EXAMPLE),
             file,
             snapshots.Human,
             indent=snapshots.DEFAULT_INDENT,
@@ -35,7 +37,9 @@ def dump_composite_examples() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        ujson5.dump(snapshots.COMPOSITE_EXAMPLE, file, indent=snapshots.DEFAULT_INDENT)
+        ujson5.dump(
+            dict(snapshots.COMPOSITE_EXAMPLE), file, indent=snapshots.DEFAULT_INDENT
+        )
 
     with open(
         snapshots.SNAPSHOTS_ROOT
@@ -43,7 +47,7 @@ def dump_composite_examples() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        ujson5.dump(snapshots.COMPOSITE_EXAMPLE, file)
+        ujson5.dump(dict(snapshots.COMPOSITE_EXAMPLE), file)
 
     with open(
         snapshots.SNAPSHOTS_ROOT
@@ -51,7 +55,7 @@ def dump_composite_examples() -> None:
         "w",
         encoding="utf8",
     ) as file:
-        ujson5.dump(snapshots.COMPOSITE_EXAMPLE, file, indent=7)
+        ujson5.dump(dict(snapshots.COMPOSITE_EXAMPLE), file, indent=7)
 
     with open(
         snapshots.SNAPSHOTS_ROOT
@@ -60,7 +64,7 @@ def dump_composite_examples() -> None:
         encoding="utf8",
     ) as file:
         ujson5.dump(
-            snapshots.COMPOSITE_EXAMPLE,
+            dict(snapshots.COMPOSITE_EXAMPLE),
             file,
             indent=snapshots.DEFAULT_INDENT,
             separators=("|", "->"),
@@ -73,7 +77,7 @@ def dump_composite_examples() -> None:
         encoding="utf8",
     ) as file:
         ujson5.dump(
-            snapshots.COMPOSITE_EXAMPLE,
+            dict(snapshots.COMPOSITE_EXAMPLE),
             file,
             indent=snapshots.DEFAULT_INDENT,
             trailing_comma=True,
@@ -86,7 +90,7 @@ def dump_composite_examples() -> None:
         encoding="utf8",
     ) as file:
         ujson5.dump(
-            snapshots.COMPOSITE_EXAMPLE,
+            dict(snapshots.COMPOSITE_EXAMPLE),
             file,
             indent=snapshots.DEFAULT_INDENT,
             trailing_comma=False,
@@ -108,8 +112,24 @@ def dump_pydantic_examples() -> None:
         )
 
 
+def dump_dataclass_examples() -> None:
+    """Dump json5 for dataclass obj."""
+    with open(
+        snapshots.SNAPSHOTS_ROOT / snapshots.SNAPSHOT_NAMES["dataclass_example"],
+        "w",
+        encoding="utf8",
+    ) as file:
+        ujson5.dump(
+            asdict(snapshots.DATA_CLASS_EXAMPLE),
+            file,
+            snapshots.Snapshot,
+            indent=snapshots.DEFAULT_INDENT,
+        )
+
+
 if __name__ == "__main__":
     snapshots.SNAPSHOTS_ROOT.mkdir(exist_ok=True)
     dump_composite_examples()
     dump_pydantic_examples()
+    dump_dataclass_examples()
     print("Snapshots generated successfully. 🎉")

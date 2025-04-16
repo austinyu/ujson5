@@ -1,5 +1,6 @@
 """Snapshots for testing."""
 
+from dataclasses import dataclass
 from os.path import dirname
 from pathlib import Path
 from typing import Annotated, Literal, TypedDict
@@ -145,6 +146,26 @@ PYDANTIC_EXAMPLE = CameraSlice(
     readout_speed=1000,
 )
 
+
+@dataclass
+class Snapshot:
+    """Snapshot"""
+
+    # name of the snapshot
+    name: str  # this is a comment
+    description: str  # this is a comment
+    # type of the snapshot
+    filename: str
+    validated: bool
+
+
+DATA_CLASS_EXAMPLE = Snapshot(
+    name="data_class",
+    description="data_class's snapshot",
+    filename="data_class.json5",
+    validated=True,
+)
+
 SNAPSHOT_NAMES: dict[str, str] = {
     "composite_example_default": "composite_example_default.json5",
     "composite_example_with_comments": "composite_example_with_comments.json5",
@@ -155,4 +176,5 @@ SNAPSHOT_NAMES: dict[str, str] = {
     "composite_example_with_trailing_comma": "composite_example_with_trailing_comma.json5",
     "composite_example_no_trailing_comma": "composite_example_no_trailing_comma.json5",
     "pydantic_example": "pydantic_example.json5",
+    "dataclass_example": "data_class_example.json5",
 }

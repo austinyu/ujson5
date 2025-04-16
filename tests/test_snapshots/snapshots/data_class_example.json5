@@ -1,0 +1,8 @@
+{
+  // name of the snapshot
+  "name": "data_class",  // this is a comment
+  "description": "data_class's snapshot",  // this is a comment
+  // type of the snapshot
+  "filename": "data_class.json5",
+  "validated": true,
+}

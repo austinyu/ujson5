@@ -63,7 +63,7 @@ def test_basic_loads_raw(json5: str, py_value: Any) -> None:
         if not isnan(py_value):
             assert loaded == py_value
         else:
-            assert isnan(loaded)
+            assert isnan(loaded)  # type: ignore
     except TypeError:
         assert loaded == py_value
     assert idx == str_len

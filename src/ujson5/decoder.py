@@ -4,7 +4,7 @@ import re
 from collections.abc import Callable
 from typing import Any, Literal, TextIO
 
-from ujson5.consts import ESCAPE_SEQUENCE, RESERVED_WORDS
+from ujson5.consts import ESCAPE_SEQUENCE, RESERVED_WORDS, Serializable
 from ujson5.core import TOKEN_TYPE, JSON5DecodeError, JsonValue, JsonValuePairs, Token
 from ujson5.err_msg import DecoderErr
 from ujson5.lexer import tokenize
@@ -95,7 +95,7 @@ class Json5Decoder:
         self._strict: bool = strict
         self._object_pairs_hook: ObjectPairsHook | None = object_pairs_hook
 
-    def decode(self, json5_str: str) -> Any:
+    def decode(self, json5_str: str) -> Serializable:
         """Deserialize a JSON5 string to a Python object.
 
         Args:
@@ -110,7 +110,7 @@ class Json5Decoder:
         tokens = tokenize(json5_str)
         return self._parse_json5(json5_str, tokens)
 
-    def raw_decode(self, json5_str: str) -> tuple[Any, int]:
+    def raw_decode(self, json5_str: str) -> tuple[Serializable, int]:
         """Deserialize a JSON5 string to a Python object and return the index of the last
         character parsed.
 
@@ -514,7 +514,7 @@ def loads(
     allow_reserved_words: bool = True,
     object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
-) -> Any:
+) -> Serializable:
     r"""Deserialize `json5_str` (a `str`, `bytes` or `bytearray` instance
     containing a JSON document) to a Python object.
 
@@ -592,7 +592,7 @@ def load(
     allow_reserved_words: bool = True,
     object_hook: ObjectHook | None = None,
     object_pairs_hook: ObjectPairsHook | None = None,
-) -> Any:
+) -> Serializable:
     r"""Deserialize `fp` (a `.read()`-supporting file-like object containing
     a JSON document) to a Python object.
 
