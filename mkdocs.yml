@@ -4,27 +4,27 @@ site_url: https://austinyu.github.io/ujson5/
 theme:
   name: material
   palette:
-  - media: "(prefers-color-scheme)"
-    scheme: default
-    primary: orange
-    accent: amber
-    toggle:
-      icon: material/weather-sunny
-      name: "Switch to light mode"
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: orange
-    accent: amber
-    toggle:
-      icon: material/weather-night
-      name: "Switch to dark mode"
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: orange
-    accent: amber
-    toggle:
-      icon: material/lightbulb-auto-outline
-      name: "Switch to system preference"
+    - media: "(prefers-color-scheme)"
+      scheme: default
+      primary: orange
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: "Switch to light mode"
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: orange
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: "Switch to dark mode"
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: orange
+      accent: amber
+      toggle:
+        icon: material/lightbulb-auto-outline
+        name: "Switch to system preference"
   features:
     - content.tabs.link
     - content.code.annotate
@@ -46,49 +46,52 @@ repo_name: austinyu/ujson5
 repo_url: https://github.com/austinyu/ujson5
 
 plugins:
-- mkdocstrings:
-    handlers:
-      python:
-        paths: [src]
-        options:
-          docstring_style: google
-          members_order: source
-          separate_signature: true
-          filters: ["!^_"]
-          docstring_options:
-            ignore_init_summary: true
-          merge_init_into_class: true
-          show_signature_annotations: true
-          signature_crossrefs: true
-        inventories:
-          - url: https://docs.python.org/3/objects.inv
-            domains: [py, std]
-- search
-
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            members_order: source
+            separate_signature: true
+            filters: ["!^_"]
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+          inventories:
+            - url: https://docs.python.org/3/objects.inv
+              domains: [py, std]
+  - search
 
 markdown_extensions:
-- tables
-- toc:
-    permalink: true
-    title: Page contents
-- admonition
-- pymdownx.details
-- pymdownx.superfences
-- pymdownx.highlight:
-    pygments_lang_class: true
-- pymdownx.extra
-- pymdownx.tabbed:
-    alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+      title: Page contents
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.extra
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
 
 nav:
-- Home:
-  - Welcome to ujson5: index.md
-  - Quick Start Encoding: start_encoding.md
-  - Quick Start Decoding: start_decoding.md
-  - Contributing: contributing.md
-- API Reference:
-  - Core: api_reference/core.md
-  - Decoder: api_reference/decoder.md
-  - Encoder: api_reference/encoder.md
-- About:
-  - About ujson5: about.md
+  - Home:
+      - Welcome to ujson5: index.md
+      - Quick Start Encoding: start_encoding.md
+      - Quick Start Decoding: start_decoding.md
+      - Contributing: contributing.md
+  - API Reference:
+      - Core: api_reference/core.md
+      - Decoder: api_reference/decoder.md
+      - Encoder: api_reference/encoder.md
+  - About:
+      - About ujson5: about.md

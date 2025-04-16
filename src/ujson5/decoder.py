@@ -606,7 +606,7 @@ def load(
     All arguments except `file` are keyword-only.
 
     Args:
-        file: A file-like object containing a JSON document.
+        input_file: A file-like object containing a JSON document.
         cls: If specified, must be a [`Json5Decoder`][ujson5.Json5Decoder] subclass. The `cls`
             will be used to instantiate the decoder. If `cls` is not specified, the default
             `Json5Decoder` will be used.

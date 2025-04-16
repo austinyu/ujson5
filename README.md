@@ -2,13 +2,12 @@
 
 [Documentation](https://austinyu.github.io/ujson5/)
 
-|                 |  |
-|------------------------|--------|
-| CI/CD  | [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml) <br> [![build docs](https://github.com/austinyu/ujson5/actions/workflows/docs.yml/badge.svg)](https://github.com/austinyu/ujson5/actions/workflows/docs.yml)   |
-| Coverage / Codspeed      | [![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5) <br>[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/austinyu/ujson5)     |
-| Package | ![PyPI - Version](https://img.shields.io/pypi/v/ujson5) <br> ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ujson5) <br> ![PyPI - License](https://img.shields.io/pypi/l/ujson5)  <br> ![PyPI - Downloads](https://img.shields.io/pypi/dm/ujson5)     |
-| Meta  | [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) <br> [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) <br> [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](http://mypy-lang.org/) |
-
+|                     |                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI/CD               | [![CI](https://github.com/austinyu/ujson5/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/austinyu/ujson5/actions/workflows/CI.yml) <br> [![build docs](https://github.com/austinyu/ujson5/actions/workflows/docs.yml/badge.svg)](https://github.com/austinyu/ujson5/actions/workflows/docs.yml)                                                             |
+| Coverage / Codspeed | [![codecov](https://codecov.io/gh/austinyu/ujson5/graph/badge.svg?token=YLMVKROAF2)](https://codecov.io/gh/austinyu/ujson5) <br>[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/austinyu/ujson5)                                                                                                                     |
+| Package             | ![PyPI - Version](https://img.shields.io/pypi/v/ujson5) <br> ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ujson5) <br> ![PyPI - License](https://img.shields.io/pypi/l/ujson5) <br> ![PyPI - Downloads](https://img.shields.io/pypi/dm/ujson5)                                                                                                                |
+| Meta                | [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) <br> [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) <br> [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](http://mypy-lang.org/) |
 
 `ujson5` is a Python that encodes and decodes [JSON5](https://json5.org/), a superset of JSON that supports many human-friendly features such as comments, trailing commas, and more!
 
@@ -32,7 +31,6 @@ like **macOS** and **iOS**.
 
 - **Gentle learning curve** - If you know how to use the `json` module in Python, you already know how to use `ujson5`. `ujson5` API is almost identical to the `json` module with some additional features.
 - **Robust test suite** - `ujson5` is tested against the most famous JSON5 test suite to ensure compatibility. See the testing section for more information.
-- **Speed** - `ujson5` tokenizer and parser implement DFA-based algorithms for fast parsing, which is only slightly slower than the built-in `json` module.
 - **Pythonic** - Comments in python are directly encoded into JSON5 comments. Magic!
 - **Quality code base** - `ujson5` is linted with `flake8`, formatted with `black`, and type-checked with `mypy`. What's more? 100% test coverage with `pytest` and `codecov`!
 - **Friendly Error Messages** - `ujson5` provides detailed error messages to help you debug your JSON5 files, including the exact location of the error.
@@ -43,7 +41,6 @@ like **macOS** and **iOS**.
 ```bash
 pip install ujson5
 ```
-
 
 ## Quick Start
 
@@ -81,6 +78,14 @@ print(json5_str)
 #   "key": "value",  // inline comment
 # }
 
+```
+
+Comments extraction works for all class based data models (e.g. `TypedDict`, `dataclass`, `pydantic.BaseModel` etc.). Basically everything that defines a `__annotations__` attribute like this way:
+
+```python
+class Data(SomeDataModelClass):
+    key: str
+    attribute: int
 ```
 
 ## CLI Usage

@@ -58,7 +58,8 @@
     "ujson",
     "venv",
     "virtualenvs",
-    "ZWNJ"
+    "ZWNJ",
+    "dataclass"
   ],
   "ignoreWords": [],
   "import": []

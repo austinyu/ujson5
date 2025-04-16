@@ -5,7 +5,6 @@
 When using [load][ujson5.load] or [loads][ujson5.loads] functions, you can either pass in parameters or pass in a subclass of [JSON5Decoder][ujson5.decoder.Json5Decoder] to customize the deserialization process. When passing in the `object_hook` or `pairs_hook` parameter, you can exploit types exposed by the `ujson5` module to enforce type checking. Here is an example:
 `ujson5` provides some useful type variables that will help you to enforce type checking when writing object hook functions. Here is an example:
 
-
 ```python
 import ujson5
 
@@ -39,5 +38,5 @@ assert deserialized == {"key": "value", "key2": "value2", "count": 2}
 
 ```
 
-!!! View full API
-    Checkout the [API Reference](api_reference/decoder.md) for more details on decoding.
+!!! API
+Checkout the [API Reference](api_reference/decoder.md) for more details on decoding.

@@ -31,7 +31,7 @@ print(serialized)
 !!! warning
 Comment extraction is currently only fully supported on Python 3.12+. On older
 versions, the function will still work but will not extract all comments from the
-parent TypedDicts.
+parent data models.
 
 !!! Note
 Comments will only be extracted and added when `indent` argument to [dumps][ujson5.dumps], [dump][ujson5.dump] or [JSON5Encoder][ujson5.encoder.JSON5Encoder] is set to a non-`None` value. Because if `indent` is `None`, the output will be a single line string and comments will not be added.
@@ -49,6 +49,14 @@ JSON5 supports adding comments to the data using the `//` and `/* */` syntax. Th
 ```
 
 `ujson5` makes it easy to encode python objects with comments to json5 strings with comments.
+
+Comments extraction works for all class based data models (e.g. `TypedDict`, `dataclass`, `pydantic.BaseModel` etc.). Basically everything that defines a `__annotations__` attribute like this way:
+
+```python
+class Data(SomeDataModelClass):
+    key: str
+    attribute: int
+```
 
 Here is an example to show how it works.
 
@@ -86,7 +94,7 @@ As mentioned in the [official JSON5 website](https://json5.org/):
 
 > JSON5 is an extension to the popular JSON file format that aims to be easier to write and maintain by hand (e.g. for config files).
 
-Comments extraction is a very handy feature if you are going to use `TypeDict` to validate your config files. Just make sure to comment your `TypeDict` attributes and `ujson5` will take care of propagating your comments to the JSON5 output so that you can easily maintain your config files.
+Comments extraction is a very handy feature if you are going to use class based data model to represent your config files. Just make sure to comment your class based data model attributes and `ujson5` will take care of propagating your comments to the JSON5 output so that you can easily maintain your config files.
 
 Here is a more complex example involving composite and inherited TypedDicts:
 
@@ -217,5 +225,5 @@ print(jack_str)
 # }
 ```
 
-!!! View full API
+!!! API
 Checkout the [API Reference](api_reference/encoder.md) for more details on decoding.
